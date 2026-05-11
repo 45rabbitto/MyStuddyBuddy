@@ -1,0 +1,146 @@
+
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# API Keys & Secrets
+secrets.properties
+api_keys.properties
+keystore.properties
+google-services.json
+google-services.json.old
+firebase-debug.log
+*.jks
+*.keystore
+*.key
+
+# Android Studio files
+/.idea/deploymentTargetSelector.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/migrations.xml
+/.idea/kotlinc.xml
+/.idea/compiler.xml
+/.idea/jarRepositories.xml
+/.idea/misc.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/gradle.xml
+*.hprof
+*.iws
+*.ipr
+.idea/codeStyles/
+.idea/runConfigurations.xml
+.idea/shelf/
+.idea/dictionaries/
+
+# Build outputs
+*/build/
+*/*/build/
+app/build/
+release/
+outputs/
+*.apk
+*.aab
+
+# Logs & Reports
+*.log
+*.lock
+reports/
+test-output/
+test-results/
+hs_err_pid*
+*.hprof
+
+# Backup files
+*.bak
+*.tmp
+*.swp
+*.~lock.*
+*~
+~$*
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Module files
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.db-journal
+
+# Proguard
+proguard/
+proguard-project.txt
+proguard-usage.txt
+proguard-mapping.txt
+proguard-seeds.txt
+
+# Document uploads temporary
+app/src/main/assets/temp/
+app/src/main/assets/uploads/
+*.pdf.tmp
+*.docx.tmp
+
+# User data
+user_data/
+preferences/
+user_profiles/
+
+# Kotlin
+.kotlin/
+.kotlin-compiler-1.9.xml
+.klib/
+
+# Compose
+compose.log
+compose_compiler/
+
+# Gradle
+.gradle/
+gradle-app.setting
+gradle-wrapper.properties (jika ada credential)
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+
+# Keystore files untuk signing APK
+*.jks
+*.keystore
+debug.keystore
+key.properties
+signing.properties
+
+# Environment variables file
+.env
+.env.local
+.env.production
+.env.development
+
+# Cache
+.cache/
+*.cache
+.cache-main
+.cache-tests
