@@ -35,12 +35,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/poppins"
-        android:text="Username"
-        android:textSize="16dp"
-        android:textColor="@color/dark_text"
         android:layout_marginTop="30dp"
-        android:paddingStart="5dp" />
+        android:fontFamily="@font/poppins"
+        android:paddingStart="5dp"
+        android:text="Username"
+        android:textColor="@color/dark_text"
+        android:textSize="16dp" />
 
     <EditText
         android:id="@+id/etEmail"
