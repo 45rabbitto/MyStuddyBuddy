@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/abu_muda"
+    android:background="@drawable/bg_gradient"
     android:padding="20dp">
 
     <!-- Greeting -->
@@ -44,10 +44,144 @@
         android:layout_marginTop="-20dp"
         android:textColor="@color/dark_text"/>
 
-    <ImageView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/kontainer"
+        android:padding="12dp">
+
+        <ImageView
+            android:layout_width="400dp"
+            android:layout_height="250dp"
+            android:clipToOutline="true"
+            android:src="@drawable/dashboard" />
+
+        <LinearLayout
+            android:id="@+id/streakContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:background="@drawable/button_line"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/api"
+                android:contentDescription="Streak Icon"/>
+
+            <TextView
+                android:id="@+id/tvStreak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginStart="6dp"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@draw"
+        android:layout_marginTop="30dp"
+        android:fontFamily="@font/poppins"
+        android:paddingStart="5dp"
+        android:text="Menu"
+        android:textStyle="bold"
+        android:textColor="@color/dark_text"
+        android:textSize="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:weightSum="3">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/history"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/history"
+                android:scaleType="centerCrop"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="History"
+                android:textSize="15dp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginTop="6dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/alur"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/alur" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Alur Belajar"
+                android:fontFamily="@font/poppins"
+                android:textSize="15sp"
+                android:layout_marginTop="6dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/progres"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/progres" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Progres Belajar"
+                android:textSize="15sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginTop="6dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>
