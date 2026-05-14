@@ -1,7 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/abu_muda">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- HEADER -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profil Saya "
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/dark_text"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- FOTO PROFIL -->
+        <ImageView
+            android:id="@+id/imgProfile"
+            android:layout_width="110dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center"
+            android:src="@drawable/profil"
+            android:background="@drawable/circle_bg"
+            android:padding="10dp"/>
+
+        <!-- NAMA -->
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Risma Student"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/dark_text"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"/>
+
+        <!-- EMAIL -->
+        <TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="risma@email.com"
+            android:textSize="14sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="#888888"
+            android:layout_gravity="center"
+            android:layout_marginBottom="24dp"/>
+
+        <!-- CARD STATISTIK -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="18dp"
+            android:layout_marginBottom="20dp">
+
+            <TextView
+                android:text="Statistik Belajar"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/dark_text"
+                android:layout_marginBottom="10dp"/>
+
+            <TextView
+                android:id="@+id/tvUploadCount"
+                android:text="File diupload : 0"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:id="@+id/tvSummaryCount"
+                android:text=" Ringkasan dibuat : 0"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:id="@+id/tvQuizCount"
+                android:text="Quiz dikerjakan : 0"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:id="@+id/tvChatCount"
+                android:text="💬 Chat AI : 0"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"/>
+        </LinearLayout>
+
+        <!-- BUTTON LOGOUT -->
+        <Button
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:text="Logout"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#EF4444"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+</ScrollView>

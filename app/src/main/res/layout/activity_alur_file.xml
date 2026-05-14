@@ -1,7 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/soft_white">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- TITLE -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Materi 📄"
+            android:textSize="25sp"
+            android:fontFamily="@font/poppins"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unggah file PDF / DOCX untuk mulai belajar"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/dark_text"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- CARD AREA -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/card_bg"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/upload"
+                android:layout_gravity="center"
+                android:layout_marginBottom="12dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pilih file dari perangkatmu"
+                android:textAlignment="center"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/dark_text"
+                android:layout_marginBottom="16dp"/>
+
+            <Button
+                android:id="@+id/btnChooseFile"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Pilih File"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins"
+                android:textColor="@android:color/white"
+                android:background="@drawable/button1"/>
+
+            <TextView
+                android:id="@+id/tvFileName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Belum ada file dipilih"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"
+                android:textColor="#777777"
+                android:layout_marginTop="12dp"
+                android:textAlignment="center"/>
+
+        </LinearLayout>
+
+        <!-- BUTTON LANJUT -->
+        <Button
+            android:id="@+id/btnUploadNext"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Lanjut ke Ringkasan ➜"
+            android:textSize="18sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button1"
+            android:layout_marginTop="24dp"/>
+
+    </LinearLayout>
+</ScrollView>

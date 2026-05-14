@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.presentation.screens.history
+package com.studdy.mystudybuddy.presentation.screens.quiz
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HistoryScreen() {
+fun QuizHistoryScreen() {
 
     val historyList = listOf(
-        "Matematika",
-        "Pemrograman",
-        "Bahasa Inggris"
+        "Quiz Matematika - 90",
+        "Quiz Bahasa Inggris - 85",
+        "Quiz Pemrograman - 95"
     )
 
     LazyColumn(

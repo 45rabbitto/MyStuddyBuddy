@@ -1,7 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/soft_white">
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- TITLE -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alur Belajar"
+            android:textSize="25sp"
+            android:fontFamily="@font/poppins"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ikuti langkah berikut agar belajar lebih efektif"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/dark_text"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"/>
+
+        <!-- CARD CONTAINER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/card_bg"
+            android:padding="18dp">
+
+            <include layout="@layout/item_step_upload"/>
+            <include layout="@layout/item_step_summary"/>
+            <include layout="@layout/item_step_quiz"/>
+            <include layout="@layout/item_step_chatbot"/>
+            <include layout="@layout/item_step_progress"/>
+
+        </LinearLayout>
+
+        <!-- BUTTON MULAI -->
+        <Button
+            android:id="@+id/btnMulaiBelajar"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Mulai Belajar"
+            android:textSize="18sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@android:color/white"
+            android:background="@drawable/button1"
+            android:layout_marginTop="24dp"/>
+
+    </LinearLayout>
+</ScrollView>
