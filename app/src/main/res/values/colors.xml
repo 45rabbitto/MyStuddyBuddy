@@ -13,5 +13,8 @@
     <color name="dark_text">#1F2937</color>
     <color name="gray_text">#6B7280</color>
     <color name="primary_button">#250DAB</color>
+    <color name="ungu_muda">#F1EEFF</color>
+    <color name="abu_muda">#DEDEDE</color>
+
 </resources>
 
