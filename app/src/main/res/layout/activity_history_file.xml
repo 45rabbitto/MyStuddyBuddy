@@ -1,44 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/soft_white">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="18dp">
+        android:padding="12dp"
+        android:background="@drawable/bg_gradient">
 
         <!-- HEADER -->
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="18dp">
+            android:layout_height="60dp"
+            android:background="@drawable/kontainer"
+            android:padding="8dp">
 
-            < <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:padding="10dp"
-            android:src="@drawable/back"
-            android:tint="@color/dark_text" />
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
+                android:src="@drawable/back"
+                android:clickable="true"
+                android:focusable="true" />
 
-            <!-- TITLE -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Riwayat File"
-                android:gravity="center"
-                android:textSize="22sp"
+                android:text="History File"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/dark_text"
-                android:fontFamily="@font/poppins"/>
-        </LinearLayout>
+                android:fontFamily="@font/poppins"
+                android:layout_centerInParent="true" />
+
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/history" />
+
+        </RelativeLayout>
 
         <!-- SUBTITLE -->
         <TextView
@@ -73,79 +81,12 @@
                     android:orientation="vertical"
                     android:gravity="center">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total File"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="45dp"
                     android:background="@color/abu_muda"/>
-
-                <!-- PDF -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="8"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PDF"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="45dp"
-                    android:background="@color/abu_muda"/>
-
-                <!-- DOC -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="4"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="DOC"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
 
             </LinearLayout>
 
@@ -187,11 +128,6 @@
                     android:gravity="center"
                     android:background="@drawable/bg_file_icon">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_save"
-                        app:tint="@color/sky_blue"/>
                 </LinearLayout>
 
                 <!-- FILE INFO -->
@@ -202,31 +138,7 @@
                     android:orientation="vertical"
                     android:layout_marginStart="14dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Materi Algoritma.pdf"
-                        android:textStyle="bold"
-                        android:textSize="15sp"
-                        android:textColor="@color/dark_text"
-                        android:fontFamily="@font/poppins"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PDF • 2.4 MB • 12 Mei 2026"
-                        android:textSize="12sp"
-                        android:textColor="#8A8A8A"
-                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
-
-                <!-- ARROW -->
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@android:drawable/ic_media_next"
-                    app:tint="#B0B0B0"/>
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
@@ -254,12 +166,6 @@
                     android:layout_height="52dp"
                     android:gravity="center"
                     android:background="@drawable/bg_file_icon">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_menu_upload"
-                        app:tint="@color/sky_blue"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -269,28 +175,7 @@
                     android:orientation="vertical"
                     android:layout_marginStart="14dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Latihan Struktur Data.docx"
-                        android:textStyle="bold"
-                        android:textSize="15sp"
-                        android:textColor="@color/dark_text"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="DOCX • 1.2 MB • 10 Mei 2026"
-                        android:textSize="12sp"
-                        android:textColor="#8A8A8A"
-                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:src="@android:drawable/ic_media_next"
-                    app:tint="#B0B0B0"/>
 
             </LinearLayout>
 

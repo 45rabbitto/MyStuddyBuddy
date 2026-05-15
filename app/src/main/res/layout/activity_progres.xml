@@ -1,46 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/abu_muda">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="12dp"
+        android:background="@drawable/bg_gradient">
 
-        <!-- HEADER NAVIGATION -->
-        <LinearLayout
+        <!-- HEADER -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="20dp">
+            android:layout_height="60dp"
+            android:background="@drawable/kontainer"
+            android:padding="8dp">
 
-            <!-- Tombol Back -->
             <ImageView
                 android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:padding="10dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentStart="true"
                 android:src="@drawable/back"
-                android:tint="@color/dark_text" />
+                android:clickable="true"
+                android:focusable="true" />
 
-            <!-- Judul -->
             <TextView
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Progress Belajar"
-                android:gravity="center"
+                android:text="Progres"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:textColor="@color/dark_text"
                 android:fontFamily="@font/poppins"
-                android:textColor="@color/dark_text"/>
-        </LinearLayout>
+                android:layout_centerInParent="true" />
 
+            <ImageView
+                android:id="@+id/imgLogo"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/progres" />
+
+        </RelativeLayout>
         <!-- CARD RINGKASAN -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -78,14 +84,6 @@
                         android:orientation="vertical"
                         android:gravity="center">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="12"
-                            android:textStyle="bold"
-                            android:textSize="24sp"
-                            android:textColor="@color/sky_blue"
-                            android:fontFamily="@font/poppins"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -106,15 +104,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="28"
-                            android:textStyle="bold"
-                            android:textSize="24sp"
-                            android:textColor="@color/sky_blue"
-                            android:fontFamily="@font/poppins"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
                             android:text="Kuis"
                             android:textSize="12sp"
                             android:textColor="@color/dark_text"/>
@@ -127,15 +116,6 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="76%"
-                            android:textStyle="bold"
-                            android:textSize="24sp"
-                            android:textColor="@color/sky_blue"
-                            android:fontFamily="@font/poppins"/>
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -179,7 +159,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Algoritma Dasar"
+                    android:text="xxxxxx"
                     android:textStyle="bold"
                     android:textColor="@color/dark_text"/>
 
@@ -196,7 +176,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="100%"
+                    android:text="xx"
                     android:textSize="12sp"
                     android:textColor="@color/dark_text"
                     android:layout_gravity="end"
@@ -206,7 +186,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Struktur Data"
+                    android:text="xxxxxx"
                     android:textStyle="bold"
                     android:textColor="@color/dark_text"/>
 
@@ -223,7 +203,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="75%"
+                    android:text="xx"
                     android:textSize="12sp"
                     android:textColor="@color/dark_text"
                     android:layout_gravity="end"
@@ -233,7 +213,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Basis Data"
+                    android:text="xxxxxx"
                     android:textStyle="bold"
                     android:textColor="@color/dark_text"/>
 
@@ -250,7 +230,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="40%"
+                    android:text="xx"
                     android:textSize="12sp"
                     android:textColor="@color/dark_text"
                     android:layout_gravity="end"/>
