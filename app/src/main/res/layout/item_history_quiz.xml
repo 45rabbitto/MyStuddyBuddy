@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="14dp"
+    android:foreground="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- HEADER QUIZ -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- ICON -->
+            <LinearLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:gravity="center"
+                android:background="@drawable/bg_quiz_icon">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="@color/sky_blue"/>
+            </LinearLayout>
+
+            <!-- INFO -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="14dp">
+
+                <TextView
+                    android:id="@+id/txtQuizTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quiz Algoritma Dasar"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="@color/dark_text"
+                    android:fontFamily="@font/poppins"/>
+
+                <TextView
+                    android:id="@+id/txtQuizDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12 Mei 2026 • 10 Soal"
+                    android:textSize="12sp"
+                    android:textColor="#8A8A8A"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- SCORE -->
+            <TextView
+                android:id="@+id/txtScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="85%"
+                android:textStyle="bold"
+                android:textColor="#34A853"
+                android:textSize="15sp"/>
+        </LinearLayout>
+
+        <!-- DIVIDER -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#EEEEEE"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="14dp"/>
+
+        <!-- SOAL -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1. Apa fungsi algoritma?"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text"
+            android:textSize="14sp"/>
+
+        <!-- JAWABAN USER -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jawaban kamu: Menyimpan data"
+            android:textSize="13sp"
+            android:textColor="#D93025"
+            android:layout_marginTop="6dp"/>
+
+        <!-- JAWABAN BENAR -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jawaban benar: Langkah menyelesaikan masalah"
+            android:textSize="13sp"
+            android:textColor="#34A853"
+            android:layout_marginTop="4dp"/>
+
+        <!-- STATUS -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Salah"
+            android:textStyle="bold"
+            android:textColor="#D93025"
+            android:background="@drawable/bg_badge_red"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

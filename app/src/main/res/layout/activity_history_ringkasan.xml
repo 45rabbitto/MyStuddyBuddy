@@ -17,31 +17,41 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="18dp">
 
+            <!-- BACK -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="10dp"
+                android:src="@drawable/back"
+                android:tint="@color/dark_text" />
+
+            <!-- TITLE -->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Histori Ringkasan"
-                android:textAlignment="center"
+                android:text="Hasil Ringkasan"
+                android:gravity="center"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/poppins"
-                android:textColor="@color/dark_text"/>
+                android:textColor="@color/dark_text"
+                android:fontFamily="@font/poppins"/>
         </LinearLayout>
 
         <!-- SUBTITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Daftar ringkasan yang pernah kamu buka"
+            android:text="Ringkasan materi dan riwayat quiz dari hasil pembelajaran"
             android:textSize="14sp"
+            android:textColor="#777777"
             android:fontFamily="@font/poppins"
-            android:textColor="@color/dark_text"
             android:layout_marginBottom="18dp"/>
 
-        <!-- SUMMARY CARD -->
+        <!-- CARD RINGKASAN -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,102 +62,225 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="18dp"
-                android:gravity="center">
+                android:orientation="vertical"
+                android:padding="18dp">
 
-                <!-- Total Ringkasan -->
-                <LinearLayout
-                    android:layout_width="0dp"
+                <!-- TITLE -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:text="Ringkasan Algoritma Dasar"
+                    android:textStyle="bold"
+                    android:textSize="18sp"
+                    android:textColor="@color/dark_text"
+                    android:fontFamily="@font/poppins"/>
 
-                    <TextView
-                        android:id="@+id/tvTotalRingkasan"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"
-                        android:fontFamily="@font/poppins"/>
+                <!-- INFO -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dibuat pada 12 Mei 2026"
+                    android:textSize="12sp"
+                    android:textColor="#8A8A8A"
+                    android:layout_marginTop="4dp"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
-
-                <!-- Divider -->
+                <!-- DIVIDER -->
                 <View
-                    android:layout_width="1dp"
-                    android:layout_height="45dp"
-                    android:background="@color/abu_muda"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="14dp"/>
 
-                <!-- Terakhir Dibuka -->
-                <LinearLayout
-                    android:layout_width="0dp"
+                <!-- HASIL RINGKASAN -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:text="Algoritma adalah langkah-langkah logis yang digunakan untuk menyelesaikan suatu masalah secara sistematis. Algoritma memiliki karakteristik seperti memiliki input, proses, output, serta instruksi yang jelas dan terstruktur."
+                    android:textSize="14sp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="@color/dark_text"/>
 
-                    <TextView
-                        android:id="@+id/tvLastDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12 Jun"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"
-                        android:fontFamily="@font/poppins"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Terakhir"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
+                <!-- ACTION -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lihat Ringkasan Lengkap →"
+                    android:textStyle="bold"
+                    android:textColor="@color/sky_blue"
+                    android:layout_marginTop="18dp"
+                    android:layout_gravity="end"/>
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- TITLE LIST -->
+        <!-- TITLE HISTORY -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Riwayat Ringkasan"
+            android:text="Riwayat Quiz"
             android:textStyle="bold"
-            android:textSize="17sp"
+            android:textSize="18sp"
             android:textColor="@color/dark_text"
             android:fontFamily="@font/poppins"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="14dp"/>
 
-        <!-- LIST CARD -->
+        <!-- QUIZ ITEM 1 -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="12dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvHistoriRingkasan"
-                    android:layout_width="match_parent"
+                <!-- ICON -->
+                <LinearLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_quiz_icon">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="@color/sky_blue"/>
+                </LinearLayout>
+
+                <!-- INFO -->
+                <LinearLayout
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"/>
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="14dp">
 
+                    <!-- DATE -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12 Mei 2026"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/dark_text"/>
+
+                    <!-- PERCENTAGE -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nilai: 85%"
+                        android:textSize="13sp"
+                        android:textColor="#34A853"
+                        android:layout_marginTop="3dp"/>
+
+                    <!-- STATUS -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lulus"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#34A853"
+                        android:background="@drawable/circle_blue"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+
+                <!-- ACTION -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Detail"
+                    android:textStyle="bold"
+                    android:textColor="@color/sky_blue"
+                    android:textSize="13sp"/>
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- QUIZ ITEM 2 -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <!-- ICON -->
+                <LinearLayout
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:gravity="center"
+                    android:background="@drawable/bg_quiz_icon">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        app:tint="@color/sky_blue"/>
+                </LinearLayout>
+
+                <!-- INFO -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="10 Mei 2026"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/dark_text"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nilai: 60%"
+                        android:textSize="13sp"
+                        android:textColor="#D93025"
+                        android:layout_marginTop="3dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Belum Lulus"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:textColor="#D93025"
+                        android:background="@drawable/bg_badge_red"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+
+                <!-- ACTION -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ulangi"
+                    android:textStyle="bold"
+                    android:textColor="@color/sky_blue"
+                    android:textSize="13sp"/>
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>

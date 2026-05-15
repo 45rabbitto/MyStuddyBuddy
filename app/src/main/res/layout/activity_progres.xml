@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- HEADER -->
+        <!-- HEADER NAVIGATION -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,27 +19,35 @@
             android:gravity="center_vertical"
             android:layout_marginBottom="20dp">
 
+            <!-- Tombol Back -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="10dp"
+                android:src="@drawable/back"
+                android:tint="@color/dark_text" />
 
+            <!-- Judul -->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Progress Belajar"
-                android:textAlignment="center"
+                android:gravity="center"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins"
                 android:textColor="@color/dark_text"/>
-
         </LinearLayout>
 
         <!-- CARD RINGKASAN -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
             app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="20dp">
+            app:cardElevation="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -52,7 +60,7 @@
                     android:layout_height="wrap_content"
                     android:text="Ringkasan Progress"
                     android:textStyle="bold"
-                    android:textSize="14sp"
+                    android:textSize="16sp"
                     android:textColor="@color/dark_text"
                     android:fontFamily="@font/poppins"/>
 
@@ -140,8 +148,8 @@
                 </LinearLayout>
 
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
+        </androidx.cardview.widget.CardView>
 
         <!-- MATERI SELESAI -->
         <TextView
@@ -154,102 +162,113 @@
             android:fontFamily="@font/poppins"
             android:layout_marginBottom="12dp"/>
 
-        <!-- ITEM -->
-        <LinearLayout
+        <!-- CARD PROGRESS -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
 
-            <!-- Algoritma -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Algoritma Dasar"
-                android:textStyle="bold"
-                android:textColor="@color/dark_text"/>
-
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:progress="100"
-                android:max="100"
-                android:progressTint="@color/sky_blue"
-                android:progressBackgroundTint="@color/abu_muda"
-                android:layout_marginTop="6dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100%"
-                android:layout_gravity="end"
-                android:textSize="12sp"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp"/>
+                android:orientation="vertical"
+                android:padding="16dp">
 
-            <!-- Struktur Data -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Struktur Data"
-                android:textStyle="bold"
-                android:textColor="@color/dark_text"/>
+                <!-- Algoritma -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Algoritma Dasar"
+                    android:textStyle="bold"
+                    android:textColor="@color/dark_text"/>
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:progress="75"
-                android:max="100"
-                android:progressTint="@color/sky_blue"
-                android:progressBackgroundTint="@color/abu_muda"
-                android:layout_marginTop="6dp"/>
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="6dp"
+                    android:max="100"
+                    android:progress="100"
+                    android:progressTint="@color/sky_blue"
+                    android:progressBackgroundTint="@color/abu_muda"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="75%"
-                android:layout_gravity="end"
-                android:textSize="12sp"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="100%"
+                    android:textSize="12sp"
+                    android:textColor="@color/dark_text"
+                    android:layout_gravity="end"
+                    android:layout_marginBottom="14dp"/>
 
-            <!-- Basis Data -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Basis Data"
-                android:textStyle="bold"
-                android:textColor="@color/dark_text"/>
+                <!-- Struktur Data -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Struktur Data"
+                    android:textStyle="bold"
+                    android:textColor="@color/dark_text"/>
 
-            <ProgressBar
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:progress="40"
-                android:max="100"
-                android:progressTint="@color/sky_blue"
-                android:progressBackgroundTint="@color/abu_muda"
-                android:layout_marginTop="6dp"/>
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="6dp"
+                    android:max="100"
+                    android:progress="75"
+                    android:progressTint="@color/sky_blue"
+                    android:progressBackgroundTint="@color/abu_muda"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="40%"
-                android:layout_gravity="end"
-                android:textSize="12sp"
-                android:textColor="@color/dark_text"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="75%"
+                    android:textSize="12sp"
+                    android:textColor="@color/dark_text"
+                    android:layout_gravity="end"
+                    android:layout_marginBottom="14dp"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lihat Progres Detail  →"
-                android:textStyle="bold"
-                android:textColor="@color/sky_blue"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="22dp"/>
+                <!-- Basis Data -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Basis Data"
+                    android:textStyle="bold"
+                    android:textColor="@color/dark_text"/>
 
-        </LinearLayout>
+                <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="6dp"
+                    android:max="100"
+                    android:progress="40"
+                    android:progressTint="@color/sky_blue"
+                    android:progressBackgroundTint="@color/abu_muda"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="40%"
+                    android:textSize="12sp"
+                    android:textColor="@color/dark_text"
+                    android:layout_gravity="end"/>
+
+                <!-- Tombol -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lihat Progres Detail →"
+                    android:textStyle="bold"
+                    android:textColor="@color/sky_blue"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="22dp"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
+
 </ScrollView>

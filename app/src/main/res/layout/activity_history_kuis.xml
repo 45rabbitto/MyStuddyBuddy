@@ -17,25 +17,28 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="18dp">
 
+            <!-- BACK -->
             <ImageView
-                android:layout_width="22dp"
-                android:layout_height="22dp"
-                android:src="@android:drawable/ic_media_previous"
-                android:contentDescription="back"
-                app:tint="@color/dark_text"/>
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="10dp"
+                android:src="@drawable/back"
+                android:tint="@color/dark_text" />
 
+            <!-- TITLE -->
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Riwayat Quiz"
-                android:textAlignment="center"
+                android:text="History Quiz"
+                android:gravity="center"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:fontFamily="@font/poppins"
-                android:textColor="@color/dark_text"/>
+                android:textColor="@color/dark_text"
+                android:fontFamily="@font/poppins"/>
         </LinearLayout>
 
         <!-- SUBTITLE -->
@@ -44,145 +47,136 @@
             android:layout_height="wrap_content"
             android:text="Lihat hasil quiz yang sudah kamu kerjakan"
             android:textSize="14sp"
+            android:textColor="#777777"
             android:fontFamily="@font/poppins"
-            android:textColor="@color/dark_text"
             android:layout_marginBottom="18dp"/>
-
-        <!-- SUMMARY CARD -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="20dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="18dp"
-                android:gravity="center">
-
-                <!-- Total Quiz -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="28"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"
-                        android:fontFamily="@font/poppins"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total Quiz"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="45dp"
-                    android:background="@color/abu_muda"/>
-
-                <!-- Nilai -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="76%"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"
-                        android:fontFamily="@font/poppins"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rata-rata"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="45dp"
-                    android:background="@color/abu_muda"/>
-
-                <!-- Selesai -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="20"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"
-                        android:fontFamily="@font/poppins"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Selesai"
-                        android:textSize="12sp"
-                        android:textColor="@color/dark_text"/>
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
 
         <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Quiz Terakhir"
+            android:text="Riwayat Soal"
             android:textStyle="bold"
             android:textSize="17sp"
             android:textColor="@color/dark_text"
             android:fontFamily="@font/poppins"
             android:layout_marginBottom="12dp"/>
 
-        <!-- LIST CARD -->
+        <!-- QUIZ ITEM -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="4dp">
+            android:layout_marginBottom="14dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="12dp">
+                android:padding="16dp">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerHistoryQuiz"
+                <!-- HEADER ITEM -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- ICON -->
+                    <LinearLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_quiz_icon">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@android:drawable/ic_menu_edit"
+                            app:tint="@color/sky_blue"/>
+                    </LinearLayout>
+
+                    <!-- INFO -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Quiz Algoritma Dasar"
+                            android:textStyle="bold"
+                            android:textSize="15sp"
+                            android:textColor="@color/dark_text"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12 Mei 2026 • 10 Soal"
+                            android:textSize="12sp"
+                            android:textColor="#8A8A8A"/>
+                    </LinearLayout>
+
+                    <!-- SCORE -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="85%"
+                        android:textStyle="bold"
+                        android:textSize="15sp"
+                        android:textColor="#34A853"/>
+                </LinearLayout>
+
+                <!-- DIVIDER -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#EEEEEE"
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="14dp"/>
+
+                <!-- SOAL -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. Apa fungsi algoritma?"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:textColor="@color/dark_text"/>
+
+                <!-- JAWABAN USER -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jawaban kamu: Menyimpan data"
+                    android:textSize="13sp"
+                    android:textColor="#D93025"
+                    android:layout_marginTop="6dp"/>
+
+                <!-- JAWABAN BENAR -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jawaban benar: Langkah menyelesaikan masalah"
+                    android:textSize="13sp"
+                    android:textColor="#34A853"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- STATUS -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Salah"
+                    android:textStyle="bold"
+                    android:textColor="#D93025"
+                    android:background="@drawable/bg_badge_red"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginTop="10dp"/>
 
             </LinearLayout>
 
