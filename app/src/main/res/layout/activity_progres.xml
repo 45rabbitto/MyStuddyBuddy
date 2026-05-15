@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/abu_muda">
@@ -11,82 +12,253 @@
         android:padding="20dp">
 
         <!-- HEADER -->
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Progress Belajar 📊"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/poppins"
-            android:textColor="@color/dark_text"
-            android:layout_marginBottom="16dp"/>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
 
-        <!-- CARD TOTAL PROGRESS -->
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Progress Belajar"
+                android:textAlignment="center"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/dark_text"/>
+        </LinearLayout>
+
+        <!-- CARD RINGKASAN -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="18dp"
-            app:cardElevation="6dp"
+            app:cardElevation="4dp"
             android:layout_marginBottom="20dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="16dp">
 
                 <TextView
-                    android:text="Total Progress"
-                    android:textSize="18sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ringkasan Progress"
                     android:textStyle="bold"
-                    android:fontFamily="@font/poppins"
-                    android:textColor="@color/dark_text"/>
+                    android:textSize="14sp"
+                    android:textColor="@color/dark_text"
+                    android:fontFamily="@font/poppins"/>
 
-                <TextView
-                    android:id="@+id/tvTotalPercent"
-                    android:text="70%"
-                    android:textSize="40sp"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/poppins"
-                    android:textColor="@color/primary"
-                    android:layout_marginTop="8dp"/>
-
-                <ProgressBar
-                    android:id="@+id/progressBarTotal"
-                    style="?android:attr/progressBarStyleHorizontal"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:progress="70"
-                    android:max="100"
-                    android:layout_marginTop="12dp"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+
+                    <!-- Materi -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12"
+                            android:textStyle="bold"
+                            android:textSize="24sp"
+                            android:textColor="@color/sky_blue"
+                            android:fontFamily="@font/poppins"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Materi"
+                            android:textSize="12sp"
+                            android:textColor="@color/dark_text"/>
+                    </LinearLayout>
+
+                    <!-- Kuis -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="28"
+                            android:textStyle="bold"
+                            android:textSize="24sp"
+                            android:textColor="@color/sky_blue"
+                            android:fontFamily="@font/poppins"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Kuis"
+                            android:textSize="12sp"
+                            android:textColor="@color/dark_text"/>
+                    </LinearLayout>
+
+                    <!-- Skor -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="76%"
+                            android:textStyle="bold"
+                            android:textSize="24sp"
+                            android:textColor="@color/sky_blue"
+                            android:fontFamily="@font/poppins"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Rata-rata Skor"
+                            android:textSize="12sp"
+                            android:textColor="@color/dark_text"/>
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- DETAIL PROGRESS -->
+        <!-- GRAFIK -->
         <TextView
-            android:text="Detail Aktivitas"
-            android:textSize="18sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Grafik Skor"
             android:textStyle="bold"
-            android:fontFamily="@font/poppins"
+            android:textSize="16sp"
             android:textColor="@color/dark_text"
+            android:fontFamily="@font/poppins"
             android:layout_marginBottom="12dp"/>
 
-        <!-- Upload -->
-        <include layout="@layout/item_progress_row"
-            android:id="@+id/progressUpload"/>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="20dp">
 
-        <!-- Ringkasan -->
-        <include layout="@layout/item_progress_row"
-            android:id="@+id/progressSummary"/>
+        </androidx.cardview.widget.CardView>
 
-        <!-- Quiz -->
-        <include layout="@layout/item_progress_row"
-            android:id="@+id/progressQuiz"/>
+        <!-- MATERI SELESAI -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Materi Selesai"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@color/dark_text"
+            android:fontFamily="@font/poppins"
+            android:layout_marginBottom="12dp"/>
 
-        <!-- Chatbot -->
-        <include layout="@layout/item_progress_row"
-            android:id="@+id/progressChatbot"/>
+        <!-- ITEM -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Algoritma -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Algoritma Dasar"
+                android:textStyle="bold"
+                android:textColor="@color/dark_text"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:progress="100"
+                android:max="100"
+                android:progressTint="@color/sky_blue"
+                android:progressBackgroundTint="@color/abu_muda"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100%"
+                android:layout_gravity="end"
+                android:textSize="12sp"
+                android:textColor="@color/dark_text"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Struktur Data -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Struktur Data"
+                android:textStyle="bold"
+                android:textColor="@color/dark_text"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:progress="75"
+                android:max="100"
+                android:progressTint="@color/sky_blue"
+                android:progressBackgroundTint="@color/abu_muda"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="75%"
+                android:layout_gravity="end"
+                android:textSize="12sp"
+                android:textColor="@color/dark_text"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Basis Data -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Basis Data"
+                android:textStyle="bold"
+                android:textColor="@color/dark_text"/>
+
+            <ProgressBar
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:progress="40"
+                android:max="100"
+                android:progressTint="@color/sky_blue"
+                android:progressBackgroundTint="@color/abu_muda"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="40%"
+                android:layout_gravity="end"
+                android:textSize="12sp"
+                android:textColor="@color/dark_text"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

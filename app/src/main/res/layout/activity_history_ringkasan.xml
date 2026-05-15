@@ -1,125 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#F5F7FB">
+    android:background="@color/soft_white">
 
-    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:background="#4F46E5"
-        android:gravity="center_vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_back"
-            android:tint="@android:color/white"/>
+        <!-- HEADER -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="20dp">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Histori Ringkasan"
+                android:textAlignment="center"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/dark_text"/>
+        </LinearLayout>
+
+        <!-- SUBTITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Histori Ringkasan"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
+            android:text="Daftar ringkasan yang pernah kamu buka"
+            android:textSize="14sp"
+            android:fontFamily="@font/poppins"
+            android:textColor="@color/dark_text"
+            android:layout_marginBottom="18dp"/>
+
+        <!-- SUMMARY CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="18dp"
+                android:gravity="center">
+
+                <!-- Total Ringkasan -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvTotalRingkasan"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/sky_blue"
+                        android:fontFamily="@font/poppins"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total"
+                        android:textSize="12sp"
+                        android:textColor="@color/dark_text"/>
+                </LinearLayout>
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="45dp"
+                    android:background="@color/abu_muda"/>
+
+                <!-- Terakhir Dibuka -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:id="@+id/tvLastDate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12 Jun"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/sky_blue"
+                        android:fontFamily="@font/poppins"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Terakhir"
+                        android:textSize="12sp"
+                        android:textColor="@color/dark_text"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- TITLE LIST -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Riwayat Ringkasan"
             android:textStyle="bold"
-            android:layout_marginStart="16dp"/>
+            android:textSize="17sp"
+            android:textColor="@color/dark_text"
+            android:fontFamily="@font/poppins"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- LIST CARD -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="4dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvHistoriRingkasan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
     </LinearLayout>
 
-
-    <!-- Card Statistik -->
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="18dp"
-        app:cardElevation="6dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="16dp">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/tvTotalRingkasan"
-                    android:text="0"
-                    android:textSize="26sp"
-                    android:textStyle="bold"
-                    android:textColor="#4F46E5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Total Ringkasan"
-                    android:textSize="14sp"
-                    android:textColor="#666"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="60dp"
-                android:background="#E0E0E0"/>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/tvLastDate"
-                    android:text="-"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#4F46E5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-
-                <TextView
-                    android:text="Terakhir Dibuka"
-                    android:textSize="14sp"
-                    android:textColor="#666"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-
-    <!-- Title List -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Riwayat Ringkasan"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="#333"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="8dp"/>
-
-
-    <!-- List Histori -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvHistoriRingkasan"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp"/>
-
-</LinearLayout>
+</ScrollView>

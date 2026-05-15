@@ -1,51 +1,135 @@
-package com.studdy.mystudybuddy.presentation.profile
+package com.example.mystudybuddy.ui.profile
 
+import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
-import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.data.ProgressRepository
+import androidx.appcompat.app.AppCompatDelegate
+import com.example.mystudybuddy.R
+import com.example.mystudybuddy.ui.auth.LoginActivity
+import com.example.mystudybuddy.ui.profile.EditProfileActivity
 
 class ProfileActivity : AppCompatActivity() {
 
-    private lateinit var repo: ProgressRepository
+    private lateinit var appPref: SharedPreferences
+    private lateinit var userPref: SharedPreferences
+
+    private lateinit var tvName: TextView
+    private lateinit var tvEmail: TextView
+    private lateinit var imgProfile: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_profile)
+        setContentView(R.layout.activity_profil)
 
-        repo = ProgressRepository(this)
+        appPref = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+        userPref = getSharedPreferences("USER_PREF", Context.MODE_PRIVATE)
 
-        loadStatistics()
-        setupLogout()
+        tvName = findViewById(R.id.tvName)
+        tvEmail = findViewById(R.id.tvEmail)
+        imgProfile = findViewById(R.id.imgProfile)
+
+        val menuEdit = findViewById<LinearLayout>(R.id.menuEditProfile)
+        val menuTheme = findViewById<LinearLayout>(R.id.menuTheme)
+        val menuLanguage = findViewById<LinearLayout>(R.id.menuLanguage)
+        val menuNotif = findViewById<LinearLayout>(R.id.menuNotif)
+        val menuLogout = findViewById<LinearLayout>(R.id.menuLogout)
+
+        menuEdit.setOnClickListener { openEditProfile() }
+        menuTheme.setOnClickListener { showThemeDialog() }
+        menuLanguage.setOnClickListener { showLanguageDialog() }
+        menuNotif.setOnClickListener { toggleNotification() }
+        menuLogout.setOnClickListener { logout() }
+
+        loadProfile()
     }
 
-    private fun loadStatistics() {
-        val uploadCount = repo.getUploadCount()
-        val summaryCount = repo.getSummaryCount()
-        val quizCount = repo.getQuizCount()
-        val chatCount = repo.getChatbotCount()
-
-        findViewById<TextView>(R.id.tvUploadCount).text =
-            "File diupload : $uploadCount"
-
-        findViewById<TextView>(R.id.tvSummaryCount).text =
-            "Ringkasan dibuat : $summaryCount"
-
-        findViewById<TextView>(R.id.tvQuizCount).text =
-            "Quiz dikerjakan : $quizCount"
-
-        findViewById<TextView>(R.id.tvChatCount).text =
-            "Chat AI : $chatCount"
+    override fun onResume() {
+        super.onResume()
+        loadProfile()
     }
 
-    private fun setupLogout() {
-        val btnLogout = findViewById<Button>(R.id.btnLogout)
+    private fun loadProfile() {
+        val name = userPref.getString("name", "Risma Student")
+        val email = userPref.getString("email", "risma@email.com")
+        val photoUri = userPref.getString("photo", null)
 
-        btnLogout.setOnClickListener {
-            // sementara hanya menutup aplikasi
-            finishAffinity()
+        tvName.text = name
+        tvEmail.text = email
+
+        if (photoUri != null) {
+            imgProfile.setImageURI(android.net.Uri.parse(photoUri))
         }
+    }
+
+    private fun openEditProfile() {
+        startActivity(Intent(this, EditProfileActivity::class.java))
+    }
+
+    private fun showThemeDialog() {
+        val options = arrayOf("Light Mode", "Dark Mode")
+
+        AlertDialog.Builder(this)
+            .setTitle("Pilih Tema")
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        appPref.edit().putString("theme", "light").apply()
+                    }
+                    1 -> {
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                        appPref.edit().putString("theme", "dark").apply()
+                    }
+                }
+            }.show()
+    }
+
+    private fun showLanguageDialog() {
+        val options = arrayOf("Indonesia", "English")
+
+        AlertDialog.Builder(this)
+            .setTitle("Pilih Bahasa")
+            .setItems(options) { _, which ->
+                val lang = if (which == 0) "id" else "en"
+                appPref.edit().putString("language", lang).apply()
+
+                AlertDialog.Builder(this)
+                    .setMessage("Restart aplikasi untuk menerapkan bahasa")
+                    .setPositiveButton("OK", null)
+                    .show()
+            }.show()
+    }
+
+    private fun toggleNotification() {
+        val isOn = appPref.getBoolean("notif", true)
+        appPref.edit().putBoolean("notif", !isOn).apply()
+
+        val status = if (!isOn) "Notifikasi Aktif 🔔" else "Notifikasi Dimatikan 🔕"
+
+        AlertDialog.Builder(this)
+            .setMessage(status)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    private fun logout() {
+        AlertDialog.Builder(this)
+            .setTitle("Keluar")
+            .setMessage("Yakin ingin logout?")
+            .setPositiveButton("Ya") { _, _ ->
+                val loginPref = getSharedPreferences("login_session", Context.MODE_PRIVATE)
+                loginPref.edit().clear().apply()
+
+                startActivity(Intent(this, LoginActivity::class.java))
+                finishAffinity()
+            }
+            .setNegativeButton("Batal", null)
+            .show()
     }
 }
