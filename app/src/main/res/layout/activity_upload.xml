@@ -71,14 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/poppins"
-                android:text="PDF, TXT, PPT, PPTX, JPG, atau PNG"
-                android:textColor="@color/gray_text" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="(Maks. 20MB)"
-                android:fontFamily="@font/poppins"
+                android:text="PDF (Maks. 20MB)"
                 android:textColor="@color/gray_text" />
 
         </LinearLayout>

@@ -1,7 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_gradient"
+    android:padding="16dp">
+
+    <!-- Header Nilai -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/card_bg"
+        android:gravity="center">
+
+        <!-- Benar -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:background="@drawable/kontainer"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Benar"
+                android:textSize="14sp"
+                android:textColor="@color/dark_text"
+                android:fontFamily="@font/poppins"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvBenar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:textColor="@color/benar"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"/>
+        </LinearLayout>
+
+        <!-- Salah -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/kontainer"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Salah"
+                android:textSize="14sp"
+                android:textColor="@color/dark_text"
+                android:fontFamily="@font/poppins"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvSalah"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:textColor="#E74C3C"
+                android:textStyle="bold"
+                android:fontFamily="@font/poppins"/>
+        </LinearLayout>
+
+        <!-- Skor -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/kontainer"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Skor"
+                android:textSize="14sp"
+                android:fontFamily="@font/poppins"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/tvSkor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/gray_text"
+                android:fontFamily="@font/poppins"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Judul -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pembahasan"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/dark_text"
+        android:fontFamily="@font/poppins"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Scroll pembahasan -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/card_bg">
+
+        <LinearLayout
+            android:id="@+id/pembahasanContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <!-- isi pembahasan akan ditambahkan otomatis -->
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Tombol -->
+    <Button
+        android:id="@+id/btnDashboard"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/button1"
+        android:text="Kembali ke Dashboard"
+        android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:fontFamily="@font/poppins"/>
 
 </LinearLayout>
