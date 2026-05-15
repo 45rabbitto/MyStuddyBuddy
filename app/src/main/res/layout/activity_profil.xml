@@ -30,7 +30,7 @@
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Risma Student"
+                android:text="Student"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -40,7 +40,7 @@
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="risma@email.com"
+                android:text="student@email.com"
                 android:textColor="#E0E7FF"
                 android:textSize="14sp"/>
 
@@ -121,10 +121,6 @@
                     android:orientation="horizontal"
                     android:clickable="true"
                     android:foreground="?attr/selectableItemBackground">
-
-                    <ImageView
-                        android:layout_width="22dp"
-                        android:layout_height="22dp" />
 
                     <TextView
                         android:layout_width="wrap_content"
