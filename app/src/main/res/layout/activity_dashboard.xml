@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/bg_gradient"
+    android:background="@color/abu_muda"
     android:padding="20dp">
 
     <LinearLayout
@@ -43,53 +43,10 @@
         android:layout_marginTop="-20dp"
         android:textColor="@color/dark_text"/>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/kontainer"
-        android:padding="12dp">
-
-        <ImageView
-            android:layout_width="400dp"
-            android:layout_height="250dp"
-            android:clipToOutline="true"
-            android:src="@drawable/dashboard" />
-
-        <LinearLayout
-            android:id="@+id/streakContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_margin="8dp"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp"
-            android:background="@drawable/button_line"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/api"
-                android:contentDescription="Streak Icon"/>
-
-            <TextView
-                android:id="@+id/tvStreak"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="7"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginStart="6dp"/>
-
-        </LinearLayout>
-
-    </FrameLayout>
-
-    <TextView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+<<<<<<< HEAD
         android:layout_marginTop="30dp"
         android:fontFamily="@font/poppins"
         android:paddingStart="5dp"
@@ -199,6 +156,9 @@
         <include layout="@layout/navigasi"/>
 
     </LinearLayout>
+=======
+        android:src="@draw"
+>>>>>>> 8a01f00151afeef6346f79c9317e5ee9e5f569f7
 
 
 </LinearLayout>
