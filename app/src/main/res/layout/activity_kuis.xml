@@ -2,55 +2,54 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_quiz">
+    android:background="@drawable/bg_gradient">
 
-    <<RelativeLayout
-    android:layout_width="390dp"
-    android:layout_height="50dp"
-    android:layout_margin="10dp"
-    android:layout_centerHorizontal="true"
-    android:background="@drawable/kontainer" >
+    <RelativeLayout
+        android:layout_width="390dp"
+        android:layout_height="50dp"
+        android:layout_margin="10dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/kontainer">
 
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/back"
+            android:clickable="true"
+            android:focusable="true" />
 
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/back"
-        android:layout_margin="5dp"
-        android:layout_alignParentStart="true"
-        android:clickable="true"
-        android:focusable="true"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kuis"
+            android:layout_marginTop="10dp"
+            android:textSize="20sp"
+            android:fontFamily="@font/poppins"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text"
+            android:layout_centerHorizontal="true" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Kuis"
-        android:layout_marginTop="10dp"
-        android:textSize="20sp"
-        android:fontFamily="@font/poppins"
-        android:textStyle="bold"
-        android:textColor="@color/dark_text"
-        android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
 
-</RelativeLayout>
-
-    <!-- Kontainer Soal -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/bottomButtons"
+        android:layout_below="@id/btnBack"
         android:fillViewport="true">
 
         <LinearLayout
             android:id="@+id/contentQuiz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- Soal -->
             <TextView
                 android:id="@+id/tvQuestion"
                 android:layout_width="match_parent"
@@ -59,9 +58,8 @@
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins"
                 android:textColor="@color/dark_text"
-                android:layout_marginBottom="24dp"/>
+                android:layout_marginBottom="24dp" />
 
-            <!-- Jawaban A -->
             <Button
                 android:id="@+id/optionA"
                 android:layout_width="match_parent"
@@ -71,9 +69,8 @@
                 android:fontFamily="@font/poppins"
                 android:background="@drawable/kontainer"
                 android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp" />
 
-            <!-- Jawaban B -->
             <Button
                 android:id="@+id/optionB"
                 android:layout_width="match_parent"
@@ -83,9 +80,8 @@
                 android:fontFamily="@font/poppins"
                 android:background="@drawable/kontainer"
                 android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp" />
 
-            <!-- Jawaban C -->
             <Button
                 android:id="@+id/optionC"
                 android:layout_width="match_parent"
@@ -95,9 +91,8 @@
                 android:fontFamily="@font/poppins"
                 android:background="@drawable/kontainer"
                 android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="12dp" />
 
-            <!-- Jawaban D -->
             <Button
                 android:id="@+id/optionD"
                 android:layout_width="match_parent"
@@ -106,13 +101,14 @@
                 android:padding="12dp"
                 android:fontFamily="@font/poppins"
                 android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"/>
+                android:textColor="@color/dark_text" />
 
         </LinearLayout>
 
     </ScrollView>
 
     <LinearLayout
+        android:id="@+id/bottomButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -128,8 +124,8 @@
             android:text="Sebelumnya"
             android:fontFamily="@font/poppins"
             android:background="@drawable/button1"
-            android:textColor="@color/white"
-            android:layout_marginEnd="8dp"/>
+            android:textColor="@android:color/white"
+            android:layout_marginEnd="8dp" />
 
         <Button
             android:id="@+id/btnNext"
@@ -139,8 +135,9 @@
             android:text="Selanjutnya"
             android:fontFamily="@font/poppins"
             android:background="@drawable/button1"
-            android:textColor="@color/white"
-            android:layout_marginStart="8dp"/>
+            android:textColor="@android:color/white"
+            android:layout_marginStart="8dp" />
+
     </LinearLayout>
 
 </RelativeLayout>

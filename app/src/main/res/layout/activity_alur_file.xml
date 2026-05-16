@@ -239,9 +239,6 @@
             android:textColor="@android:color/white"
             android:fontFamily="@font/poppins"
             android:background="@drawable/button1"/>
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 
