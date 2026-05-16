@@ -16,18 +16,21 @@
         android:gravity="center_vertical"
         android:padding="16dp">
 
+        <!-- Icon Ringkasan -->
         <LinearLayout
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:gravity="center"
-            android:background="@drawable/bg_file_icon">
+            android:background="@drawable/bg_quiz_icon">
 
             <ImageView
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:src="@drawable/ic_file"/>
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_edit"
+                android:tint="@color/sky_blue"/>
         </LinearLayout>
 
+        <!-- Isi -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -36,26 +39,29 @@
             android:layout_marginStart="14dp">
 
             <TextView
-                android:id="@+id/tvFileName"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nama File"
-                android:textStyle="bold"/>
+                android:text="Ringkasan Bab AI"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
 
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="12 Mei 2026"/>
+                android:text="12 Mei 2026"
+                android:textSize="13sp"/>
         </LinearLayout>
 
+        <!-- Tombol Hapus -->
         <ImageButton
             android:id="@+id/btnDelete"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_delete"/>
-
+            android:src="@drawable/ic_delete"
+            android:contentDescription="Hapus"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

@@ -16,8 +16,12 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+    }
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    buildFeatures {
+        viewBinding = true
+        dataBinding = true
+        compose = true
     }
 
     buildTypes {
@@ -30,12 +34,8 @@ android {
         }
     }
 
-    buildFeatures {
-        compose = true
-    }
-
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.10"  // Update dari 1.5.14 ke 1.5.10
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
 
     compileOptions {
