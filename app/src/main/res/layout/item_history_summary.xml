@@ -27,7 +27,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_edit"
-                android:tint="@color/sky_blue"/>
+                app:tint="@color/sky_blue"/>
         </LinearLayout>
 
         <!-- Isi -->
@@ -35,22 +35,22 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_marginStart="14dp">
+            android:layout_marginStart="14dp"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ringkasan Bab AI"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:text="@string/ringkasan_ai"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="12 Mei 2026"
+                android:text="@string/tanggal_default"
                 android:textSize="13sp"/>
         </LinearLayout>
 
@@ -61,7 +61,9 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_delete"
-            android:contentDescription="Hapus"/>
+            android:contentDescription="@string/hapus"
+            app:tint="@android:color/holo_red_dark"/>
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

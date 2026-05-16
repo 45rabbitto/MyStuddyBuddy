@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">My Study Buddy</string>
     <string name="welcome_message">Your Personal AI Learning Assistant</string>
+    <string name="ringkasan_ai">Ringkasan Bab AI</string>
+    <string name="tanggal_default">12 Mei 2026</string>
+    <string name="hapus">Hapus</string>
 </resources>
