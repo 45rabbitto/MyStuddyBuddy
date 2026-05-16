@@ -25,9 +25,7 @@
                 android:layout_height="40dp"
                 android:layout_centerVertical="true"
                 android:layout_alignParentStart="true"
-                android:src="@drawable/back"
-                android:clickable="true"
-                android:focusable="true" />
+                android:src="@drawable/back"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -37,16 +35,14 @@
                 android:textStyle="bold"
                 android:textColor="@color/dark_text"
                 android:fontFamily="@font/poppins"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"/>
 
             <ImageView
-                android:id="@+id/imgLogo"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/alur" />
-
+                android:src="@drawable/alur"/>
         </RelativeLayout>
 
         <!-- SUBTITLE -->
@@ -58,7 +54,7 @@
             android:textColor="#777777"
             android:fontFamily="@font/poppins"
             android:layout_marginTop="12dp"
-            android:layout_marginBottom="18dp" />
+            android:layout_marginBottom="18dp"/>
 
         <!-- SUMMARY CARD -->
         <androidx.cardview.widget.CardView
@@ -75,164 +71,76 @@
                 android:gravity="center"
                 android:padding="18dp">
 
-                <!-- TOTAL FILE -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="xx"
+                        android:id="@+id/txtTotalFile"
+                        android:text="0"
                         android:textSize="26sp"
                         android:textStyle="bold"
-                        android:textColor="@color/sky_blue" />
+                        android:textColor="@color/sky_blue"/>
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Total File"
                         android:textSize="13sp"
-                        android:textColor="#777777" />
-
+                        android:textColor="#777777"/>
                 </LinearLayout>
 
                 <View
                     android:layout_width="1dp"
                     android:layout_height="45dp"
-                    android:background="@color/abu_muda" />
+                    android:background="@color/abu_muda"/>
 
-                <!-- FILE DIPROSES -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+                    android:gravity="center"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="xx"
+                        android:id="@+id/txtDiproses"
+                        android:text="0"
                         android:textSize="26sp"
                         android:textStyle="bold"
-                        android:textColor="#6C63FF" />
+                        android:textColor="#6C63FF"/>
 
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Diproses AI"
                         android:textSize="13sp"
-                        android:textColor="#777777" />
-
+                        android:textColor="#777777"/>
                 </LinearLayout>
 
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
 
         <!-- TITLE -->
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="File Terakhir"
             android:textStyle="bold"
             android:textSize="17sp"
             android:textColor="@color/dark_text"
             android:fontFamily="@font/poppins"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp"/>
 
-        <!-- FILE ITEM 1 -->
-        <androidx.cardview.widget.CardView
+        <!-- LIST FILE DINAMIS -->
+        <LinearLayout
+            android:id="@+id/containerFile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="3dp">
+            android:orientation="vertical"/>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp">
-
-                <!-- ICON -->
-                <LinearLayout
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:gravity="center"
-                    android:background="@drawable/bg_file_icon">
-
-                </LinearLayout>
-
-                <!-- FILE INFO -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="14dp">
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- FILE ITEM 2 -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
-            android:foreground="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="3dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:gravity="center"
-                    android:background="@drawable/bg_file_icon">
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:layout_marginStart="14dp">
-
-                </LinearLayout>
-
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <!-- BUTTON Alur BELAJAR -->
+        <!-- BUTTON AUTO GENERATE -->
         <Button
-            android:id="@+id/btnRekomendasi"
+            android:id="@+id/btnAutoGenerate"
             android:layout_width="match_parent"
             android:layout_height="55dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="20dp"
-            android:text="Minta Alur Belajar"
+            android:text="Auto Generate Alur"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textSize="16sp"
