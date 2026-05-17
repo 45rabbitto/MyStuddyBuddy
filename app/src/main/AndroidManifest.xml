@@ -2,40 +2,57 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- INTERNET -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+
+    <!-- Storage (Android 13 ready) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
 
     <application
         android:name=".MyStudyBuddyApplication"
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyStudyBuddy"
-        tools:targetApi="31">
+        tools:targetApi="33">
 
-        <!-- MAIN ACTIVITY (LAUNCHER) -->
+        <!-- MAIN ACTIVITY (SUDAH BENAR PATHNYA) -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MyStudyBuddy">
+            android:name=".presentation.main.MainActivity"
+            android:exported="true">
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-
         </activity>
 
         <!-- PROFILE -->
-        <activity android:name=".ui.profile.ProfileActivity"/>
-        <activity android:name=".ui.profile.EditProfileActivity"/>
+        <activity
+            android:name=".presentation.screens.profile.activity.ProfileActivity"
+            android:exported="false"/>
+
+        <!-- EDIT PROFILE -->
+        <activity
+            android:name=".presentation.screens.profile.activity.EditProfileActivity"
+            android:exported="false"/>
+
+        <!-- HISTORY -->
+        <activity
+            android:name=".presentation.screens.history.activity.FileHistoryActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".presentation.screens.history.activity.QuizHistoryActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".presentation.screens.history.activity.SummaryHistoryActivity"
+            android:exported="false"/>
 
     </application>
 

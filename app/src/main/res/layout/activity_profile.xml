@@ -11,17 +11,18 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- Tombol Back -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:layout_alignParentStart="true"
+            android:layout_margin="12dp"
             android:src="@drawable/back"
             android:clickable="true"
-            android:focusable="true" />
+            android:focusable="true"
+            android:contentDescription="Back" />
 
-        <!-- ================= HEADER ================= -->
+        <!-- HEADER -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="230dp"
@@ -30,7 +31,7 @@
             android:gravity="center"
             android:padding="20dp">
 
-            <!-- FOTO -->
+            <!-- Foto Profile -->
             <androidx.cardview.widget.CardView
                 android:layout_width="110dp"
                 android:layout_height="110dp"
@@ -42,11 +43,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/profil" />
+                    android:src="@drawable/profil"
+                    android:contentDescription="Foto Profil"/>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- NAMA -->
+            <!-- Nama -->
             <TextView
                 android:id="@+id/tvName"
                 android:layout_width="wrap_content"
@@ -56,9 +58,9 @@
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:fontFamily="@font/poppins"
-                android:layout_marginTop="14dp" />
+                android:layout_marginTop="14dp"/>
 
-            <!-- EMAIL -->
+            <!-- Email -->
             <TextView
                 android:id="@+id/tvEmail"
                 android:layout_width="wrap_content"
@@ -67,16 +69,15 @@
                 android:textColor="@android:color/darker_gray"
                 android:textSize="14sp"
                 android:fontFamily="@font/poppins"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="4dp"/>
 
         </LinearLayout>
 
-        <!-- ================= MENU ================= -->
+        <!-- MENU -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginBottom="24dp"
+            android:layout_margin="16dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="6dp">
 
@@ -86,7 +87,7 @@
                 android:orientation="vertical"
                 android:paddingVertical="6dp">
 
-                <!-- TITLE -->
+                <!-- Title -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -97,9 +98,9 @@
                     android:fontFamily="@font/poppins"
                     android:paddingHorizontal="18dp"
                     android:paddingTop="16dp"
-                    android:paddingBottom="10dp" />
+                    android:paddingBottom="10dp"/>
 
-                <!-- EDIT PROFILE -->
+                <!-- Edit Profile -->
                 <LinearLayout
                     android:id="@+id/menuEditProfile"
                     android:layout_width="match_parent"
@@ -115,7 +116,8 @@
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:src="@android:drawable/ic_menu_edit"
-                        app:tint="#4F46E5" />
+                        app:tint="#4F46E5"
+                        android:contentDescription="Edit"/>
 
                     <TextView
                         android:layout_width="0dp"
@@ -124,17 +126,17 @@
                         android:text="Edit Profil"
                         android:textSize="16sp"
                         android:textColor="#333333"
-                        android:layout_marginStart="16dp" />
+                        android:layout_marginStart="16dp"/>
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@android:drawable/ic_media_next"
-                        app:tint="#AAAAAA" />
-
+                        app:tint="#AAAAAA"
+                        android:contentDescription="Arrow"/>
                 </LinearLayout>
 
-                <!-- LOGOUT -->
+                <!-- Logout -->
                 <LinearLayout
                     android:id="@+id/menuLogout"
                     android:layout_width="match_parent"
@@ -150,7 +152,8 @@
                         android:layout_width="22dp"
                         android:layout_height="22dp"
                         android:src="@android:drawable/ic_lock_power_off"
-                        app:tint="#EF4444" />
+                        app:tint="#EF4444"
+                        android:contentDescription="Logout"/>
 
                     <TextView
                         android:layout_width="0dp"
@@ -159,13 +162,14 @@
                         android:text="Keluar"
                         android:textSize="16sp"
                         android:textColor="#EF4444"
-                        android:layout_marginStart="16dp" />
+                        android:layout_marginStart="16dp"/>
 
                     <ImageView
                         android:layout_width="18dp"
                         android:layout_height="18dp"
                         android:src="@android:drawable/ic_media_next"
-                        app:tint="#EF4444" />
+                        app:tint="#EF4444"
+                        android:contentDescription="Arrow"/>
 
                 </LinearLayout>
 

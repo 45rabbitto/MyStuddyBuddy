@@ -188,9 +188,5 @@
         <include layout="@layout/navigasi"/>
 
     </LinearLayout>
-=======
-        android:src="@draw"
->>>>>>> 8a01f00151afeef6346f79c9317e5ee9e5f569f7
-
 
 </LinearLayout>

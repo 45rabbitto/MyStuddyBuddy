@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.presentation.history.activity
+package com.studdy.mystuddybuddy.presentation.history.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
