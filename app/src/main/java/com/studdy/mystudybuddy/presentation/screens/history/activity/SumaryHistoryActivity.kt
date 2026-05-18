@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 package com.studdy.mystuddybuddy.presentation.history.activity
+=======
+package com.studdy.mystudybuddy.presentation.history.activity
+>>>>>>> 769d51d (melly)
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
