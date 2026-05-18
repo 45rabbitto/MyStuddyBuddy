@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-=======
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
->>>>>>> 0ddf80d (melly)
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="@drawable/bg_gradient">
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="@drawable/bg_gradient">
 
         <!-- HEADER -->
         <RelativeLayout
@@ -27,8 +26,7 @@
                 android:layout_alignParentStart="true"
                 android:src="@drawable/back"
                 android:clickable="true"
-                android:focusable="true"
-                app:tint="@color/dark_text"/>
+                android:focusable="true" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -46,8 +44,7 @@
                 android:layout_height="45dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/history"
-                app:tint="@color/dark_text"/>
+                android:src="@drawable/history" />
         </RelativeLayout>
 
         <!-- TITLE -->
@@ -62,14 +59,6 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="12dp" />
 
-<<<<<<< HEAD
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerHistory"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    </LinearLayout>
-=======
         <!-- FILE ITEM 1 -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -185,4 +174,3 @@
     </LinearLayout>
 
 </ScrollView>
->>>>>>> 0ddf80d (melly)
