@@ -16,53 +16,57 @@
         android:gravity="center_vertical"
         android:padding="16dp">
 
-        <!-- Icon Ringkasan -->
+        <!-- ICON FILE -->
         <LinearLayout
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:gravity="center"
-            android:background="@drawable/bg_quiz_icon">
+            android:background="@drawable/bg_file_icon">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_edit"
-                app:tint="@color/sky_blue"/>
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/ic_file"/>
         </LinearLayout>
 
-        <!-- Isi -->
+        <!-- INFO FILE -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="14dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginStart="14dp">
 
             <TextView
-                android:id="@+id/tvTitle"
+                android:id="@+id/txtFileName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ringkasan_ai"
+                android:text="Ringkasan AI"
+                android:textStyle="bold"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:textColor="@color/dark_text"
+                android:fontFamily="@font/poppins"/>
 
             <TextView
-                android:id="@+id/tvDate"
+                android:id="@+id/txtDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tanggal_default"
-                android:textSize="13sp"/>
+                android:text="Upload 12 Mei 2026 • 2.3 MB"
+                android:textSize="13sp"
+                android:textColor="#888888"
+                android:fontFamily="@font/poppins"/>
+
         </LinearLayout>
 
-        <!-- Tombol Hapus -->
+        <!-- DELETE BUTTON -->
         <ImageButton
             android:id="@+id/btnDelete"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_delete"
-            android:contentDescription="@string/hapus"
-            app:tint="@android:color/holo_red_dark"/>
+            android:contentDescription="Hapus"
+            app:tint="@color/dark_text"/>
 
     </LinearLayout>
 

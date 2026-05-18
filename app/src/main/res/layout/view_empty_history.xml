@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:src="@drawable/ic_empty_history"
+        android:src="@drawable/history"
         android:layout_marginBottom="16dp"/>
 
     <TextView
@@ -39,6 +39,6 @@
         android:layout_height="48dp"
         android:text="Mulai Sekarang"
         android:textAllCaps="false"
-        android:background="@drawable/btn_primary"
+        android:background="@drawable/button1"
         android:textColor="@color/white"/>
 </LinearLayout>

@@ -88,10 +88,10 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/btnMulai"
+        android:id="@+id/btnLogin"
         android:layout_width="300dp"
         android:layout_height="50dp"
-        android:text="Mulai"
+        android:text="Login"
         android:textColor="#ffffff"
         android:textSize="18sp"
         android:fontFamily="@font/poppins"

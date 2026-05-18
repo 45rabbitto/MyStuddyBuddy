@@ -1,10 +1,7 @@
-<<<<<<< HEAD
 package com.studdy.mystuddybuddy.presentation.history.activity
-=======
-package com.studdy.mystudybuddy.presentation.history.activity
->>>>>>> 769d51d (melly)
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.studdy.mystudybuddy.databinding.ActivityHistorySummaryBinding
@@ -15,17 +12,28 @@ class SummaryHistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHistorySummaryBinding
     private lateinit var adapter: SummaryHistoryAdapter
+
     private val summaryList = mutableListOf<SummaryHistoryModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityHistorySummaryBinding.inflate(layoutInflater)
+        binding =
+            ActivityHistorySummaryBinding.inflate(
+                layoutInflater
+            )
+
         setContentView(binding.root)
 
         binding.btnBack.setOnClickListener {
             finish()
         }
+
+        loadData()
+        setupRecycler()
+    }
+
+    private fun loadData() {
 
         summaryList.add(
             SummaryHistoryModel(
@@ -40,16 +48,16 @@ class SummaryHistoryActivity : AppCompatActivity() {
                 "11 Mei 2026"
             )
         )
-
-        setupRecycler()
     }
 
     private fun setupRecycler() {
 
-        adapter = SummaryHistoryAdapter(summaryList) { item ->
-            summaryList.remove(item)
-            adapter.notifyDataSetChanged()
-        }
+        adapter =
+            SummaryHistoryAdapter(summaryList) { item ->
+
+                summaryList.remove(item)
+                adapter.notifyDataSetChanged()
+            }
 
         binding.recyclerHistory.layoutManager =
             LinearLayoutManager(this)

@@ -98,6 +98,7 @@
             android:textColor="@color/dark_text"/>
 
         <TextView
+            android:id="@+id/tvRegister"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" Daftar"
@@ -107,8 +108,7 @@
             android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
-            android:background="?android:attr/selectableItemBackgroundBorderless" />
-
+            android:background="?android:attr/selectableItemBackgroundBorderless"/>
     </LinearLayout>
 
 </LinearLayout>
