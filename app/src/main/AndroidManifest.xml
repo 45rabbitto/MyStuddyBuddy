@@ -47,19 +47,19 @@
         <activity
             android:name=".presentation.screens.auth.activity.WelcomeActivity"/>
 
-        <!-- Profile -->
-        <activity
-            android:name=".presentation.screens.profile.ProfileActivity"/>
 
         <!-- History -->
         <activity
-            android:name=".presentation.screens.history.activity.FileHistoryActivity"/>
+            android:name=".presentation.history.activity.FileHistoryActivity"
+            android:exported="false"/>
 
         <activity
-            android:name=".presentation.screens.history.activity.QuizHistoryActivity"/>
+            android:name=".presentation.history.activity.QuizHistoryActivity"
+            android:exported="false"/>
 
         <activity
-            android:name=".presentation.screens.history.activity.SummaryHistoryActivity"/>
+            android:name=".presentation.history.activity.SummaryHistoryActivity"
+            android:exported="false"/>
 
     </application>
 

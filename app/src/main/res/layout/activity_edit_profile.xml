@@ -108,7 +108,7 @@
 
         <!-- BUTTON SIMPAN -->
         <Button
-            android:id="@+id/btnSaveProfile"
+            android:id="@+id/btnSave"
             android:layout_width="match_parent"
             android:layout_height="55dp"
             android:text="Simpan Perubahan"

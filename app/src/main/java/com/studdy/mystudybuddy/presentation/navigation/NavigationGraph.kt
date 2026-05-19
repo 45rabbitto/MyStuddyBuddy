@@ -1,55 +1,27 @@
 package com.studdy.mystudybuddy.presentation.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
+object NavigationGraph {
 
-import com.studdy.mystudybuddy.presentation.screens.chatbot.ChatbotScreen
-import com.studdy.mystudybuddy.presentation.screens.history.HistoryScreen
-import com.studdy.mystudybuddy.presentation.screens.home.HomeScreen
-import com.studdy.mystudybuddy.presentation.screens.progress.ProgressScreen
-import com.studdy.mystudybuddy.presentation.screens.quiz.QuizScreen
-import com.studdy.mystudybuddy.presentation.screens.quiz_history.QuizHistoryScreen
-import com.studdy.mystudybuddy.presentation.screens.summary.SummaryScreen
+    // Auth
+    const val WELCOME = "welcome"
+    const val LOGIN = "login"
+    const val REGISTER = "register"
 
-// PENTING: pakai Screen dari Screen.kt (jangan buat ulang)
+    // Main
+    const val DASHBOARD = "dashboard"
 
-@Composable
-fun NavigationGraph(
-    navController: NavHostController
-) {
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Home.route
-    ) {
+    // Profile
+    const val PROFILE = "profile"
+    const val EDIT_PROFILE = "edit_profile"
 
-        composable(Screen.Home.route) {
-            HomeScreen(navController)
-        }
+    // History
+    const val FILE_HISTORY = "file_history"
+    const val QUIZ_HISTORY = "quiz_history"
+    const val SUMMARY_HISTORY = "summary_history"
 
-        composable(Screen.Summary.route) {
-            SummaryScreen(navController)
-        }
+    // Progress
+    const val PROGRESS = "progress"
 
-        composable(Screen.Quiz.route) {
-            QuizScreen(navController)
-        }
-
-        composable(Screen.Chatbot.route) {
-            ChatbotScreen(navController)
-        }
-
-        composable(Screen.Progress.route) {
-            ProgressScreen(navController)
-        }
-
-        composable(Screen.History.route) {
-            HistoryScreen()
-        }
-
-        composable(Screen.QuizHistory.route) {
-            QuizHistoryScreen()
-        }
-    }
+    // Chatbot
+    const val CHATBOT = "chatbot"
 }

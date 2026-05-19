@@ -34,14 +34,18 @@ class FileHistoryActivity : AppCompatActivity() {
 
         adapter = FileHistoryAdapter(fileList) { item ->
 
-            fileList.remove(item)
-            adapter.notifyDataSetChanged()
+            val position = fileList.indexOf(item)
+
+            if (position != -1) {
+                fileList.removeAt(position)
+                adapter.notifyItemRemoved(position)
+            }
         }
 
         binding.recyclerHistory.layoutManager =
             LinearLayoutManager(this)
 
-        binding.recyclerHistory.adapter = adapter
-
+        binding.recyclerHistory.adapter =
+            adapter
     }
 }

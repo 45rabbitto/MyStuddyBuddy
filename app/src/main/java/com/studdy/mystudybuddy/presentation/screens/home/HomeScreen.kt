@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.studdy.mystudybuddy.presentation.components.common.GradientCard
 import com.studdy.mystudybuddy.presentation.theme.*
 import kotlinx.coroutines.delay
 

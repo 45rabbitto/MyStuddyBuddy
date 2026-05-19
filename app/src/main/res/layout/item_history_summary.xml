@@ -38,7 +38,7 @@
             android:layout_marginStart="14dp">
 
             <TextView
-                android:id="@+id/txtFileName"
+                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Ringkasan AI"
@@ -48,7 +48,7 @@
                 android:fontFamily="@font/poppins"/>
 
             <TextView
-                android:id="@+id/txtDate"
+                android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Upload 12 Mei 2026 • 2.3 MB"
