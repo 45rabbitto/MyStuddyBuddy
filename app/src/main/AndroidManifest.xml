@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Permission -->
     <uses-permission android:name="android.permission.INTERNET"/>
 
-    <!-- Android 12 ke bawah -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <!-- Storage permission (Android 13+ & below compatibility) -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32"/>
 
-    <!-- Android 13+ -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+
     <application
         android:name=".MyStudyBuddyApplication"
         android:allowBackup="true"
@@ -22,9 +22,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyStudyBuddy">
 
-        <!-- Launcher -->
+        <!-- =========================
+             MAIN / DASHBOARD (LAUNCHER)
+        ========================== -->
         <activity
-            android:name=".presentation.main.MainActivity"
+            android:name="com.studdy.mystuddybuddy.presentation.screens.home.DashboardActivity"
             android:exported="true">
 
             <intent-filter>
@@ -34,31 +36,58 @@
 
         </activity>
 
-        <activity
-            android:name=".presentation.screens.profile.ProfileActivity"/>
+        <!-- =========================
+             AUTH
+        ========================== -->
+        <activity android:name=".presentation.screens.auth.activity.WelcomeActivity"
+            android:exported="false"/>
 
-        <!-- Auth -->
-        <activity
-            android:name=".presentation.screens.auth.activity.LoginActivity"/>
+        <activity android:name=".presentation.screens.auth.activity.LoginActivity"
+            android:exported="false"/>
 
-        <activity
-            android:name=".presentation.screens.auth.activity.RegisterActivity"/>
+        <activity android:name=".presentation.screens.auth.activity.RegisterActivity"
+            android:exported="false"/>
 
-        <activity
-            android:name=".presentation.screens.auth.activity.WelcomeActivity"/>
+        <!-- =========================
+             MAIN FEATURES
+        ========================== -->
+        <activity android:name=".presentation.main.MainActivity"
+            android:exported="false"/>
 
+        <activity android:name=".presentation.screens.upload.activity.UploadActivity"
+            android:exported="false"/>
 
-        <!-- History -->
-        <activity
-            android:name=".presentation.history.activity.FileHistoryActivity"
+        <activity android:name=".presentation.screens.profile.ProfileActivity"
+            android:exported="false"/>
+
+        <activity android:name=".presentation.screens.progress.activity.ProgresActivity"
+            android:exported="false"/>
+
+        <activity android:name=".presentation.screens.chatbot.activity.ChatbotActivity"
             android:exported="false"/>
 
         <activity
-            android:name=".presentation.history.activity.QuizHistoryActivity"
+            android:name=".presentation.screens.quiz.activity.QuizActivity"
             android:exported="false"/>
 
         <activity
-            android:name=".presentation.history.activity.SummaryHistoryActivity"
+            android:name=".presentation.screens.quiz.activity.HasilKuisActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".presentation.screens.ringkasan.RingkasanActivity"
+            android:exported="false"/>
+
+        <!-- =========================
+             HISTORY
+        ========================== -->
+        <activity android:name=".presentation.history.activity.FileHistoryActivity"
+            android:exported="false"/>
+
+        <activity android:name=".presentation.history.activity.QuizHistoryActivity"
+            android:exported="false"/>
+
+        <activity android:name="com.studdy.mystuddybuddy.presentation.history.activity.SummaryHistoryActivity"
             android:exported="false"/>
 
     </application>

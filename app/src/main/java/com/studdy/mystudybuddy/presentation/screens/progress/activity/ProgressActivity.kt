@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.presentation.progress.activity
+package com.studdy.mystudybuddy.presentation.screens.progress.activity
 
 import android.os.Bundle
 import android.view.View
