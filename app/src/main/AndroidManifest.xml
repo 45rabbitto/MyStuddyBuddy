@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <!-- Permission -->
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- Android 12 ke bawah -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" /> <!-- Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
-    <!-- Android 12 ke bawah -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32"/>
-
-    <!-- Android 13+ -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
-    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
     <application
         android:name=".MyStudyBuddyApplication"
         android:allowBackup="true"
@@ -21,46 +18,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyStudyBuddy">
-
+        <activity
+            android:name=".AddQuoteActivity"
+            android:exported="false"
+            android:label="@string/title_activity_add_quote"
+            android:theme="@style/Theme.MyStudyBuddy" />
         <!-- Launcher -->
         <activity
             android:name=".presentation.main.MainActivity"
             android:exported="true">
-
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-        <activity
-            android:name=".presentation.screens.profile.ProfileActivity"/>
-
-        <!-- Auth -->
-        <activity
-            android:name=".presentation.screens.auth.activity.LoginActivity"/>
-
-        <activity
-            android:name=".presentation.screens.auth.activity.RegisterActivity"/>
-
-        <activity
-            android:name=".presentation.screens.auth.activity.WelcomeActivity"/>
-
-        <!-- Profile -->
-        <activity
-            android:name=".presentation.screens.profile.ProfileActivity"/>
-
-        <!-- History -->
-        <activity
-            android:name=".presentation.screens.history.activity.FileHistoryActivity"/>
-
-        <activity
-            android:name=".presentation.screens.history.activity.QuizHistoryActivity"/>
-
-        <activity
-            android:name=".presentation.screens.history.activity.SummaryHistoryActivity"/>
-
+        <activity android:name=".presentation.screens.profile.ProfileActivity" /> <!-- Profile -->
+        <activity android:name=".presentation.screens.profile.ProfileActivity" /> <!-- Auth -->
+        <activity android:name=".presentation.screens.auth.activity.LoginActivity" />
+        <activity android:name=".presentation.screens.auth.activity.RegisterActivity" />
+        <activity android:name=".presentation.screens.auth.activity.WelcomeActivity" /> <!-- History -->
+        <activity android:name=".presentation.screens.history.activity.FileHistoryActivity" />
+        <activity android:name=".presentation.screens.history.activity.QuizHistoryActivity" />
+        <activity android:name=".presentation.screens.history.activity.SummaryHistoryActivity" />
     </application>
 
 </manifest>
