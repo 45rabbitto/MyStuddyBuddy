@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurFileActivity
-import com.studdy.mystudybuddy.presentation.history.activity.FileHistoryActivity
+import com.studdy.mystudybuddy.presentation.screens.history.activity.FileHistoryActivity
 import com.studdy.mystudybuddy.presentation.screens.home.DashboardItem
 import com.studdy.mystudybuddy.presentation.screens.home.adapter.DashboardAdapter
-import com.studdy.mystudybuddy.presentation.screens.profile.ProfileActivity
+import com.studdy.mystudybuddy.presentation.screens.profile.activity.ProfileActivity
 import com.studdy.mystudybuddy.presentation.screens.progress.activity.ProgresActivity
 import com.studdy.mystudybuddy.presentation.screens.upload.activity.UploadActivity
 
@@ -102,6 +102,12 @@ class DashboardActivity : AppCompatActivity() {
                     }
 
                     "Upload" -> {
+
+                        Toast.makeText(
+                            this,
+                            "Membuka Upload",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                         startActivity(
                             Intent(

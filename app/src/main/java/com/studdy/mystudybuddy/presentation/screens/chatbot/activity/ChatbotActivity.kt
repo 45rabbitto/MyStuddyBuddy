@@ -1,43 +1,58 @@
 package com.studdy.mystudybuddy.presentation.screens.chatbot.activity
 
+import android.net.Uri
 import android.os.Bundle
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
 
 class ChatbotActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
-    private lateinit var btnSend: ImageButton
+    private lateinit var tvFileName: TextView
+
     private lateinit var etMessage: EditText
-    private lateinit var chatContainer: LinearLayout
+    private lateinit var btnSend: Button
+    private lateinit var tvChatResult: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_chatbot)
 
         initViews()
+        setupData()
         setupListeners()
     }
 
     private fun initViews() {
 
-        btnBack =
-            findViewById(R.id.btnBack)
+        btnBack = findViewById(R.id.btnBack)
+        tvFileName = findViewById(R.id.tvFileName)
 
-        btnSend =
-            findViewById(R.id.btnSend)
+        etMessage = findViewById(R.id.etMessage)
+        btnSend = findViewById(R.id.btnSend)
+        tvChatResult = findViewById(R.id.tvChatResult)
+    }
 
-        etMessage =
-            findViewById(R.id.etMessage)
+    private fun setupData() {
 
-        chatContainer =
-            findViewById(R.id.chatContainer)
+        val fileUriString = intent.getStringExtra("FILE_URI")
+
+        if (fileUriString == null) {
+            Toast.makeText(this, "File tidak ditemukan", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        val uri = Uri.parse(fileUriString)
+
+        val fileName = uri.lastPathSegment ?: "Dokumen PDF"
+
+        tvFileName.text = fileName
     }
 
     private fun setupListeners() {
@@ -48,85 +63,28 @@ class ChatbotActivity : AppCompatActivity() {
 
         btnSend.setOnClickListener {
 
-            val message =
-                etMessage.text.toString().trim()
+            val message = etMessage.text.toString().trim()
 
-            if(message.isNotEmpty()){
-
-                addUserMessage(message)
-
-                val botReply =
-                    getBotResponse(message)
-
-                addBotMessage(botReply)
-
-                etMessage.text.clear()
+            if (message.isEmpty()) {
+                Toast.makeText(this, "Tulis pertanyaan dulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
-        }
-    }
 
-    private fun addUserMessage(message: String){
+            // 🔥 dummy response chatbot
+            val response = when {
 
-        val tv = TextView(this)
+                message.contains("apa", true) ->
+                    "Ini adalah penjelasan dari dokumen yang kamu upload."
 
-        tv.text = "Anda: $message"
+                message.contains("ringkasan", true) ->
+                    "Dokumen ini berisi materi pembelajaran penting."
 
-        tv.textSize = 16f
+                else ->
+                    "Saya masih mempelajari dokumen ini, coba pertanyaan lain."
+            }
 
-        tv.setPadding(
-            20,
-            20,
-            20,
-            20
-        )
-
-        chatContainer.addView(tv)
-    }
-
-    private fun addBotMessage(message: String){
-
-        val tv = TextView(this)
-
-        tv.text = "StudyBuddy AI: $message"
-
-        tv.textSize = 16f
-
-        tv.setPadding(
-            20,
-            20,
-            20,
-            20
-        )
-
-        chatContainer.addView(tv)
-    }
-
-    private fun getBotResponse(
-        message: String
-    ): String {
-
-        return when {
-
-            message.contains(
-                "algoritma",
-                true
-            ) ->
-                "Algoritma adalah langkah sistematis untuk menyelesaikan masalah."
-
-            message.contains(
-                "java",
-                true
-            ) ->
-                "Java adalah bahasa pemrograman berbasis OOP."
-
-            message.contains(
-                "python",
-                true
-            ) ->
-                "Python sering digunakan untuk AI dan machine learning."
-
-            else ->
-                "Saya siap membantu proses belajar Anda."
+            tvChatResult.text = response
+            etMessage.setText("")
         }
     }
 }

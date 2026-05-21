@@ -10,6 +10,15 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/back"
+            android:layout_marginBottom="10dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
         <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"

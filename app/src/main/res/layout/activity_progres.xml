@@ -188,16 +188,6 @@
                 android:textColor="#888888"
                 android:layout_marginTop="4dp"/>
 
-            <TextView
-                android:id="@+id/tvDetail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lihat Progres Detail →"
-                android:textStyle="bold"
-                android:textColor="@color/sky_blue"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="22dp"/>
-
         </LinearLayout>
 
     </LinearLayout>

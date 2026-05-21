@@ -1,51 +1,93 @@
-package com.studdy.mystudybuddy.presentation.history.activity
+package com.studdy.mystudybuddy.presentation.screens.history.activity
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.studdy.mystudybuddy.databinding.ActivityHistoryFileBinding
-import com.studdy.mystudybuddy.presentation.history.adapter.FileHistoryAdapter
-import com.studdy.mystudybuddy.presentation.history.model.FileHistoryModel
+import androidx.recyclerview.widget.RecyclerView
+import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.presentation.screens.history.adapter.FileHistoryAdapter
+import com.studdy.mystudybuddy.presentation.screens.history.model.FileHistoryModel
+import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 
 class FileHistoryActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHistoryFileBinding
-    private lateinit var adapter: FileHistoryAdapter
-    private val fileList = mutableListOf<FileHistoryModel>()
+    private lateinit var rvHistory: RecyclerView
+    private lateinit var btnBack: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityHistoryFileBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(
+            R.layout.activity_history_file
+        )
 
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
-
-        // dummy data
-        fileList.add(FileHistoryModel("Materi AI.pdf", "12 Mei 2026"))
-        fileList.add(FileHistoryModel("Catatan NLP.docx", "10 Mei 2026"))
-
-        setupRecycler()
+        initViews()
+        setupRecyclerView()
+        setupListener()
     }
 
-    private fun setupRecycler() {
+    private fun initViews() {
 
-        adapter = FileHistoryAdapter(fileList) { item ->
+        rvHistory =
+            findViewById(R.id.rvHistory)
 
-            val position = fileList.indexOf(item)
+        btnBack =
+            findViewById(R.id.btnBack)
+    }
 
-            if (position != -1) {
-                fileList.removeAt(position)
-                adapter.notifyItemRemoved(position)
-            }
+    private fun setupListener() {
+
+        btnBack.setOnClickListener {
+            finish()
         }
+    }
 
-        binding.recyclerHistory.layoutManager =
+    private fun setupRecyclerView() {
+
+        val historyList = listOf(
+
+            FileHistoryModel(
+                fileName = "Biologi Sel.pdf",
+                date = "20 Mei 2026"
+            ),
+
+            FileHistoryModel(
+                fileName = "Matematika Diskrit.pdf",
+                date = "18 Mei 2026"
+            ),
+
+            FileHistoryModel(
+                fileName = "Algoritma Dasar.pdf",
+                date = "15 Mei 2026"
+            )
+
+        )
+
+        val adapter =
+            FileHistoryAdapter(
+                historyList
+            ){ file ->
+
+                startActivity(
+                    Intent(
+                        this,
+                        FileHistoryDetailActivity::class.java
+                    ).apply {
+
+                        putExtra(
+                            "FILE_NAME",
+                            file.fileName
+                        )
+                    }
+                )
+            }
+
+        rvHistory.layoutManager =
             LinearLayoutManager(this)
 
-        binding.recyclerHistory.adapter =
+        rvHistory.adapter =
             adapter
     }
 }

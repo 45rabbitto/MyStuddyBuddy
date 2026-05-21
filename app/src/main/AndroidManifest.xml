@@ -57,7 +57,11 @@
         <activity android:name=".presentation.screens.upload.activity.UploadActivity"
             android:exported="false"/>
 
-        <activity android:name=".presentation.screens.profile.ProfileActivity"
+        <activity android:name=".presentation.screens.profile.activity.ProfileActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".presentation.screens.profile.activity.EditProfileActivity"
             android:exported="false"/>
 
         <activity android:name=".presentation.screens.progress.activity.ProgresActivity"
@@ -75,19 +79,24 @@
             android:exported="false"/>
 
         <activity
-            android:name=".presentation.screens.ringkasan.RingkasanActivity"
-            android:exported="false"/>
+        android:name=".presentation.screens.ringkasan.RingkasanActivity"
+        android:exported="false"/>
 
         <!-- =========================
              HISTORY
         ========================== -->
-        <activity android:name=".presentation.history.activity.FileHistoryActivity"
+        <activity android:name=".presentation.screens.history.activity.FileHistoryActivity"
             android:exported="false"/>
 
-        <activity android:name=".presentation.history.activity.QuizHistoryActivity"
+        <activity
+            android:name=".presentation.screens.history.activity.FileHistoryDetailActivity"
             android:exported="false"/>
 
-        <activity android:name="com.studdy.mystuddybuddy.presentation.history.activity.SummaryHistoryActivity"
+
+        <activity android:name=".presentation.screens.history.activity.QuizHistoryActivity"
+            android:exported="false"/>
+
+        <activity android:name="com.studdy.mystudybuddy.presentation.screens.history.activity.SummaryHistoryActivity"
             android:exported="false"/>
 
     </application>

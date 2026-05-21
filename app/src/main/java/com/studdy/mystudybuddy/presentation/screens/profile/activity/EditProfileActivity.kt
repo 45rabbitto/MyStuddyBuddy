@@ -26,19 +26,13 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-
         btnBack = findViewById(R.id.btnBack)
-
         etName = findViewById(R.id.etName)
-
         etEmail = findViewById(R.id.etEmail)
-
         btnSave = findViewById(R.id.btnSave)
     }
 
     private fun loadProfile() {
-
-        // sementara dummy data
         etName.setText("Student")
         etEmail.setText("student@email.com")
     }
@@ -51,25 +45,16 @@ class EditProfileActivity : AppCompatActivity() {
 
         btnSave.setOnClickListener {
 
-            val name =
-                etName.text.toString().trim()
-
-            val email =
-                etEmail.text.toString().trim()
+            val name = etName.text.toString().trim()
+            val email = etEmail.text.toString().trim()
 
             if (name.isEmpty()) {
-
-                etName.error =
-                    "Nama wajib diisi"
-
+                etName.error = "Nama wajib diisi"
                 return@setOnClickListener
             }
 
             if (email.isEmpty()) {
-
-                etEmail.error =
-                    "Email wajib diisi"
-
+                etEmail.error = "Email wajib diisi"
                 return@setOnClickListener
             }
 
