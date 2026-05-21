@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizResult
-import com.studdy.mystuddybuddy.presentation.screens.home.DashboardActivity
+import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActivity
 
 class HasilKuisActivity : AppCompatActivity() {
 

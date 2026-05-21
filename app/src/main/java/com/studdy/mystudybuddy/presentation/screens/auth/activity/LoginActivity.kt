@@ -7,7 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.studdy.mystuddybuddy.presentation.screens.home.DashboardActivity
+import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActivity
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.main.MainActivity
 

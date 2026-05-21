@@ -1,11 +1,10 @@
-package com.studdy.mystuddybuddy.presentation.screens.home.adapter
+package com.studdy.mystudybuddy.presentation.screens.home.adapter
 
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.studdy.mystudybuddy.R
-import com.studdy.mystuddybuddy.presentation.home.DashboardItem
+import com.studdy.mystudybuddy.presentation.screens.home.DashboardItem
 import com.studdy.mystudybuddy.databinding.ItemDashboardBinding
 
 class DashboardAdapter(

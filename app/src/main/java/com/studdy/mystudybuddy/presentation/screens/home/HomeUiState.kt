@@ -1,6 +1,6 @@
 package com.studdy.mystudybuddy.presentation.screens.home
 
-import com.studdy.mystuddybuddy.presentation.home.DashboardItem
+import com.studdy.mystudybuddy.presentation.screens.home.DashboardItem
 
 data class HomeUiState(
 

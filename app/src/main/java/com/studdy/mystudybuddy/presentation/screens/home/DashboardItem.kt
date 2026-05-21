@@ -1,4 +1,4 @@
-package com.studdy.mystuddybuddy.presentation.home
+package com.studdy.mystudybuddy.presentation.screens.home
 
 data class DashboardItem(
     val title: String,
