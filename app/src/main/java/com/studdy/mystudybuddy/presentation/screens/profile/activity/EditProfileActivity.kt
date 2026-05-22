@@ -15,6 +15,7 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var etEmail: EditText
     private lateinit var btnSave: Button
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

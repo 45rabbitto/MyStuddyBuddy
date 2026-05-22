@@ -14,73 +14,64 @@ import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActiv
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
 import com.studdy.mystudybuddy.presentation.screens.recommendation.adaptor.AlurAdapter
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
+import com.studdy.mystudybuddy.presentation.screens.upload.activity.UploadActivity
 
 class AlurActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var imgLogo: ImageView
+    private lateinit var tvRekomendasi: TextView
+    private lateinit var tvNextStep: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(
-            R.layout.activity_alur
-        )
+        setContentView(R.layout.activity_alur)
 
         initViews()
-
         setupListeners()
+        loadRekomendasi()
     }
 
     private fun initViews() {
-
-        btnBack =
-            findViewById(R.id.btnBack)
-
-        imgLogo =
-            findViewById(R.id.imgLogo)
+        btnBack = findViewById(R.id.btnBack)
+        imgLogo = findViewById(R.id.imgLogo)
+        tvRekomendasi = findViewById(R.id.tvRekomendasi)
+        tvNextStep = findViewById(R.id.tvMulaiLatihan)
     }
 
     private fun setupListeners() {
 
         btnBack.setOnClickListener {
-
             finish()
         }
 
         imgLogo.setOnClickListener {
-
-            Toast.makeText(
-                this,
-                "Alur belajar aktif",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Rekomendasi belajar AI aktif", Toast.LENGTH_SHORT).show()
         }
 
-        // Untuk membuka latihan/quiz
-        findViewById<android.widget.TextView>(
-            R.id.tvMulaiLatihan
-        )?.setOnClickListener {
+        // lanjut belajar
+        tvNextStep.setOnClickListener {
 
             startActivity(
-                Intent(
-                    this,
-                    QuizActivity::class.java
-                )
+                Intent(this, UploadActivity::class.java)
             )
         }
+    }
 
-        // Untuk membuka detail rekomendasi
-        findViewById<android.widget.TextView>(
-            R.id.tvRekomendasi
-        )?.setOnClickListener {
+    private fun loadRekomendasi() {
 
-            startActivity(
-                Intent(
-                    this,
-                    RingkasanActivity::class.java
-                )
-            )
+        val prefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+
+        val avg = prefs.getInt("avg_score", 0)
+        val last = prefs.getInt("last_score", 0)
+
+        val text = when {
+            last < 60 -> "Ulangi materi terakhir"
+            avg < 70 -> "Latihan dasar"
+            avg < 85 -> "Materi menengah"
+            else -> "Materi lanjutan & project"
         }
+
+        findViewById<TextView>(R.id.tvRekomendasi).text = text
     }
 }

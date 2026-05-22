@@ -4,60 +4,84 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Button
 import android.widget.Toast
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
+
 
 class RingkasanActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
-    private lateinit var tvFileName: TextView
     private lateinit var tvRingkasan: TextView
+    private lateinit var btnGenerate: Button
+
+    private var fileUri: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ringkasan)
 
         initViews()
+        setupClickListeners()
         setupData()
-        setupListeners()
     }
 
     private fun initViews() {
         btnBack = findViewById(R.id.btnBack)
-        tvFileName = findViewById(R.id.tvFileName)
         tvRingkasan = findViewById(R.id.tvRingkasan)
+        btnGenerate = findViewById(R.id.btnGenerate)
+    }
+
+    private fun setupClickListeners() {
+
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        btnGenerate.setOnClickListener {
+
+            val text = tvRingkasan.text.toString()
+
+            if (text.isEmpty() || text.contains("Belum")) {
+                Toast.makeText(this, "Ringkasan belum tersedia", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val intent = Intent(this, QuizActivity::class.java).apply {
+                putExtra("RINGKASAN", text)
+                putExtra("FILE_URI", fileUri)
+            }
+
+            startActivity(intent)
+        }
     }
 
     private fun setupData() {
 
-        val fileUriString = intent.getStringExtra("FILE_URI")
+        fileUri = intent.getStringExtra("FILE_URI")
 
-        if (fileUriString == null) {
-            Toast.makeText(this, "File tidak ditemukan", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
+        if (fileUri != null) {
 
-        val uri = Uri.parse(fileUriString)
+            val fileName = Uri.parse(fileUri).lastPathSegment ?: "File PDF"
 
-        val fileName = uri.lastPathSegment ?: "Dokumen PDF"
+            tvRingkasan.text = """
+                File berhasil diterima:
+                
+                Nama file: $fileName
+                
+                🔹 Ringkasan:
+                (sementara ini dummy, nanti bisa AI / parsing PDF)
+                
+                - Materi 1
+                - Materi 2
+                - Materi 3
+            """.trimIndent()
 
-        tvFileName.text = fileName
-
-        // 🔥 sementara dummy ringkasan
-        tvRingkasan.text = """
-            Ringkasan Dokumen:
-
-            - Dokumen ini membahas materi pembelajaran.
-            - Berisi konsep-konsep penting.
-            - Perlu dianalisis lebih lanjut untuk detail lengkap.
-        """.trimIndent()
-    }
-
-    private fun setupListeners() {
-        btnBack.setOnClickListener {
-            finish()
+        } else {
+            tvRingkasan.text = "Tidak ada file yang dikirim dari UploadActivity"
         }
     }
 }

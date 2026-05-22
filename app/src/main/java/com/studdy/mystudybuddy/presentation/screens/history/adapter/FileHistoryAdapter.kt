@@ -7,8 +7,9 @@ import com.studdy.mystudybuddy.databinding.ItemHistoryFileBinding
 import com.studdy.mystudybuddy.presentation.screens.history.model.FileHistoryModel
 
 class FileHistoryAdapter(
-    private val list: List<FileHistoryModel>,
-    private val onItemClick: (FileHistoryModel) -> Unit
+    private var list: MutableList<FileHistoryModel>,
+    private val onItemClick: (FileHistoryModel) -> Unit,
+    private val onDelete: (FileHistoryModel) -> Unit
 ) : RecyclerView.Adapter<FileHistoryAdapter.ViewHolder>() {
 
     inner class ViewHolder(
@@ -36,19 +37,19 @@ class FileHistoryAdapter(
 
         val item = list[position]
 
-        holder.binding.tvFileName.text =
-            item.fileName
+        holder.binding.tvFileName.text = item.fileName
+        holder.binding.tvDate.text = item.date
 
-        holder.binding.tvDate.text =
-            item.date
-
-        // klik seluruh item
+        // klik item
         holder.binding.root.setOnClickListener {
             onItemClick(item)
         }
+
+        // tombol delete
+        holder.binding.btnDelete.setOnClickListener {
+            onDelete(item)
+        }
     }
 
-    override fun getItemCount(): Int {
-        return list.size
-    }
+    override fun getItemCount(): Int = list.size
 }

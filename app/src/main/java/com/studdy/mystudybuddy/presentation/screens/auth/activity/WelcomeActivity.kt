@@ -5,11 +5,12 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActivity
 
 class WelcomeActivity : AppCompatActivity() {
 
     private lateinit var btnLogin: Button
-    private lateinit var btnRegister: Button
+    private lateinit var btnMulai: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,7 +23,7 @@ class WelcomeActivity : AppCompatActivity() {
 
     private fun initViews() {
         btnLogin = findViewById(R.id.btnLogin)
-        btnRegister = findViewById(R.id.btnRegister)
+        btnMulai = findViewById(R.id.btnMulai)
     }
 
     private fun setupClickListeners() {
@@ -36,13 +37,8 @@ class WelcomeActivity : AppCompatActivity() {
             )
         }
 
-        btnRegister.setOnClickListener {
-            startActivity(
-                Intent(
-                    this,
-                    RegisterActivity::class.java
-                )
-            )
+        btnMulai.setOnClickListener {
+            startActivity(Intent(this, DashboardActivity::class.java))
         }
     }
 }

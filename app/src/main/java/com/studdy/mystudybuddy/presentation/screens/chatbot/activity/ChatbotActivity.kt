@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,10 +14,10 @@ import com.studdy.mystudybuddy.R
 class ChatbotActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
-    private lateinit var tvFileName: TextView
+    private var tvFileName: TextView? = null
 
     private lateinit var etMessage: EditText
-    private lateinit var btnSend: Button
+    private lateinit var btnSend: ImageButton
     private lateinit var tvChatResult: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,10 +50,9 @@ class ChatbotActivity : AppCompatActivity() {
         }
 
         val uri = Uri.parse(fileUriString)
-
         val fileName = uri.lastPathSegment ?: "Dokumen PDF"
 
-        tvFileName.text = fileName
+        tvFileName?.text = fileName
     }
 
     private fun setupListeners() {
@@ -70,7 +70,6 @@ class ChatbotActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // 🔥 dummy response chatbot
             val response = when {
 
                 message.contains("apa", true) ->
