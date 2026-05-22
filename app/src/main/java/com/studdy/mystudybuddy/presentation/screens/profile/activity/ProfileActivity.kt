@@ -1,54 +1,61 @@
-package com.studdy.mystudybuddy.presentation.screens.profile
+package com.studdy.mystudybuddy.presentation.screens.profile.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.presentation.main.MainActivity
+import com.studdy.mystudybuddy.presentation.screens.profile.activity.EditProfileActivity
+import com.studdy.mystudybuddy.presentation.screens.auth.activity.LoginActivity
 
 class ProfileActivity : AppCompatActivity() {
 
+    private lateinit var btnEditProfile: LinearLayout
     private lateinit var btnBack: ImageView
-    private lateinit var menuEditProfile: LinearLayout
     private lateinit var menuLogout: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_profile)
 
         initViews()
-        setupClickListeners()
+        setupListeners()
     }
 
     private fun initViews() {
+
         btnBack = findViewById(R.id.btnBack)
-        menuEditProfile = findViewById(R.id.menuEditProfile)
+        btnEditProfile = findViewById(R.id.btnEditProfile)
         menuLogout = findViewById(R.id.menuLogout)
     }
 
-    private fun setupClickListeners() {
+    private fun setupListeners() {
 
+        // back ke halaman sebelumnya
         btnBack.setOnClickListener {
             finish()
         }
 
-        menuEditProfile.setOnClickListener {
-            // buka EditProfileActivity nanti
+        // edit profile
+        btnEditProfile.setOnClickListener {
+            startActivity(
+                Intent(this, EditProfileActivity::class.java)
+            )
         }
 
+        // logout
         menuLogout.setOnClickListener {
 
-            val intent = Intent(
-                this,
-                MainActivity::class.java
-            )
+            val sharedPref = getSharedPreferences("user_session", MODE_PRIVATE)
+            sharedPref.edit().clear().apply()
 
-            intent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val intent = Intent(this, LoginActivity::class.java)
+
+
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TASK
 
             startActivity(intent)
             finish()

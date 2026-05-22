@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.presentation.history.model
+package com.studdy.mystudybuddy.presentation.screens.history.model
 
 data class FileHistoryModel(
     val fileName: String,

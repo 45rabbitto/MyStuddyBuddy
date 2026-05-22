@@ -102,7 +102,7 @@
 
                 <!-- Edit Profile -->
                 <LinearLayout
-                    android:id="@+id/menuEditProfile"
+                    android:id="@+id/btnEditProfile"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:gravity="center_vertical"

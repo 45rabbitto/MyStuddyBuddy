@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.presentation.screens.summary
+package com.studdy.mystudybuddy.presentation.screens.ringkasan
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text

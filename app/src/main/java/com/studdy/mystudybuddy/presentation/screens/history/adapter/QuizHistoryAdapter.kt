@@ -1,56 +1,49 @@
-package com.studdy.mystudybuddy.presentation.history.adapter
+package com.studdy.mystudybuddy.presentation.screens.history.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.studdy.mystudybuddy.databinding.ItemHistoryQuizBinding
-import com.studdy.mystudybuddy.presentation.history.model.QuizHistoryModel
+import com.studdy.mystudybuddy.R
 
 class QuizHistoryAdapter(
-    private val list: MutableList<QuizHistoryModel>,
-    private val onDeleteClick: (QuizHistoryModel) -> Unit,
-    private val onRepeatClick: (QuizHistoryModel) -> Unit
+    private val questions: List<Triple<String, String, String>>
 ) : RecyclerView.Adapter<QuizHistoryAdapter.ViewHolder>() {
 
-    inner class ViewHolder(
-        val binding: ItemHistoryQuizBinding
-    ) : RecyclerView.ViewHolder(binding.root)
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ViewHolder {
+        val tvQuestion: TextView =
+            itemView.findViewById(R.id.tvQuestion)
 
-        val binding = ItemHistoryQuizBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val tvCorrect: TextView =
+            itemView.findViewById(R.id.tvCorrectAnswer)
 
-        return ViewHolder(binding)
+        val tvWrong: TextView =
+            itemView.findViewById(R.id.tvWrongAnswer)
     }
 
-    override fun onBindViewHolder(
-        holder: ViewHolder,
-        position: Int
-    ) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
-        val item = list[position]
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_history_quiz, parent, false)
 
-        holder.binding.tvTitle.text = item.title
-        holder.binding.tvScore.text = "Skor: ${item.score}"
-        holder.binding.tvDate.text = item.date
-
-        holder.binding.btnDelete.setOnClickListener {
-            onDeleteClick(item)
-        }
-
-        holder.binding.btnRepeat.setOnClickListener {
-            onRepeatClick(item)
-        }
+        return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return list.size
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        val item = questions[position]
+
+        holder.tvQuestion.text =
+            "${position + 1}. ${item.first}"
+
+        holder.tvCorrect.text =
+            item.second
+
+        holder.tvWrong.text =
+            item.third
     }
+
+    override fun getItemCount(): Int = questions.size
 }

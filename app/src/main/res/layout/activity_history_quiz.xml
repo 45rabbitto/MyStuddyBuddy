@@ -1,60 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="12dp"
     android:background="@drawable/bg_gradient">
 
-        <!-- HEADER -->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/kontainer"
-            android:padding="8dp">
+    <!-- HEADER -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/kontainer"
+        android:padding="8dp">
 
-            <ImageView
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:src="@drawable/back"
-                android:contentDescription="Back"/>
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/back"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="History Quiz"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/dark_text"
-                android:layout_centerInParent="true"/>
-
-            <ImageView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/history"/>
-        </RelativeLayout>
-
-        <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Riwayat Soal"
+            android:text="History Quiz"
+            android:textSize="20sp"
             android:textStyle="bold"
-            android:textSize="17sp"
             android:textColor="@color/dark_text"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="12dp"/>
+            android:fontFamily="@font/poppins"
+            android:layout_centerInParent="true"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerHistory"
+        <ImageView
+            android:id="@+id/imgLogo"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/history"/>
+
+    </RelativeLayout>
+
+
+    <!-- CARD FILE -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/card_bg"
+        android:layout_marginTop="16dp"
+        android:padding="18dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Judul File"
+            android:textStyle="bold"
+            android:textColor="#888888"/>
+
+        <TextView
+            android:id="@+id/tvFileName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Biologi Sel.pdf"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="14dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tanggal"
+            android:textStyle="bold"
+            android:textColor="#888888"/>
+
+        <TextView
+            android:id="@+id/tvDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="20 Mei 2026"
+            android:layout_marginBottom="14dp"/>
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jumlah Soal"
+            android:textStyle="bold"
+            android:textColor="#888888"/>
+
+        <TextView
+            android:id="@+id/tvTotalQuestion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="10 Soal"/>
+
+    </LinearLayout>
+
+
+    <!-- HASIL QUIZ -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
-    </LinearLayout>
+        android:layout_weight="1"
+        android:layout_marginTop="16dp">
+
+        <LinearLayout
+            android:id="@+id/resultContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1. Apa fungsi inti sel?"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jawaban Benar"
+                    android:textStyle="bold"
+                    android:textColor="#4CAF50"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/tvCorrectAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mengatur aktivitas sel"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jawaban Salah"
+                    android:textStyle="bold"
+                    android:textColor="#F44336"
+                    android:layout_marginTop="12dp"/>
+
+                <TextView
+                    android:id="@+id/tvWrongAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Membentuk energi"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

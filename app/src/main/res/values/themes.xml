@@ -1,5 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MyStudyBuddy" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.MyStudyBuddy"
+        parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="colorPrimary">@color/primary_button</item>
+        <item name="colorPrimaryDark">@color/primary_button</item>
+        <item name="colorAccent">@color/sky_blue</item>
+
+    </style>
+
 </resources>

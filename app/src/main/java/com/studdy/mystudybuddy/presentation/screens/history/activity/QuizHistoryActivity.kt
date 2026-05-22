@@ -1,72 +1,144 @@
-package com.studdy.mystudybuddy.presentation.history.activity
+package com.studdy.mystudybuddy.presentation.screens.history.activity
 
 import android.os.Bundle
-import android.widget.Toast
+import android.view.LayoutInflater
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.studdy.mystudybuddy.databinding.ActivityHistoryQuizBinding
-import com.studdy.mystudybuddy.presentation.history.adapter.QuizHistoryAdapter
-import com.studdy.mystudybuddy.presentation.history.model.QuizHistoryModel
+import com.studdy.mystudybuddy.R
 
 class QuizHistoryActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHistoryQuizBinding
-    private lateinit var adapter: QuizHistoryAdapter
-    private val quizList = mutableListOf<QuizHistoryModel>()
+    private lateinit var btnBack: ImageView
+
+    private lateinit var tvFileName: TextView
+    private lateinit var tvDate: TextView
+    private lateinit var tvTotalQuestion: TextView
+
+    private lateinit var resultContainer: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityHistoryQuizBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
-
-        // Dummy data
-        quizList.add(
-            QuizHistoryModel(
-                "Machine Learning",
-                10,
-                80,
-                "12 Mei 2026"
-            )
+        setContentView(
+            R.layout.activity_history_quiz
         )
 
-        quizList.add(
-            QuizHistoryModel(
-                "Deep Learning",
-                15,
-                90,
-                "10 Mei 2026"
-            )
-        )
-
-        setupRecycler()
+        initViews()
+        loadData()
+        setupListeners()
     }
 
-    private fun setupRecycler() {
+    private fun initViews() {
 
-        adapter = QuizHistoryAdapter(
-            quizList,
-            onDeleteClick = { item ->
-                quizList.remove(item)
-                adapter.notifyDataSetChanged()
-            },
-            onRepeatClick = { item ->
-                Toast.makeText(
-                    this,
-                    "Ulang quiz: ${item.title}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        btnBack =
+            findViewById(R.id.btnBack)
+
+        tvFileName =
+            findViewById(R.id.tvFileName)
+
+        tvDate =
+            findViewById(R.id.tvDate)
+
+        tvTotalQuestion =
+            findViewById(R.id.tvTotalQuestion)
+
+        resultContainer =
+            findViewById(R.id.resultContainer)
+    }
+
+    private fun loadData() {
+
+        val fileName =
+            intent.getStringExtra(
+                "FILE_NAME"
+            ) ?: "Dokumen"
+
+        tvFileName.text =
+            fileName
+
+        tvDate.text =
+            "20 Mei 2026"
+
+        val questions =
+            listOf(
+
+                Triple(
+                    "Apa fungsi inti sel?",
+                    "Mengatur aktivitas sel",
+                    "Membentuk energi"
+                ),
+
+                Triple(
+                    "Organel penghasil energi adalah?",
+                    "Mitokondria",
+                    "Ribosom"
+                ),
+
+                Triple(
+                    "Bagian tumbuhan untuk fotosintesis?",
+                    "Kloroplas",
+                    "Membran sel"
+                )
+            )
+
+        tvTotalQuestion.text =
+            "${questions.size} Soal"
+
+        showQuestions(
+            questions
         )
+    }
 
-        binding.recyclerHistory.layoutManager =
-            LinearLayoutManager(this)
+    private fun showQuestions(
+        questions: List<Triple<String,String,String>>
+    ) {
 
-        binding.recyclerHistory.adapter =
-            adapter
+        resultContainer.removeAllViews()
+
+        for ((index, item) in questions.withIndex()) {
+
+            val view =
+                LayoutInflater.from(this)
+                    .inflate(
+                        R.layout.item_history_quiz,
+                        resultContainer,
+                        false
+                    )
+
+            val tvQuestion =
+                view.findViewById<TextView>(
+                    R.id.tvQuestion
+                )
+
+            val tvCorrect =
+                view.findViewById<TextView>(
+                    R.id.tvCorrectAnswer
+                )
+
+            val tvWrong =
+                view.findViewById<TextView>(
+                    R.id.tvWrongAnswer
+                )
+
+            tvQuestion.text =
+                "${index+1}. ${item.first}"
+
+            tvCorrect.text =
+                item.second
+
+            tvWrong.text =
+                item.third
+
+            resultContainer.addView(view)
+        }
+    }
+
+    private fun setupListeners() {
+
+        btnBack.setOnClickListener {
+            finish()
+        }
     }
 }

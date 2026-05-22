@@ -1,68 +1,71 @@
-package com.studdy.mystuddybuddy.presentation.history.activity
+package com.studdy.mystudybuddy.presentation.screens.history.activity
 
 import android.os.Bundle
-import android.widget.Toast
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.studdy.mystudybuddy.databinding.ActivityHistorySummaryBinding
-import com.studdy.mystudybuddy.presentation.history.adapter.SummaryHistoryAdapter
-import com.studdy.mystudybuddy.presentation.history.model.SummaryHistoryModel
+import com.studdy.mystudybuddy.R
 
 class SummaryHistoryActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityHistorySummaryBinding
-    private lateinit var adapter: SummaryHistoryAdapter
-
-    private val summaryList = mutableListOf<SummaryHistoryModel>()
+    private lateinit var btnBack: ImageView
+    private lateinit var tvFileName: TextView
+    private lateinit var tvSummary: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding =
-            ActivityHistorySummaryBinding.inflate(
-                layoutInflater
-            )
+        setContentView(
+            R.layout.activity_history_summary
+        )
 
-        setContentView(binding.root)
-
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
-
+        initViews()
         loadData()
-        setupRecycler()
+        setupListener()
+    }
+
+    private fun initViews() {
+
+        btnBack =
+            findViewById(R.id.btnBack)
+
+        tvFileName =
+            findViewById(R.id.tvFileName)
+
+        tvSummary =
+            findViewById(R.id.tvSummary)
     }
 
     private fun loadData() {
 
-        summaryList.add(
-            SummaryHistoryModel(
-                "Ringkasan Bab 1 AI",
-                "12 Mei 2026"
-            )
-        )
+        val fileName =
+            intent.getStringExtra("FILE_NAME")
+                ?: "Dokumen"
 
-        summaryList.add(
-            SummaryHistoryModel(
-                "Ringkasan NLP",
-                "11 Mei 2026"
-            )
-        )
+        tvFileName.text =
+            fileName
+
+        // sementara data dummy
+        tvSummary.text =
+            """
+            Ringkasan dari $fileName
+
+            Materi membahas:
+
+            • Pengertian dasar
+            • Konsep utama
+            • Struktur materi
+            • Contoh penerapan
+            • Kesimpulan materi
+
+            Ringkasan ini nantinya dapat diganti menggunakan hasil AI dari file upload.
+            """.trimIndent()
     }
 
-    private fun setupRecycler() {
+    private fun setupListener() {
 
-        adapter =
-            SummaryHistoryAdapter(summaryList) { item ->
-
-                summaryList.remove(item)
-                adapter.notifyDataSetChanged()
-            }
-
-        binding.recyclerHistory.layoutManager =
-            LinearLayoutManager(this)
-
-        binding.recyclerHistory.adapter =
-            adapter
+        btnBack.setOnClickListener {
+            finish()
+        }
     }
 }
