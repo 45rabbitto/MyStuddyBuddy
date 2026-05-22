@@ -7,7 +7,11 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.presentation.main.MainActivity
+import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActivity
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -17,10 +21,16 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var btnRegister: Button
     private lateinit var tvLogin: TextView
 
+    // Firebase
+    private lateinit var auth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_register)
+
+        // Inisialisasi Firebase
+        auth = FirebaseAuth.getInstance()
 
         initViews()
         setupClickListeners()
@@ -33,7 +43,7 @@ class RegisterActivity : AppCompatActivity() {
         etPassword = findViewById(R.id.etPassword)
 
         btnRegister = findViewById(R.id.btnRegister)
-        tvLogin = findViewById(R.id.btnLogin)
+        tvLogin = findViewById(R.id.tvLogin)
     }
 
     private fun setupClickListeners() {
@@ -45,6 +55,7 @@ class RegisterActivity : AppCompatActivity() {
             val password = etPassword.text.toString().trim()
 
             when {
+
                 username.isEmpty() -> {
                     etUsername.error = "Username wajib diisi"
                     etUsername.requestFocus()
@@ -67,20 +78,67 @@ class RegisterActivity : AppCompatActivity() {
 
                 else -> {
 
-                    Toast.makeText(
-                        this,
-                        "Registrasi berhasil",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    // Register Firebase Auth
+                    auth.createUserWithEmailAndPassword(
+                        email,
+                        password
+                    ).addOnCompleteListener(this) { task ->
 
-                    startActivity(
-                        Intent(
-                            this,
-                            LoginActivity::class.java
-                        )
-                    )
+                        if (task.isSuccessful) {
 
-                    finish()
+                            val userId = auth.currentUser?.uid
+
+                            // Data user
+                            val userMap = HashMap<String, Any>()
+                            userMap["username"] = username
+                            userMap["email"] = email
+
+                            // Simpan ke Realtime Database
+                            if (userId != null) {
+
+                                FirebaseDatabase
+                                    .getInstance()
+                                    .getReference("Users")
+                                    .child(userId)
+                                    .setValue(userMap)
+                                    .addOnSuccessListener {
+
+                                        Toast.makeText(
+                                            this,
+                                            "Registrasi berhasil",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                        // PINDAH KE MAIN ACTIVITY
+                                        startActivity(
+                                            Intent(
+                                                this,
+                                                DashboardActivity::class.java
+                                            )
+                                        )
+
+                                        finish()
+                                    }
+
+                                    .addOnFailureListener {
+
+                                        Toast.makeText(
+                                            this,
+                                            "Gagal menyimpan data",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            }
+
+                        } else {
+
+                            Toast.makeText(
+                                this,
+                                "Register gagal: ${task.exception?.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 }
             }
         }

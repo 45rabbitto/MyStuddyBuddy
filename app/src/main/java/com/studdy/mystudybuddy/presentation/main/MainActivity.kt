@@ -3,8 +3,6 @@ package com.studdy.mystudybuddy.presentation.main
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 import com.studdy.mystudybuddy.R
 
 class MainActivity : AppCompatActivity() {

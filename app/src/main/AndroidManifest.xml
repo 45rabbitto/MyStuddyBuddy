@@ -22,17 +22,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyStudyBuddy">
 
-        <!-- LAUNCHER (HALAMAN PERTAMA: WELCOME) -->
+        <!-- SPLASH SCREEN -->
         <activity
-            android:name=".presentation.screens.auth.activity.WelcomeActivity"
+            android:name=".presentation.Splash.SplashActivity"
             android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
         </activity>
+
+        <!-- WELCOME -->
+        <activity
+            android:name=".presentation.screens.auth.activity.WelcomeActivity"
+            android:exported="false"/>
 
         <!-- AUTH -->
         <activity
@@ -78,16 +84,20 @@
             android:name=".presentation.screens.profile.activity.ProfileActivity"
             android:exported="false"/>
 
-        <activity android:name=".presentation.screens.profile.activity.EditProfileActivity"
+        <activity
+            android:name=".presentation.screens.profile.activity.EditProfileActivity"
             android:exported="false" />
 
-        <activity android:name=".presentation.screens.progress.activity.ProgresActivity"
+        <activity
+            android:name=".presentation.screens.progress.activity.ProgresActivity"
             android:exported="false"/>
 
-        <activity android:name=".presentation.screens.recommendation.activity.AlurActivity"
+        <activity
+            android:name=".presentation.screens.recommendation.activity.AlurActivity"
             android:exported="false"/>
 
-        <activity android:name=".presentation.screens.recommendation.activity.AlurFileActivity"
+        <activity
+            android:name=".presentation.screens.recommendation.activity.AlurFileActivity"
             android:exported="false"/>
 
         <!-- HISTORY -->

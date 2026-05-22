@@ -72,19 +72,24 @@
                 android:padding="18dp">
 
                 <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical">
 
                     <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:id="@+id/txtTotalFile"
                         android:text="0"
                         android:textSize="26sp"
                         android:textStyle="bold"
+                        android:fontFamily="@font/poppins"
                         android:textColor="@color/sky_blue"/>
 
                     <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:text="Total File"
                         android:textSize="13sp"
                         android:textColor="#777777"/>

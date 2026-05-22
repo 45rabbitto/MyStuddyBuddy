@@ -43,10 +43,28 @@
         android:textSize="16dp" />
 
     <EditText
-        android:id="@+id/etEmail"
+        android:id="@+id/etUsername"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:hint="Anto9080"
+        android:background="@drawable/button_line"
+        android:paddingStart="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:fontFamily="@font/poppins"
+        android:paddingStart="5dp"
+        android:text="Email"
+        android:textColor="@color/dark_text"
+        android:textSize="16dp" />
+
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Anto@gmail.com"
         android:background="@drawable/button_line"
         android:paddingStart="16dp"/>
 
