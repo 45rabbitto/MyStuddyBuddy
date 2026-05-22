@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.presentation.progress.adapter
+package com.studdy.mystudybuddy.presentation.screens.progress.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,65 +7,35 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.presentation.progress.model.ProgressModel
+import com.studdy.mystudybuddy.presentation.screens.progress.model.ProgressModel
 
 class ProgressAdapter(
-    private val progressList: List<ProgressModel>
-) : RecyclerView.Adapter<ProgressAdapter.ViewHolder>() {
+    private val list: List<ProgressModel>
+) : RecyclerView.Adapter<ProgressAdapter.VH>() {
 
-    class ViewHolder(itemView: View)
-        : RecyclerView.ViewHolder(itemView) {
-
-        val tvTitle: TextView =
-            itemView.findViewById(R.id.tvTitle)
-
-        val tvStatus: TextView =
-            itemView.findViewById(R.id.tvStatus)
-
-        val tvPercent: TextView =
-            itemView.findViewById(R.id.tvPercent)
-
-        val progressBar: ProgressBar =
-            itemView.findViewById(R.id.progressBar)
+    class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val title: TextView = itemView.findViewById(R.id.tvTitle)
+        val progressText: TextView = itemView.findViewById(R.id.tvProgressText)
+        val progressBar: ProgressBar = itemView.findViewById(R.id.progressBar)
+        val status: TextView = itemView.findViewById(R.id.tvStatus)
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): ViewHolder {
-
-        val view = LayoutInflater
-            .from(parent.context)
-            .inflate(
-                R.layout.item_progress_row,
-                parent,
-                false
-            )
-
-        return ViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_progress, parent, false)
+        return VH(view)
     }
 
-    override fun onBindViewHolder(
-        holder: ViewHolder,
-        position: Int
-    ) {
+    override fun onBindViewHolder(holder: VH, position: Int) {
 
-        val item = progressList[position]
+        val item = list[position]
 
-        holder.tvTitle.text =
-            item.title
+        holder.title.text = item.title
+        holder.progressBar.progress = item.progress
+        holder.progressText.text = "${item.progress}%"
 
-        holder.tvStatus.text =
-            item.status
-
-        holder.tvPercent.text =
-            "${item.progress}%"
-
-        holder.progressBar.progress =
-            item.progress
+        holder.status.text = if (item.progress >= 100) "Completed" else "In Progress"
     }
 
-    override fun getItemCount(): Int {
-        return progressList.size
-    }
+    override fun getItemCount() = list.size
 }

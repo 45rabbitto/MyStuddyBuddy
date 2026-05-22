@@ -2,184 +2,55 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@drawable/bg_gradient">
+    android:background="@drawable/bg_gradient"
+    android:padding="16dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="vertical">
 
         <!-- HEADER -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:background="@drawable/kontainer"
-            android:padding="8dp">
+            android:padding="10dp">
 
+            <!-- Tombol Back -->
             <ImageView
                 android:id="@+id/btnBack"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/back"
-                android:clickable="true"
-                android:focusable="true"/>
+                android:src="@drawable/back" />
 
+            <!-- Judul -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Progress"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/dark_text"
-                android:fontFamily="@font/poppins"
-                android:layout_centerInParent="true"/>
+                android:layout_centerInParent="true"
+                android:text="Progres Belajar"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
+            <!-- Icon Progress -->
             <ImageView
-                android:id="@+id/imgLogo"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:id="@+id/imgProgress"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/progres"/>
+                android:src="@drawable/progres" />
         </RelativeLayout>
 
-        <!-- SUMMARY CARD -->
-        <LinearLayout
+        <!-- RECYCLERVIEW -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/progressContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/kontainer"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ringkasan Progress"
-                android:textStyle="bold"
-                android:textSize="16sp"
-                android:textColor="@color/dark_text"/>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:orientation="horizontal">
-
-                <!-- Materi -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvMateri"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Materi"/>
-                </LinearLayout>
-
-                <!-- Quiz -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvQuiz"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Kuis"/>
-                </LinearLayout>
-
-                <!-- Rata-rata -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvAverage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0%"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/sky_blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rata-rata"/>
-                </LinearLayout>
-
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- TITLE -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Materi Terakhir"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            android:textColor="@color/dark_text"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="10dp"/>
-
-        <!-- LAST MATERIAL CARD -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/kontainer"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <TextView
-                android:id="@+id/tvSubject"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Belum ada materi"
-                android:textStyle="bold"
-                android:textSize="15sp"
-                android:textColor="@color/dark_text"/>
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Upload dulu untuk mulai belajar"
-                android:textSize="13sp"
-                android:textColor="#888888"
-                android:layout_marginTop="4dp"/>
-
-        </LinearLayout>
+            android:layout_marginTop="16dp" />
 
     </LinearLayout>
 
