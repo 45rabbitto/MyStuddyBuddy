@@ -2,111 +2,128 @@ package com.studdy.mystudybuddy.presentation.screens.home.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.presentation.screens.home.DashboardItem
-import com.studdy.mystudybuddy.presentation.screens.home.adapter.DashboardAdapter
 import com.studdy.mystudybuddy.presentation.screens.history.activity.FileHistoryActivity
-import com.studdy.mystudybuddy.presentation.screens.progress.activity.ProgresActivity
 import com.studdy.mystudybuddy.presentation.screens.profile.activity.ProfileActivity
-import com.studdy.mystudybuddy.presentation.screens.upload.activity.UploadActivity
+import com.studdy.mystudybuddy.presentation.screens.progress.activity.ProgresActivity
 import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurActivity
+import com.studdy.mystudybuddy.presentation.screens.upload.activity.UploadActivity
 import com.studdy.mystudybuddy.utils.StreakManager
 
 class DashboardActivity : AppCompatActivity() {
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var dashboardAdapter: DashboardAdapter
-
     private lateinit var tvStreak: TextView
+
+    private lateinit var history: ImageView
+    private lateinit var alur: ImageView
+    private lateinit var progres: ImageView
+    private lateinit var upload: ImageView
+    private lateinit var profile: ImageView
+    private lateinit var home: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
-        recyclerView = findViewById(R.id.rvDashboard)
+        // STREAK
         tvStreak = findViewById(R.id.tvStreak)
 
+        // MENU
+        history = findViewById(R.id.history)
+        alur = findViewById(R.id.alur)
+        progres = findViewById(R.id.progres)
+        upload = findViewById(R.id.upload)
+        profile = findViewById(R.id.profile)
+        home = findViewById(R.id.home)
+
         setupStreak()
-        setupDashboard()
+        setupMenu()
     }
 
-    // 🔥 STREAK SYSTEM
+    // 🔥 STREAK
     private fun setupStreak() {
+
         val streakManager = StreakManager(this)
         val streak = streakManager.updateStreak()
 
-        tvStreak.text = " $streak "
+        tvStreak.text = streak.toString()
 
         Toast.makeText(
             this,
-            " $streak ",
+            "Streak kamu: $streak 🔥",
             Toast.LENGTH_SHORT
         ).show()
     }
 
-    private fun setupDashboard() {
+    // MENU CLICK
+    private fun setupMenu() {
 
-        val menuList = listOf(
-            DashboardItem("History", R.drawable.history),
-            DashboardItem("Alur", R.drawable.alur),
-            DashboardItem("Progress", R.drawable.progres),
-            DashboardItem("Upload", R.drawable.upload),
-            DashboardItem("Profile", R.drawable.profil)
-        )
+        // HISTORY
+        history.setOnClickListener {
+            startActivity(
+                Intent(this, FileHistoryActivity::class.java)
+            )
+        }
 
-        dashboardAdapter = DashboardAdapter(menuList) { item ->
+        // ALUR
+        alur.setOnClickListener {
+            startActivity(
+                Intent(this, AlurActivity::class.java)
+            )
+        }
 
-            when (item.title) {
+        // PROGRESS
+        progres.setOnClickListener {
+            startActivity(
+                Intent(this, ProgresActivity::class.java)
+            )
+        }
 
-                "History" -> {
-                    startActivity(
-                        Intent(this, FileHistoryActivity::class.java)
-                    )
-                }
+        // UPLOAD
+        upload.setOnClickListener {
 
-                "Alur" -> {
-                    startActivity(
-                        Intent(this, AlurActivity::class.java)
-                    )
-                }
+            Toast.makeText(
+                this,
+                "Membuka Upload",
+                Toast.LENGTH_SHORT
+            ).show()
 
-                "Progress" -> {
-                    startActivity(
-                        Intent(this, ProgresActivity::class.java)
-                    )
-                }
+            startActivity(
+                Intent(this, UploadActivity::class.java)
+            )
+        }
 
-                "Upload" -> {
-                    Toast.makeText(this, "Membuka Upload", Toast.LENGTH_SHORT).show()
+        // PROFILE
+        profile.setOnClickListener {
 
-                    startActivity(
-                        Intent(this, UploadActivity::class.java)
-                    )
-                }
+            try {
 
-                "Profile" -> {
+                startActivity(
+                    Intent(this, ProfileActivity::class.java)
+                )
 
-                    try {
-                        startActivity(
-                            Intent(this, ProfileActivity::class.java)
-                        )
-                    } catch (e: Exception) {
-                        Toast.makeText(
-                            this,
-                            "Profile belum tersedia",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+            } catch (e: Exception) {
+
+                Toast.makeText(
+                    this,
+                    "Profile belum tersedia",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
-        recyclerView.layoutManager = GridLayoutManager(this, 2)
-        recyclerView.adapter = dashboardAdapter
+        // HOME
+        home.setOnClickListener {
+
+            Toast.makeText(
+                this,
+                "Kamu sudah di Home",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

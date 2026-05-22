@@ -39,45 +39,83 @@ class FileHistoryActivity : AppCompatActivity() {
 
     private fun loadHistory() {
 
-        val prefs = getSharedPreferences("history_data", MODE_PRIVATE)
+        val prefs = getSharedPreferences(
+            "history_data",
+            MODE_PRIVATE
+        )
 
-        val rawSet = prefs.getStringSet("files", emptySet()) ?: emptySet()
+        val rawSet =
+            prefs.getStringSet("files", emptySet()) ?: emptySet()
 
         val historyList = rawSet.mapNotNull { item ->
-            val parts = item.split("|")
-            if (parts.size >= 2) {
+
+            val p = item.split("|")
+
+            if (p.size >= 3) {
+
                 FileHistoryModel(
-                    fileName = parts[0],
-                    date = parts[1]
+                    p[0], // file name
+                    p[1]  // date
                 )
-            } else null
-        }.toMutableList()
+
+            } else {
+                null
+            }
+        }
 
         val adapter = FileHistoryAdapter(
-            historyList,
+
+            historyList.toMutableList(),
+
             onItemClick = { file ->
+
                 startActivity(
-                    Intent(this, FileHistoryDetailActivity::class.java).apply {
-                        putExtra("FILE_NAME", file.fileName)
+                    Intent(
+                        this,
+                        FileHistoryDetailActivity::class.java
+                    ).apply {
+
+                        putExtra(
+                            "FILE_NAME",
+                            file.fileName
+                        )
                     }
                 )
             },
+
             onDelete = { file ->
 
-                val current = prefs.getStringSet("files", mutableSetOf())?.toMutableSet()
-                    ?: mutableSetOf()
+                val current =
+                    prefs.getStringSet(
+                        "files",
+                        mutableSetOf()
+                    )?.toMutableSet() ?: mutableSetOf()
 
-                current.remove("${file.fileName}|${file.date}")
+                // Cari item lengkap yang cocok
+                val target = current.find {
+
+                    val p = it.split("|")
+
+                    p.size >= 2 &&
+                            p[0] == file.fileName &&
+                            p[1] == file.date
+                }
+
+                target?.let {
+                    current.remove(it)
+                }
 
                 prefs.edit()
                     .putStringSet("files", current)
                     .apply()
 
-                loadHistory() // refresh tanpa recreate
+                loadHistory()
             }
         )
 
-        rvHistory.layoutManager = LinearLayoutManager(this)
+        rvHistory.layoutManager =
+            LinearLayoutManager(this)
+
         rvHistory.adapter = adapter
     }
 }

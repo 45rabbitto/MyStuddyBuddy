@@ -1,7 +1,6 @@
 package com.studdy.mystudybuddy.presentation.screens.upload.activity
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
+import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurActivity
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 import java.text.SimpleDateFormat
 import java.util.*
@@ -34,9 +34,13 @@ class UploadActivity : AppCompatActivity() {
 
         initViews()
         setupClickListeners()
+
+        // Simpan daftar materi upload default
+        saveUploadedMaterials()
     }
 
     private fun initViews() {
+
         btnBack = findViewById(R.id.btnBack)
         uploadContainer = findViewById(R.id.uploadContainer)
         fileContainer = findViewById(R.id.fileContainer)
@@ -50,34 +54,50 @@ class UploadActivity : AppCompatActivity() {
 
     private fun setupClickListeners() {
 
-        btnBack.setOnClickListener { finish() }
+        btnBack.setOnClickListener {
+            finish()
+        }
 
-        uploadContainer.setOnClickListener { pickFile() }
+        uploadContainer.setOnClickListener {
+            pickFile()
+        }
 
         btnRingkasan.setOnClickListener {
-            if (fileUri != null) {
-                saveData()
-                startActivity(Intent(this, RingkasanActivity::class.java).apply {
+
+            if (fileUri == null) return@setOnClickListener
+
+            saveToHistory("RINGKASAN")
+
+            startActivity(
+                Intent(this, RingkasanActivity::class.java).apply {
                     putExtra("FILE_URI", fileUri.toString())
-                })
-            }
+                    putExtra("FILE_NAME", fileName)
+                }
+            )
         }
 
         btnChatbot.setOnClickListener {
-            if (fileUri != null) {
-                saveData()
-                startActivity(Intent(this, ChatbotActivity::class.java).apply {
+
+            if (fileUri == null) return@setOnClickListener
+
+            saveToHistory("CHATBOT")
+
+            startActivity(
+                Intent(this, ChatbotActivity::class.java).apply {
                     putExtra("FILE_URI", fileUri.toString())
-                })
-            }
+                    putExtra("FILE_NAME", fileName)
+                }
+            )
         }
     }
 
     private fun pickFile() {
+
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "application/pdf"
             addCategory(Intent.CATEGORY_OPENABLE)
         }
+
         launcher.launch(intent)
     }
 
@@ -94,10 +114,23 @@ class UploadActivity : AppCompatActivity() {
                 tvKosong.visibility = View.GONE
 
                 fileContainer.removeAllViews()
+
                 fileContainer.addView(TextView(this).apply {
+
                     text = fileName
-                    textSize = 14f
+                    textSize = 15f
+
+                    setPadding(20, 20, 20, 20)
+
+                    setBackgroundResource(R.drawable.kontainer)
+
+                    setOnClickListener {
+                        openAlur()
+                    }
                 })
+
+                // Simpan materi upload terbaru
+                saveUploadedMaterial(fileName ?: "")
 
                 btnRingkasan.isEnabled = true
                 btnChatbot.isEnabled = true
@@ -105,43 +138,117 @@ class UploadActivity : AppCompatActivity() {
         }
 
     private fun getFileName(uri: Uri): String {
+
         var name = "file.pdf"
 
         val cursor = contentResolver.query(uri, null, null, null, null)
+
         cursor?.use {
+
             if (it.moveToFirst()) {
+
                 val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (index >= 0) name = it.getString(index)
+
+                if (index >= 0) {
+                    name = it.getString(index)
+                }
             }
         }
 
         return name
     }
 
-    // ===================== SAVE DATA =====================
-    private fun saveData() {
+    private fun saveToHistory(type: String) {
 
-        val progress = getSharedPreferences("progress_data", MODE_PRIVATE)
-        val history = getSharedPreferences("history_data", MODE_PRIVATE)
+        val prefs = getSharedPreferences("history_data", MODE_PRIVATE)
 
-        val time = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
+        val old = prefs.getStringSet("files", mutableSetOf()) ?: mutableSetOf()
 
-        // progress update
-        val materi = progress.getInt("materi_count", 0)
-
-        progress.edit()
-            .putInt("materi_count", materi + 1)
-            .putString("last_file", fileName)
-            .apply()
-
-        // history save
-        val old = history.getStringSet("files", mutableSetOf()) ?: mutableSetOf()
         val newSet = HashSet(old)
 
-        newSet.add("$fileName|$time")
+        val date = SimpleDateFormat(
+            "dd MMM yyyy",
+            Locale.getDefault()
+        ).format(Date())
 
-        history.edit()
+        newSet.add("$fileName|$date|$type")
+
+        prefs.edit()
             .putStringSet("files", newSet)
             .apply()
+    }
+
+    // Simpan daftar materi bawaan
+    private fun saveUploadedMaterials() {
+
+        // ===== history_data =====
+        val historyPrefs = getSharedPreferences("history_data", MODE_PRIVATE)
+
+        val historyList = mutableSetOf(
+            "Deep Learning.pdf",
+            "Python AI.pdf"
+        )
+
+        historyPrefs.edit()
+            .putStringSet("uploaded_materials", historyList)
+            .apply()
+
+        // ===== progress_data =====
+        val progressPrefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+
+        val progressList = mutableSetOf(
+            "Deep Learning.pdf",
+            "Python AI.pdf"
+        )
+
+        progressPrefs.edit()
+            .putStringSet("uploaded_materials", progressList)
+            .apply()
+    }
+
+    // Simpan materi upload baru
+    private fun saveUploadedMaterial(materialName: String) {
+
+        // ===== history_data =====
+        val historyPrefs = getSharedPreferences("history_data", MODE_PRIVATE)
+
+        val historyList =
+            historyPrefs.getStringSet(
+                "uploaded_materials",
+                mutableSetOf()
+            )?.toMutableSet() ?: mutableSetOf()
+
+        historyList.add(materialName)
+
+        historyPrefs.edit()
+            .putStringSet("uploaded_materials", historyList)
+            .apply()
+
+        // ===== progress_data =====
+        val progressPrefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+
+        val progressList =
+            progressPrefs.getStringSet(
+                "uploaded_materials",
+                mutableSetOf()
+            )?.toMutableSet() ?: mutableSetOf()
+
+        progressList.add(materialName)
+
+        progressPrefs.edit()
+            .putStringSet("uploaded_materials", progressList)
+            .apply()
+    }
+
+    private fun openAlur() {
+
+        if (fileUri == null) return
+
+        startActivity(
+            Intent(this, AlurActivity::class.java).apply {
+                putExtra("FILE_NAME", fileName)
+                putExtra("FILE_URI", fileUri.toString())
+            }
+        )
     }
 }

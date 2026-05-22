@@ -1,7 +1,6 @@
-package com.studdy.mystudybuddy.presentation.progress.model
+package com.studdy.mystudybuddy.presentation.screens.progress.model
 
 data class ProgressModel(
     val title: String,
-    val status: String,
     val progress: Int
 )
