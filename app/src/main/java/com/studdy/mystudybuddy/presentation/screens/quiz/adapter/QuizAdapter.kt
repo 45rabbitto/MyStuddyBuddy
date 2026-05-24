@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.studdy.mystudybuddy.databinding.ItemQuizBinding
-import com.studdy.mystudybuddy.presentation.screens.quiz.model.Question
+import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
 
 class QuizAdapter(
-    private val questionList: List<Question>,
+    private val questionList: List<QuizQuestion>,
     private val onOptionClick: (Int, Int) -> Unit
 ) : RecyclerView.Adapter<QuizAdapter.QuizViewHolder>() {
 
@@ -16,7 +16,7 @@ class QuizAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
-            question: Question,
+            question: QuizQuestion,
             position: Int
         ) {
 

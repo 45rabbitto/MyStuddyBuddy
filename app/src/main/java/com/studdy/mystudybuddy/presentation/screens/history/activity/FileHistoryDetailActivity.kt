@@ -5,25 +5,33 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.presentation.screens.quiz.activity.HasilKuisActivity
+import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 
 class FileHistoryDetailActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var tvFileName: TextView
+    private lateinit var tvRingkasan: TextView
+    private lateinit var tvSkor: TextView
     private lateinit var btnBukaRingkasan: Button
     private lateinit var btnBukaQuiz: Button
-    private lateinit var tvInfo: TextView
 
     private var fileName = ""
+    private var fileUri = ""
+
+    // skor global
+    private var latestScore = 0
 
     // Firebase
-    private val auth =
-        FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     private val database =
         FirebaseDatabase.getInstance().reference
@@ -49,14 +57,17 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         tvFileName =
             findViewById(R.id.tvFileName)
 
+        tvRingkasan =
+            findViewById(R.id.tvRingkasan)
+
+        tvSkor =
+            findViewById(R.id.tvSkor)
+
         btnBukaRingkasan =
             findViewById(R.id.btnBukaRingkasan)
 
         btnBukaQuiz =
             findViewById(R.id.btnBukaQuiz)
-
-        tvInfo =
-            findViewById(R.id.tvInfo)
     }
 
     private fun getData() {
@@ -66,46 +77,64 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                 "FILE_NAME"
             ) ?: "Dokumen"
 
-        tvFileName.text =
-            fileName
+        fileUri =
+            intent.getStringExtra(
+                "FILE_URI"
+            ) ?: ""
+
+        tvFileName.text = fileName
     }
 
     private fun setupListeners() {
 
-        // tombol kembali
         btnBack.setOnClickListener {
             finish()
         }
 
-        // buka history ringkasan
+        // tombol ringkasan
         btnBukaRingkasan.setOnClickListener {
 
             startActivity(
                 Intent(
                     this,
-                    SummaryHistoryActivity::class.java
+                    RingkasanActivity::class.java
                 ).apply {
 
                     putExtra(
                         "FILE_NAME",
                         fileName
                     )
+
+                    putExtra(
+                        "FILE_URI",
+                        fileUri
+                    )
                 }
             )
         }
 
-        // buka history quiz
+        // tombol hasil quiz
         btnBukaQuiz.setOnClickListener {
 
             startActivity(
                 Intent(
                     this,
-                    QuizHistoryActivity::class.java
+                    HasilKuisActivity::class.java
                 ).apply {
 
                     putExtra(
                         "FILE_NAME",
                         fileName
+                    )
+
+                    putExtra(
+                        "FILE_URI",
+                        fileUri
+                    )
+
+                    putExtra(
+                        "SCORE",
+                        latestScore
                     )
                 }
             )
@@ -115,24 +144,14 @@ class FileHistoryDetailActivity : AppCompatActivity() {
     private fun loadDetailHistory() {
 
         val uid =
-            auth.currentUser?.uid
-
-        if (uid == null) {
-
-            Toast.makeText(
-                this,
-                "User belum login",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            return
-        }
+            auth.currentUser?.uid ?: return
 
         database.child("QuizHistory")
             .child(uid)
             .orderByChild("fileName")
             .equalTo(fileName)
             .addListenerForSingleValueEvent(
+
                 object : ValueEventListener {
 
                     override fun onDataChange(
@@ -141,47 +160,42 @@ class FileHistoryDetailActivity : AppCompatActivity() {
 
                         if (!snapshot.exists()) {
 
-                            tvInfo.text =
-                                "Belum ada history quiz"
+                            tvSkor.text =
+                                "Skor : Belum ada"
+
+                            tvRingkasan.text =
+                                "Belum ada ringkasan"
 
                             return
                         }
 
-                        var latestScore = 0
-                        var latestDate = "-"
+                        latestScore = 0
 
                         for (data in snapshot.children) {
 
                             latestScore =
                                 data.child("score")
-                                    .getValue(Int::class.java)
-                                    ?: 0
-
-                            latestDate =
-                                data.child("date")
-                                    .getValue(String::class.java)
-                                    ?: "-"
+                                    .getValue(
+                                        Int::class.java
+                                    ) ?: 0
                         }
 
-                        tvInfo.text =
-                            """
-                            Nama File:
-                            $fileName
-                            
-                            Skor Terakhir:
-                            $latestScore
-                            
-                            Tanggal:
-                            $latestDate
-                            """.trimIndent()
+                        tvSkor.text =
+                            "Skor : $latestScore"
+
+                        tvRingkasan.text =
+                            "Klik tombol untuk melihat ringkasan materi"
                     }
 
                     override fun onCancelled(
                         error: DatabaseError
                     ) {
 
-                        tvInfo.text =
-                            "Gagal memuat detail"
+                        tvSkor.text =
+                            "Gagal memuat skor"
+
+                        tvRingkasan.text =
+                            "Gagal memuat data"
                     }
                 }
             )

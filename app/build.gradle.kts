@@ -5,8 +5,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
-
-    // Firebase
     id("com.google.gms.google-services")
 }
 
@@ -105,6 +103,10 @@ dependencies {
     implementation(
         "com.google.firebase:firebase-storage-ktx"
     )
+
+    // Glide
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 
     // =====================================
     // CORE

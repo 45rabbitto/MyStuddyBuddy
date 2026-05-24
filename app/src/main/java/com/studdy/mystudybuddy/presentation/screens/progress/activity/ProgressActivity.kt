@@ -18,16 +18,21 @@ class ProgresActivity : AppCompatActivity() {
     private lateinit var recycler: RecyclerView
     private lateinit var tvTotalProgress: TextView
 
-    // Firebase
     private val auth =
         FirebaseAuth.getInstance()
 
     private val database =
         FirebaseDatabase.getInstance().reference
 
+    private val progressList =
+        mutableListOf<ProgressModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_progres)
+
+        setContentView(
+            R.layout.activity_progres
+        )
 
         initViews()
         setupRecycler()
@@ -37,13 +42,25 @@ class ProgresActivity : AppCompatActivity() {
 
     private fun initViews() {
 
-        btnBack = findViewById(R.id.btnBack)
+        btnBack =
+            findViewById(R.id.btnBack)
 
         recycler =
             findViewById(R.id.progressContainer)
 
         tvTotalProgress =
             findViewById(R.id.tvTotalProgress)
+    }
+
+    private fun setupRecycler() {
+
+        recycler.layoutManager =
+            LinearLayoutManager(this)
+
+        recycler.adapter =
+            ProgressAdapter(
+                progressList
+            )
     }
 
     private fun setupBackButton() {
@@ -53,46 +70,70 @@ class ProgresActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupRecycler() {
-
-        recycler.layoutManager =
-            LinearLayoutManager(this)
-    }
-
     private fun loadProgress() {
 
         val uid =
-            auth.currentUser?.uid ?: return
+            auth.currentUser?.uid
+                ?: return
 
-        database.child("Uploads")
+        progressList.clear()
+
+        database.child("UploadedMaterials")
             .child(uid)
             .addListenerForSingleValueEvent(
+
                 object : ValueEventListener {
 
                     override fun onDataChange(
                         snapshot: DataSnapshot
                     ) {
 
-                        val progressList =
-                            mutableListOf<ProgressModel>()
-
                         var totalProgress = 0
                         var totalMateri = 0
+
+                        if (!snapshot.exists()) {
+
+                            tvTotalProgress.text =
+                                "Total Progress : 0%"
+
+                            return
+                        }
+
+                        val totalFile =
+                            snapshot.childrenCount.toInt()
+
+                        var processedFile = 0
 
                         for (data in snapshot.children) {
 
                             val fileName =
-                                data.child("fileName")
-                                    .getValue(String::class.java)
+
+                                data.child(
+                                    "fileName"
+                                )
+                                    .getValue(
+                                        String::class.java
+                                    )
                                     ?: "Materi"
 
-                            // Ambil progress quiz
-                            database.child("QuizHistory")
+                            database.child(
+                                "QuizHistory"
+                            )
+
                                 .child(uid)
-                                .orderByChild("fileName")
-                                .equalTo(fileName)
+
+                                .orderByChild(
+                                    "fileName"
+                                )
+
+                                .equalTo(
+                                    fileName
+                                )
+
                                 .addListenerForSingleValueEvent(
-                                    object : ValueEventListener {
+
+                                    object :
+                                        ValueEventListener {
 
                                         override fun onDataChange(
                                             quizSnapshot: DataSnapshot
@@ -100,44 +141,87 @@ class ProgresActivity : AppCompatActivity() {
 
                                             var score = 0
 
+                                            var pernahQuiz =
+                                                false
+
                                             for (quiz in quizSnapshot.children) {
 
                                                 score =
-                                                    quiz.child("score")
-                                                        .getValue(Int::class.java)
+                                                    quiz.child(
+                                                        "score"
+                                                    )
+
+                                                        .getValue(
+                                                            Int::class.java
+                                                        )
                                                         ?: 0
+
+                                                pernahQuiz =
+                                                    true
                                             }
 
-                                            // Rumus progress:
-                                            // quiz 70% + baca materi 30%
+                                            /*
+                                            Progress:
+                                            Ringkasan dibaca = 30
+                                            Quiz = 70
+                                            */
 
                                             val progress =
-                                                ((score * 70) / 100) + 30
 
-                                            totalProgress += progress
+                                                if (
+                                                    pernahQuiz
+                                                ) {
+
+                                                    30 +
+                                                            ((score * 70) / 100)
+
+                                                } else {
+
+                                                    30
+                                                }
+
+                                            totalProgress +=
+                                                progress
+
                                             totalMateri++
 
                                             progressList.add(
+
                                                 ProgressModel(
-                                                    title = fileName,
-                                                    progress = progress
+
+                                                    title =
+                                                        fileName,
+
+                                                    progress =
+                                                        progress
                                                 )
                                             )
 
-                                            recycler.adapter =
-                                                ProgressAdapter(
-                                                    progressList
-                                                )
+                                            processedFile++
 
-                                            val average =
-                                                if (totalMateri == 0) {
-                                                    0
-                                                } else {
-                                                    totalProgress / totalMateri
-                                                }
+                                            if (
+                                                processedFile ==
+                                                totalFile
+                                            ) {
 
-                                            tvTotalProgress.text =
-                                                "Total Progress: $average%"
+                                                recycler.adapter?.notifyDataSetChanged()
+
+                                                val average =
+
+                                                    if (
+                                                        totalMateri == 0
+                                                    ) {
+                                                        0
+                                                    } else {
+
+                                                        totalProgress /
+                                                                totalMateri
+                                                    }
+
+                                                tvTotalProgress.text =
+
+                                                    "Total Progress : $average%"
+                                            }
                                         }
 
                                         override fun onCancelled(

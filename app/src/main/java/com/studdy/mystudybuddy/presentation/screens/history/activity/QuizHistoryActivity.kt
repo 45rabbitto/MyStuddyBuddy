@@ -8,7 +8,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.studdy.mystudybuddy.R
 
 class QuizHistoryActivity : AppCompatActivity() {
@@ -22,7 +25,6 @@ class QuizHistoryActivity : AppCompatActivity() {
 
     private lateinit var resultContainer: LinearLayout
 
-    // Firebase
     private val auth =
         FirebaseAuth.getInstance()
 
@@ -37,8 +39,8 @@ class QuizHistoryActivity : AppCompatActivity() {
         )
 
         initViews()
-        loadData()
         setupListeners()
+        loadData()
     }
 
     private fun initViews() {
@@ -79,7 +81,7 @@ class QuizHistoryActivity : AppCompatActivity() {
 
             Toast.makeText(
                 this,
-                "User belum login",
+                "Silakan login terlebih dahulu",
                 Toast.LENGTH_SHORT
             ).show()
 
@@ -91,6 +93,7 @@ class QuizHistoryActivity : AppCompatActivity() {
             .orderByChild("fileName")
             .equalTo(fileName)
             .addListenerForSingleValueEvent(
+
                 object : ValueEventListener {
 
                     override fun onDataChange(
@@ -103,7 +106,7 @@ class QuizHistoryActivity : AppCompatActivity() {
                                 "Belum ada history"
 
                             tvScore.text =
-                                "0"
+                                "Skor : 0"
 
                             tvTotalQuestion.text =
                                 "0 Soal"
@@ -113,6 +116,11 @@ class QuizHistoryActivity : AppCompatActivity() {
 
                         var latestDate = "-"
                         var latestScore = 0
+
+                        val questions =
+                            mutableListOf<
+                                    Triple<String,String,String>
+                                    >()
 
                         for (data in snapshot.children) {
 
@@ -125,39 +133,78 @@ class QuizHistoryActivity : AppCompatActivity() {
                                 data.child("score")
                                     .getValue(Int::class.java)
                                     ?: 0
+
+                            // Ambil soal dari Firebase
+                            val questionSnapshot =
+                                data.child("questions")
+
+                            if(questionSnapshot.exists()){
+
+                                for(q in questionSnapshot.children){
+
+                                    val soal =
+                                        q.child("question")
+                                            .getValue(String::class.java)
+                                            ?: ""
+
+                                    val benar =
+                                        q.child("correctAnswer")
+                                            .getValue(String::class.java)
+                                            ?: ""
+
+                                    val user =
+                                        q.child("userAnswer")
+                                            .getValue(String::class.java)
+                                            ?: ""
+
+                                    questions.add(
+
+                                        Triple(
+                                            soal,
+                                            benar,
+                                            user
+                                        )
+                                    )
+                                }
+                            }
                         }
 
                         tvDate.text =
                             latestDate
 
                         tvScore.text =
-                            "$latestScore"
+                            "Skor : $latestScore"
 
-                        // Dummy total soal
-                        tvTotalQuestion.text =
-                            "3 Soal"
+                        // fallback jika data Firebase kosong
+                        if(questions.isEmpty()){
 
-                        val questions =
-                            listOf(
+                            questions.addAll(
 
-                                Triple(
-                                    "Apa fungsi inti sel?",
-                                    "Mengatur aktivitas sel",
-                                    "Membentuk energi"
-                                ),
+                                listOf(
 
-                                Triple(
-                                    "Organel penghasil energi adalah?",
-                                    "Mitokondria",
-                                    "Ribosom"
-                                ),
+                                    Triple(
+                                        "Apa fungsi inti sel?",
+                                        "Mengatur aktivitas sel",
+                                        "Membentuk energi"
+                                    ),
 
-                                Triple(
-                                    "Bagian tumbuhan untuk fotosintesis?",
-                                    "Kloroplas",
-                                    "Membran sel"
+                                    Triple(
+                                        "Organel penghasil energi?",
+                                        "Mitokondria",
+                                        "Ribosom"
+                                    ),
+
+                                    Triple(
+                                        "Tempat fotosintesis?",
+                                        "Kloroplas",
+                                        "Membran sel"
+                                    )
                                 )
                             )
+                        }
+
+                        tvTotalQuestion.text =
+                            "${questions.size} Soal"
 
                         showQuestions(
                             questions
@@ -179,12 +226,12 @@ class QuizHistoryActivity : AppCompatActivity() {
     }
 
     private fun showQuestions(
-        questions: List<Triple<String, String, String>>
+        questions: List<Triple<String,String,String>>
     ) {
 
         resultContainer.removeAllViews()
 
-        for ((index, item) in questions.withIndex()) {
+        for ((index,item) in questions.withIndex()) {
 
             val view =
                 LayoutInflater.from(this)
@@ -210,15 +257,17 @@ class QuizHistoryActivity : AppCompatActivity() {
                 )
 
             tvQuestion.text =
-                "${index + 1}. ${item.first}"
+                "${index+1}. ${item.first}"
 
             tvCorrect.text =
                 "Jawaban benar: ${item.second}"
 
             tvWrong.text =
-                "Jawaban salah: ${item.third}"
+                "Jawaban user: ${item.third}"
 
-            resultContainer.addView(view)
+            resultContainer.addView(
+                view
+            )
         }
     }
 

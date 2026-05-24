@@ -1,10 +1,10 @@
 package com.studdy.mystudybuddy.presentation.screens.quiz.model
 
-data class Question(
+data class QuizQuestion(
 
-    val question: String,
+    val question: String = "",
 
-    val options: List<String>,
+    val options: List<String> = listOf(),
 
-    val correctAnswer: Int
+    val correctAnswer: Int = -1
 )
