@@ -6,15 +6,22 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
 import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurActivity
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class UploadActivity : AppCompatActivity() {
 
@@ -25,18 +32,22 @@ class UploadActivity : AppCompatActivity() {
     private lateinit var btnRingkasan: Button
     private lateinit var btnChatbot: Button
 
+    // Firebase
+    private lateinit var auth: FirebaseAuth
+
     private var fileUri: Uri? = null
     private var fileName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_upload)
+
+        // Inisialisasi Firebase
+        auth = FirebaseAuth.getInstance()
 
         initViews()
         setupClickListeners()
-
-        // Simpan daftar materi upload default
-        saveUploadedMaterials()
     }
 
     private fun initViews() {
@@ -129,7 +140,7 @@ class UploadActivity : AppCompatActivity() {
                     }
                 })
 
-                // Simpan materi upload terbaru
+                // Simpan ke Firebase
                 saveUploadedMaterial(fileName ?: "")
 
                 btnRingkasan.isEnabled = true
@@ -141,13 +152,20 @@ class UploadActivity : AppCompatActivity() {
 
         var name = "file.pdf"
 
-        val cursor = contentResolver.query(uri, null, null, null, null)
+        val cursor = contentResolver.query(
+            uri,
+            null,
+            null,
+            null,
+            null
+        )
 
         cursor?.use {
 
             if (it.moveToFirst()) {
 
-                val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                val index =
+                    it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
 
                 if (index >= 0) {
                     name = it.getString(index)
@@ -158,86 +176,76 @@ class UploadActivity : AppCompatActivity() {
         return name
     }
 
+    // =========================
+    // SIMPAN HISTORY FIREBASE
+    // =========================
+
     private fun saveToHistory(type: String) {
 
-        val prefs = getSharedPreferences("history_data", MODE_PRIVATE)
+        val userId = auth.currentUser?.uid ?: return
 
-        val old = prefs.getStringSet("files", mutableSetOf()) ?: mutableSetOf()
+        val database = FirebaseDatabase
+            .getInstance()
+            .getReference("History")
+            .child(userId)
 
-        val newSet = HashSet(old)
+        val historyId = database.push().key ?: return
 
         val date = SimpleDateFormat(
             "dd MMM yyyy",
             Locale.getDefault()
         ).format(Date())
 
-        newSet.add("$fileName|$date|$type")
+        val historyMap = HashMap<String, Any>()
 
-        prefs.edit()
-            .putStringSet("files", newSet)
-            .apply()
+        historyMap["fileName"] = fileName ?: ""
+        historyMap["date"] = date
+        historyMap["type"] = type
+
+        database.child(historyId)
+            .setValue(historyMap)
     }
 
-    // Simpan daftar materi bawaan
-    private fun saveUploadedMaterials() {
+    // =========================
+    // SIMPAN FILE FIREBASE
+    // =========================
 
-        // ===== history_data =====
-        val historyPrefs = getSharedPreferences("history_data", MODE_PRIVATE)
-
-        val historyList = mutableSetOf(
-            "Deep Learning.pdf",
-            "Python AI.pdf"
-        )
-
-        historyPrefs.edit()
-            .putStringSet("uploaded_materials", historyList)
-            .apply()
-
-        // ===== progress_data =====
-        val progressPrefs = getSharedPreferences("progress_data", MODE_PRIVATE)
-
-        val progressList = mutableSetOf(
-            "Deep Learning.pdf",
-            "Python AI.pdf"
-        )
-
-        progressPrefs.edit()
-            .putStringSet("uploaded_materials", progressList)
-            .apply()
-    }
-
-    // Simpan materi upload baru
     private fun saveUploadedMaterial(materialName: String) {
 
-        // ===== history_data =====
-        val historyPrefs = getSharedPreferences("history_data", MODE_PRIVATE)
+        val userId = auth.currentUser?.uid ?: return
 
-        val historyList =
-            historyPrefs.getStringSet(
-                "uploaded_materials",
-                mutableSetOf()
-            )?.toMutableSet() ?: mutableSetOf()
+        val database = FirebaseDatabase
+            .getInstance()
+            .getReference("UploadedMaterials")
+            .child(userId)
 
-        historyList.add(materialName)
+        val materialId = database.push().key ?: return
 
-        historyPrefs.edit()
-            .putStringSet("uploaded_materials", historyList)
-            .apply()
+        val materialMap = HashMap<String, Any>()
 
-        // ===== progress_data =====
-        val progressPrefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+        materialMap["fileName"] = materialName
+        materialMap["timestamp"] =
+            System.currentTimeMillis()
 
-        val progressList =
-            progressPrefs.getStringSet(
-                "uploaded_materials",
-                mutableSetOf()
-            )?.toMutableSet() ?: mutableSetOf()
+        database.child(materialId)
+            .setValue(materialMap)
+            .addOnSuccessListener {
 
-        progressList.add(materialName)
+                Toast.makeText(
+                    this,
+                    "File berhasil disimpan",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
 
-        progressPrefs.edit()
-            .putStringSet("uploaded_materials", progressList)
-            .apply()
+            .addOnFailureListener {
+
+                Toast.makeText(
+                    this,
+                    "Gagal upload data",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     private fun openAlur() {
@@ -246,8 +254,16 @@ class UploadActivity : AppCompatActivity() {
 
         startActivity(
             Intent(this, AlurActivity::class.java).apply {
-                putExtra("FILE_NAME", fileName)
-                putExtra("FILE_URI", fileUri.toString())
+
+                putExtra(
+                    "FILE_NAME",
+                    fileName
+                )
+
+                putExtra(
+                    "FILE_URI",
+                    fileUri.toString()
+                )
             }
         )
     }
