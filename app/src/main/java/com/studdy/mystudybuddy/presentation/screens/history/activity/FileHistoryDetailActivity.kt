@@ -5,7 +5,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
 
 class FileHistoryDetailActivity : AppCompatActivity() {
@@ -14,8 +17,16 @@ class FileHistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvFileName: TextView
     private lateinit var btnBukaRingkasan: Button
     private lateinit var btnBukaQuiz: Button
+    private lateinit var tvInfo: TextView
 
     private var fileName = ""
+
+    // Firebase
+    private val auth =
+        FirebaseAuth.getInstance()
+
+    private val database =
+        FirebaseDatabase.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +38,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         initViews()
         getData()
         setupListeners()
+        loadDetailHistory()
     }
 
     private fun initViews() {
@@ -42,6 +54,9 @@ class FileHistoryDetailActivity : AppCompatActivity() {
 
         btnBukaQuiz =
             findViewById(R.id.btnBukaQuiz)
+
+        tvInfo =
+            findViewById(R.id.tvInfo)
     }
 
     private fun getData() {
@@ -79,7 +94,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
             )
         }
 
-        // buka history hasil quiz
+        // buka history quiz
         btnBukaQuiz.setOnClickListener {
 
             startActivity(
@@ -92,14 +107,83 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                         "FILE_NAME",
                         fileName
                     )
-
-                    // sementara dummy skor
-                    putExtra(
-                        "SCORE",
-                        85
-                    )
                 }
             )
         }
+    }
+
+    private fun loadDetailHistory() {
+
+        val uid =
+            auth.currentUser?.uid
+
+        if (uid == null) {
+
+            Toast.makeText(
+                this,
+                "User belum login",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        database.child("QuizHistory")
+            .child(uid)
+            .orderByChild("fileName")
+            .equalTo(fileName)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
+
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
+
+                        if (!snapshot.exists()) {
+
+                            tvInfo.text =
+                                "Belum ada history quiz"
+
+                            return
+                        }
+
+                        var latestScore = 0
+                        var latestDate = "-"
+
+                        for (data in snapshot.children) {
+
+                            latestScore =
+                                data.child("score")
+                                    .getValue(Int::class.java)
+                                    ?: 0
+
+                            latestDate =
+                                data.child("date")
+                                    .getValue(String::class.java)
+                                    ?: "-"
+                        }
+
+                        tvInfo.text =
+                            """
+                            Nama File:
+                            $fileName
+                            
+                            Skor Terakhir:
+                            $latestScore
+                            
+                            Tanggal:
+                            $latestDate
+                            """.trimIndent()
+                    }
+
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+
+                        tvInfo.text =
+                            "Gagal memuat detail"
+                    }
+                }
+            )
     }
 }

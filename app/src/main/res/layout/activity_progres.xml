@@ -45,6 +45,19 @@
                 android:src="@drawable/progres" />
         </RelativeLayout>
 
+        <!-- TOTAL PROGRESS -->
+        <TextView
+            android:id="@+id/tvTotalProgress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:padding="14dp"
+            android:background="@drawable/kontainer"
+            android:text="Total Progress: 0%"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text" />
+
         <!-- RECYCLERVIEW -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/progressContainer"

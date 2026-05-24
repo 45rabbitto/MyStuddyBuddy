@@ -5,7 +5,10 @@ import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
 
 class QuizHistoryActivity : AppCompatActivity() {
@@ -15,8 +18,16 @@ class QuizHistoryActivity : AppCompatActivity() {
     private lateinit var tvFileName: TextView
     private lateinit var tvDate: TextView
     private lateinit var tvTotalQuestion: TextView
+    private lateinit var tvScore: TextView
 
     private lateinit var resultContainer: LinearLayout
+
+    // Firebase
+    private val auth =
+        FirebaseAuth.getInstance()
+
+    private val database =
+        FirebaseDatabase.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +55,9 @@ class QuizHistoryActivity : AppCompatActivity() {
         tvTotalQuestion =
             findViewById(R.id.tvTotalQuestion)
 
+        tvScore =
+            findViewById(R.id.tvSkor)
+
         resultContainer =
             findViewById(R.id.resultContainer)
     }
@@ -58,41 +72,114 @@ class QuizHistoryActivity : AppCompatActivity() {
         tvFileName.text =
             fileName
 
-        tvDate.text =
-            "20 Mei 2026"
+        val uid =
+            auth.currentUser?.uid
 
-        val questions =
-            listOf(
+        if (uid == null) {
 
-                Triple(
-                    "Apa fungsi inti sel?",
-                    "Mengatur aktivitas sel",
-                    "Membentuk energi"
-                ),
+            Toast.makeText(
+                this,
+                "User belum login",
+                Toast.LENGTH_SHORT
+            ).show()
 
-                Triple(
-                    "Organel penghasil energi adalah?",
-                    "Mitokondria",
-                    "Ribosom"
-                ),
+            return
+        }
 
-                Triple(
-                    "Bagian tumbuhan untuk fotosintesis?",
-                    "Kloroplas",
-                    "Membran sel"
-                )
+        database.child("QuizHistory")
+            .child(uid)
+            .orderByChild("fileName")
+            .equalTo(fileName)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
+
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
+
+                        if (!snapshot.exists()) {
+
+                            tvDate.text =
+                                "Belum ada history"
+
+                            tvScore.text =
+                                "0"
+
+                            tvTotalQuestion.text =
+                                "0 Soal"
+
+                            return
+                        }
+
+                        var latestDate = "-"
+                        var latestScore = 0
+
+                        for (data in snapshot.children) {
+
+                            latestDate =
+                                data.child("date")
+                                    .getValue(String::class.java)
+                                    ?: "-"
+
+                            latestScore =
+                                data.child("score")
+                                    .getValue(Int::class.java)
+                                    ?: 0
+                        }
+
+                        tvDate.text =
+                            latestDate
+
+                        tvScore.text =
+                            "$latestScore"
+
+                        // Dummy total soal
+                        tvTotalQuestion.text =
+                            "3 Soal"
+
+                        val questions =
+                            listOf(
+
+                                Triple(
+                                    "Apa fungsi inti sel?",
+                                    "Mengatur aktivitas sel",
+                                    "Membentuk energi"
+                                ),
+
+                                Triple(
+                                    "Organel penghasil energi adalah?",
+                                    "Mitokondria",
+                                    "Ribosom"
+                                ),
+
+                                Triple(
+                                    "Bagian tumbuhan untuk fotosintesis?",
+                                    "Kloroplas",
+                                    "Membran sel"
+                                )
+                            )
+
+                        showQuestions(
+                            questions
+                        )
+                    }
+
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+
+                        Toast.makeText(
+                            this@QuizHistoryActivity,
+                            error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             )
-
-        tvTotalQuestion.text =
-            "${questions.size} Soal"
-
-        showQuestions(
-            questions
-        )
     }
 
     private fun showQuestions(
-        questions: List<Triple<String,String,String>>
+        questions: List<Triple<String, String, String>>
     ) {
 
         resultContainer.removeAllViews()
@@ -123,13 +210,13 @@ class QuizHistoryActivity : AppCompatActivity() {
                 )
 
             tvQuestion.text =
-                "${index+1}. ${item.first}"
+                "${index + 1}. ${item.first}"
 
             tvCorrect.text =
-                item.second
+                "Jawaban benar: ${item.second}"
 
             tvWrong.text =
-                item.third
+                "Jawaban salah: ${item.third}"
 
             resultContainer.addView(view)
         }

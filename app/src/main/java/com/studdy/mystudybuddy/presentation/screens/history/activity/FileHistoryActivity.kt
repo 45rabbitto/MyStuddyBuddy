@@ -3,9 +3,12 @@ package com.studdy.mystudybuddy.presentation.screens.history.activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.history.adapter.FileHistoryAdapter
 import com.studdy.mystudybuddy.presentation.screens.history.model.FileHistoryModel
@@ -15,107 +18,202 @@ class FileHistoryActivity : AppCompatActivity() {
     private lateinit var rvHistory: RecyclerView
     private lateinit var btnBack: ImageView
 
+    // Firebase
+    private val auth =
+        FirebaseAuth.getInstance()
+
+    private val database =
+        FirebaseDatabase.getInstance().reference
+
+    private val historyList =
+        mutableListOf<FileHistoryModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_history_file)
 
         initViews()
         setupListener()
+        setupRecycler()
     }
 
     override fun onResume() {
         super.onResume()
+
         loadHistory()
     }
 
     private fun initViews() {
-        rvHistory = findViewById(R.id.rvHistory)
-        btnBack = findViewById(R.id.btnBack)
+
+        rvHistory =
+            findViewById(R.id.rvHistory)
+
+        btnBack =
+            findViewById(R.id.btnBack)
     }
 
     private fun setupListener() {
-        btnBack.setOnClickListener { finish() }
+
+        btnBack.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun setupRecycler() {
+
+        rvHistory.layoutManager =
+            LinearLayoutManager(this)
     }
 
     private fun loadHistory() {
 
-        val prefs = getSharedPreferences(
-            "history_data",
-            MODE_PRIVATE
-        )
+        val uid =
+            auth.currentUser?.uid
 
-        val rawSet =
-            prefs.getStringSet("files", emptySet()) ?: emptySet()
+        if (uid == null) {
 
-        val historyList = rawSet.mapNotNull { item ->
+            Toast.makeText(
+                this,
+                "User belum login",
+                Toast.LENGTH_SHORT
+            ).show()
 
-            val p = item.split("|")
-
-            if (p.size >= 3) {
-
-                FileHistoryModel(
-                    p[0], // file name
-                    p[1]  // date
-                )
-
-            } else {
-                null
-            }
+            return
         }
 
-        val adapter = FileHistoryAdapter(
+        historyList.clear()
 
-            historyList.toMutableList(),
+        database.child("QuizHistory")
+            .child(uid)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
 
-            onItemClick = { file ->
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
 
-                startActivity(
-                    Intent(
-                        this,
-                        FileHistoryDetailActivity::class.java
-                    ).apply {
+                        for (data in snapshot.children) {
 
-                        putExtra(
-                            "FILE_NAME",
-                            file.fileName
-                        )
+                            val fileName =
+                                data.child("fileName")
+                                    .getValue(String::class.java)
+                                    ?: "Materi"
+
+                            val date =
+                                data.child("date")
+                                    .getValue(String::class.java)
+                                    ?: "-"
+
+                            historyList.add(
+                                FileHistoryModel(
+                                    fileName,
+                                    date
+                                )
+                            )
+                        }
+
+                        val adapter =
+                            FileHistoryAdapter(
+
+                                historyList,
+
+                                onItemClick = { file ->
+
+                                    startActivity(
+                                        Intent(
+                                            this@FileHistoryActivity,
+                                            FileHistoryDetailActivity::class.java
+                                        ).apply {
+
+                                            putExtra(
+                                                "FILE_NAME",
+                                                file.fileName
+                                            )
+                                        }
+                                    )
+                                },
+
+                                onDelete = { file ->
+
+                                    deleteHistory(
+                                        uid,
+                                        file
+                                    )
+                                }
+                            )
+
+                        rvHistory.adapter =
+                            adapter
                     }
-                )
-            },
 
-            onDelete = { file ->
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
 
-                val current =
-                    prefs.getStringSet(
-                        "files",
-                        mutableSetOf()
-                    )?.toMutableSet() ?: mutableSetOf()
-
-                // Cari item lengkap yang cocok
-                val target = current.find {
-
-                    val p = it.split("|")
-
-                    p.size >= 2 &&
-                            p[0] == file.fileName &&
-                            p[1] == file.date
+                        Toast.makeText(
+                            this@FileHistoryActivity,
+                            error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
+            )
+    }
 
-                target?.let {
-                    current.remove(it)
+    private fun deleteHistory(
+        uid: String,
+        file: FileHistoryModel
+    ) {
+
+        database.child("QuizHistory")
+            .child(uid)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
+
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
+
+                        for (data in snapshot.children) {
+
+                            val fileName =
+                                data.child("fileName")
+                                    .getValue(String::class.java)
+
+                            val date =
+                                data.child("date")
+                                    .getValue(String::class.java)
+
+                            if (
+                                fileName == file.fileName &&
+                                date == file.date
+                            ) {
+
+                                data.ref.removeValue()
+                            }
+                        }
+
+                        Toast.makeText(
+                            this@FileHistoryActivity,
+                            "History dihapus",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        loadHistory()
+                    }
+
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+
+                        Toast.makeText(
+                            this@FileHistoryActivity,
+                            error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-
-                prefs.edit()
-                    .putStringSet("files", current)
-                    .apply()
-
-                loadHistory()
-            }
-        )
-
-        rvHistory.layoutManager =
-            LinearLayoutManager(this)
-
-        rvHistory.adapter = adapter
+            )
     }
 }

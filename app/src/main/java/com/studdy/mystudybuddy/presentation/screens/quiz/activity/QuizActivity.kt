@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizResult
 
@@ -24,16 +26,25 @@ class QuizActivity : AppCompatActivity() {
     private lateinit var btnPrev: Button
     private lateinit var btnNext: Button
 
+    // Firebase
+    private lateinit var auth: FirebaseAuth
+
     private var currentQuestionIndex = 0
     private var selectedAnswer = -1
     private var score = 0
+
+    private var fileName: String? = null
 
     // Menyimpan jawaban user
     private val userAnswers = mutableListOf<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_kuis)
+
+        // Firebase
+        auth = FirebaseAuth.getInstance()
 
         initViews()
         setupData()
@@ -102,8 +113,11 @@ class QuizActivity : AppCompatActivity() {
             }
 
             if (userAnswers.size <= currentQuestionIndex) {
+
                 userAnswers.add(selectedAnswer)
+
             } else {
+
                 userAnswers[currentQuestionIndex] =
                     selectedAnswer
             }
@@ -118,6 +132,7 @@ class QuizActivity : AppCompatActivity() {
             } else {
 
                 calculateScore()
+                saveQuizResult()
                 showResult()
             }
         }
@@ -157,15 +172,23 @@ class QuizActivity : AppCompatActivity() {
 
     private fun highlightSelectedButton() {
 
-        when(selectedAnswer){
+        when (selectedAnswer) {
 
-            0 -> optionA.setBackgroundResource(R.drawable.button1)
+            0 -> optionA.setBackgroundResource(
+                R.drawable.button1
+            )
 
-            1 -> optionB.setBackgroundResource(R.drawable.button1)
+            1 -> optionB.setBackgroundResource(
+                R.drawable.button1
+            )
 
-            2 -> optionC.setBackgroundResource(R.drawable.button1)
+            2 -> optionC.setBackgroundResource(
+                R.drawable.button1
+            )
 
-            3 -> optionD.setBackgroundResource(R.drawable.button1)
+            3 -> optionD.setBackgroundResource(
+                R.drawable.button1
+            )
         }
     }
 
@@ -192,14 +215,80 @@ class QuizActivity : AppCompatActivity() {
 
         score = 0
 
-        for(i in questions.indices){
+        for (i in questions.indices) {
 
-            if(userAnswers[i] ==
-                questions[i].correctAnswer){
+            if (
+                userAnswers[i] ==
+                questions[i].correctAnswer
+            ) {
 
                 score++
             }
         }
+    }
+
+    // ==========================
+    // SIMPAN HASIL KUIS FIREBASE
+    // ==========================
+
+    private fun saveQuizResult() {
+
+        val userId =
+            auth.currentUser?.uid ?: return
+
+        val database =
+            FirebaseDatabase
+                .getInstance()
+                .getReference("QuizHistory")
+                .child(userId)
+
+        val quizId =
+            database.push().key ?: return
+
+        val finalScore =
+            (score * 100) / questions.size
+
+        val quizMap =
+            HashMap<String, Any>()
+
+        quizMap["fileName"] =
+            fileName ?: "Unknown File"
+
+        quizMap["score"] =
+            finalScore
+
+        quizMap["correctAnswer"] =
+            score
+
+        quizMap["wrongAnswer"] =
+            questions.size - score
+
+        quizMap["totalQuestion"] =
+            questions.size
+
+        quizMap["createdAt"] =
+            System.currentTimeMillis()
+
+        database.child(quizId)
+            .setValue(quizMap)
+
+            .addOnSuccessListener {
+
+                Toast.makeText(
+                    this,
+                    "Hasil kuis berhasil disimpan",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            .addOnFailureListener {
+
+                Toast.makeText(
+                    this,
+                    "Gagal menyimpan hasil kuis",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
     }
 
     private fun showResult() {
@@ -224,10 +313,11 @@ class QuizActivity : AppCompatActivity() {
             )
         )
 
-        val intent = Intent(
-            this,
-            HasilKuisActivity::class.java
-        )
+        val intent =
+            Intent(
+                this,
+                HasilKuisActivity::class.java
+            )
 
         intent.putExtra(
             "QUIZ_RESULT",
@@ -242,6 +332,9 @@ class QuizActivity : AppCompatActivity() {
     private fun setupData() {
 
         userAnswers.clear()
+
+        fileName =
+            intent.getStringExtra("FILE_NAME")
     }
 
     companion object {
@@ -249,35 +342,44 @@ class QuizActivity : AppCompatActivity() {
         val questions = listOf(
 
             Question(
-                question = "Apa ibu kota Indonesia?",
+                question =
+                    "Apa ibu kota Indonesia?",
+
                 options = listOf(
                     "Bandung",
                     "Jakarta",
                     "Surabaya",
                     "Semarang"
                 ),
+
                 correctAnswer = 1
             ),
 
             Question(
-                question = "2 + 5 = ?",
+                question =
+                    "2 + 5 = ?",
+
                 options = listOf(
                     "5",
                     "6",
                     "7",
                     "8"
                 ),
+
                 correctAnswer = 2
             ),
 
             Question(
-                question = "Planet terbesar di tata surya?",
+                question =
+                    "Planet terbesar di tata surya?",
+
                 options = listOf(
                     "Mars",
                     "Venus",
                     "Jupiter",
                     "Saturnus"
                 ),
+
                 correctAnswer = 2
             )
         )

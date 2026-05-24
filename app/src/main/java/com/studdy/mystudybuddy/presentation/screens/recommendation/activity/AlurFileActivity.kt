@@ -2,10 +2,13 @@ package com.studdy.mystudybuddy.presentation.screens.recommendation.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
 
 class AlurFileActivity : AppCompatActivity() {
@@ -14,12 +17,20 @@ class AlurFileActivity : AppCompatActivity() {
     private lateinit var fileContainer: LinearLayout
     private lateinit var tvKosong: TextView
 
+    // Firebase
+    private lateinit var auth: FirebaseAuth
+    private lateinit var database: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(
             R.layout.activity_alur_file
         )
+
+        // Firebase init
+        auth = FirebaseAuth.getInstance()
+        database = FirebaseDatabase.getInstance().reference
 
         initViews()
 
@@ -50,59 +61,85 @@ class AlurFileActivity : AppCompatActivity() {
 
     private fun loadFiles() {
 
-        // sementara data dummy
-        val fileList = listOf(
-            "Biologi.pdf",
-            "Kimia Dasar.pdf",
-            "Matematika.pdf"
-        )
+        val uid =
+            auth.currentUser?.uid ?: return
 
-        if (fileList.isEmpty()) {
+        database.child("uploads")
+            .child(uid)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
 
-            tvKosong.visibility =
-                android.view.View.VISIBLE
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
 
-            return
-        }
+                        fileContainer.removeAllViews()
 
-        tvKosong.visibility =
-            android.view.View.GONE
+                        if (!snapshot.exists()) {
 
-        fileList.forEach { fileName ->
+                            tvKosong.visibility =
+                                View.VISIBLE
 
-            val itemView =
-                layoutInflater.inflate(
-                    R.layout.item_alur_file,
-                    fileContainer,
-                    false
-                )
+                            return
+                        }
 
-            val tvNamaFile =
-                itemView.findViewById<TextView>(
-                    R.id.tvNamaFile
-                )
+                        tvKosong.visibility =
+                            View.GONE
 
-            tvNamaFile.text =
-                fileName
+                        for (data in snapshot.children) {
 
-            itemView.setOnClickListener {
+                            val fileName =
+                                data.child("fileName")
+                                    .getValue(String::class.java)
+                                    ?: "Dokumen"
 
-                val intent = Intent(
-                    this,
-                    AlurActivity::class.java
-                )
+                            val itemView =
+                                layoutInflater.inflate(
+                                    R.layout.item_alur_file,
+                                    fileContainer,
+                                    false
+                                )
 
-                intent.putExtra(
-                    "MATERI",
-                    fileName
-                )
+                            val tvNamaFile =
+                                itemView.findViewById<TextView>(
+                                    R.id.tvNamaFile
+                                )
 
-                startActivity(intent)
-            }
+                            tvNamaFile.text =
+                                fileName
 
-            fileContainer.addView(
-                itemView
+                            itemView.setOnClickListener {
+
+                                val intent = Intent(
+                                    this@AlurFileActivity,
+                                    AlurActivity::class.java
+                                )
+
+                                intent.putExtra(
+                                    "FILE_NAME",
+                                    fileName
+                                )
+
+                                startActivity(intent)
+                            }
+
+                            fileContainer.addView(
+                                itemView
+                            )
+                        }
+                    }
+
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+
+                        tvKosong.visibility =
+                            View.VISIBLE
+
+                        tvKosong.text =
+                            "Gagal mengambil data"
+                    }
+                }
             )
-        }
     }
 }

@@ -11,13 +11,19 @@ plugins {
 }
 
 android {
+
     namespace = "com.studdy.mystudybuddy"
+
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.studdy.mystudybuddy"
+
+        applicationId =
+            "com.studdy.mystudybuddy"
+
         minSdk = 24
         targetSdk = 34
+
         versionCode = 1
         versionName = "1.0"
 
@@ -26,13 +32,16 @@ android {
     }
 
     buildFeatures {
+
         viewBinding = true
         dataBinding = true
         compose = true
     }
 
     buildTypes {
+
         release {
+
             isMinifyEnabled = false
 
             proguardFiles(
@@ -45,6 +54,7 @@ android {
     }
 
     compileOptions {
+
         sourceCompatibility =
             JavaVersion.VERSION_17
 
@@ -53,38 +63,52 @@ android {
     }
 
     kotlinOptions {
+
         jvmTarget = "17"
+    }
+
+    composeOptions {
+
+        kotlinCompilerExtensionVersion =
+            "1.5.14"
     }
 }
 
 kapt {
+
     correctErrorTypes = true
 }
 
 dependencies {
 
-    // =========================
+    // =====================================
     // FIREBASE
-    // =========================
+    // =====================================
 
-    // Firebase BOM
     implementation(
-        platform("com.google.firebase:firebase-bom:33.10.0")
+        platform(
+            "com.google.firebase:firebase-bom:33.10.0"
+        )
     )
 
-    // Firebase Authentication
+    // Auth
     implementation(
         "com.google.firebase:firebase-auth-ktx"
     )
 
-    // Firebase Realtime Database
+    // Realtime Database
     implementation(
         "com.google.firebase:firebase-database-ktx"
     )
 
-    // =========================
+    // Firebase Storage
+    implementation(
+        "com.google.firebase:firebase-storage-ktx"
+    )
+
+    // =====================================
     // CORE
-    // =========================
+    // =====================================
 
     implementation(
         "androidx.core:core-ktx:1.13.1"
@@ -98,31 +122,32 @@ dependencies {
         "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
     )
 
-    // RecyclerView
     implementation(
         "androidx.recyclerview:recyclerview:1.3.2"
     )
 
-    // CardView
     implementation(
         "androidx.cardview:cardview:1.0.0"
     )
 
-    // ConstraintLayout
     implementation(
         "androidx.constraintlayout:constraintlayout:2.1.4"
     )
 
-    // =========================
+    // =====================================
     // COMPOSE
-    // =========================
+    // =====================================
 
     implementation(
-        platform("androidx.compose:compose-bom:2024.06.00")
+        platform(
+            "androidx.compose:compose-bom:2024.06.00"
+        )
     )
 
     androidTestImplementation(
-        platform("androidx.compose:compose-bom:2024.06.00")
+        platform(
+            "androidx.compose:compose-bom:2024.06.00"
+        )
     )
 
     implementation(
@@ -157,17 +182,17 @@ dependencies {
         "androidx.compose.ui:ui-test-manifest"
     )
 
-    // =========================
+    // =====================================
     // NAVIGATION
-    // =========================
+    // =====================================
 
     implementation(
         "androidx.navigation:navigation-compose:2.8.5"
     )
 
-    // =========================
+    // =====================================
     // VIEWMODEL
-    // =========================
+    // =====================================
 
     implementation(
         "androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7"
@@ -177,9 +202,9 @@ dependencies {
         "androidx.lifecycle:lifecycle-runtime-compose:2.8.7"
     )
 
-    // =========================
+    // =====================================
     // ROOM
-    // =========================
+    // =====================================
 
     implementation(
         "androidx.room:room-runtime:2.7.2"
@@ -193,9 +218,9 @@ dependencies {
         "androidx.room:room-compiler:2.7.2"
     )
 
-    // =========================
+    // =====================================
     // HILT
-    // =========================
+    // =====================================
 
     implementation(
         "com.google.dagger:hilt-android:2.56"
@@ -209,9 +234,9 @@ dependencies {
         "androidx.hilt:hilt-navigation-compose:1.2.0"
     )
 
-    // =========================
+    // =====================================
     // RETROFIT
-    // =========================
+    // =====================================
 
     implementation(
         "com.squareup.retrofit2:retrofit:2.11.0"
@@ -225,41 +250,53 @@ dependencies {
         "com.squareup.okhttp3:logging-interceptor:4.12.0"
     )
 
-    // =========================
+    // =====================================
     // DATASTORE
-    // =========================
+    // =====================================
 
     implementation(
         "androidx.datastore:datastore-preferences:1.1.1"
     )
 
-    // =========================
+    // =====================================
     // COIL
-    // =========================
+    // =====================================
 
     implementation(
         "io.coil-kt:coil-compose:2.7.0"
     )
 
-    // =========================
+    // =====================================
+    // GLIDE
+    // =====================================
+
+    implementation(
+        "com.github.bumptech.glide:glide:4.16.0"
+    )
+
+    kapt(
+        "com.github.bumptech.glide:compiler:4.16.0"
+    )
+
+    // =====================================
     // COROUTINE
-    // =========================
+    // =====================================
 
     implementation(
         "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
     )
 
-    // =========================
+    // =====================================
     // PDF
-    // =========================
+    // =====================================
 
     implementation(
         "com.tom-roush:pdfbox-android:2.0.27.0"
     )
 
-    // =========================
+    // =====================================
     // TESTING
-    // =========================
+    // =====================================
 
     testImplementation(
         "junit:junit:4.13.2"
