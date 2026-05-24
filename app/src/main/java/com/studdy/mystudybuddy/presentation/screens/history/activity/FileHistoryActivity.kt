@@ -18,20 +18,19 @@ class FileHistoryActivity : AppCompatActivity() {
     private lateinit var rvHistory: RecyclerView
     private lateinit var btnBack: ImageView
 
-    // Firebase
-    private val auth =
-        FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val database = FirebaseDatabase.getInstance().reference
 
-    private val database =
-        FirebaseDatabase.getInstance().reference
+    private val historyList = mutableListOf<FileHistoryModel>()
 
-    private val historyList =
-        mutableListOf<FileHistoryModel>()
+    private var isGuest = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_history_file)
+
+        val session = getSharedPreferences("user_session", MODE_PRIVATE)
+        isGuest = session.getBoolean("isGuest", false)
 
         initViews()
         setupListener()
@@ -40,180 +39,98 @@ class FileHistoryActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         loadHistory()
     }
 
     private fun initViews() {
-
-        rvHistory =
-            findViewById(R.id.rvHistory)
-
-        btnBack =
-            findViewById(R.id.btnBack)
+        rvHistory = findViewById(R.id.rvHistory)
+        btnBack = findViewById(R.id.btnBack)
     }
 
     private fun setupListener() {
-
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
     }
 
     private fun setupRecycler() {
-
-        rvHistory.layoutManager =
-            LinearLayoutManager(this)
+        rvHistory.layoutManager = LinearLayoutManager(this)
     }
 
     private fun loadHistory() {
 
-        val uid =
-            auth.currentUser?.uid
-
-        if (uid == null) {
-
-            Toast.makeText(
-                this,
-                "User belum login",
-                Toast.LENGTH_SHORT
-            ).show()
-
+        if (isGuest || auth.currentUser == null) {
+            historyList.clear()
+            rvHistory.adapter = FileHistoryAdapter(historyList, {}, {})
             return
         }
 
+        val uid = auth.currentUser!!.uid
+
         historyList.clear()
 
-        database.child("QuizHistory")
+        database.child("History") // ✔ sudah disamakan dengan UploadActivity
             .child(uid)
-            .addListenerForSingleValueEvent(
-                object : ValueEventListener {
+            .addListenerForSingleValueEvent(object : ValueEventListener {
 
-                    override fun onDataChange(
-                        snapshot: DataSnapshot
-                    ) {
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                        for (data in snapshot.children) {
+                    for (data in snapshot.children) {
 
-                            val fileName =
-                                data.child("fileName")
-                                    .getValue(String::class.java)
-                                    ?: "Materi"
+                        val fileName = data.child("fileName")
+                            .getValue(String::class.java) ?: "Materi"
 
-                            val date =
-                                data.child("date")
-                                    .getValue(String::class.java)
-                                    ?: "-"
+                        val date = data.child("date")
+                            .getValue(String::class.java) ?: "-"
 
-                            historyList.add(
-                                FileHistoryModel(
-                                    fileName,
-                                    date
-                                )
-                            )
-                        }
+                        historyList.add(FileHistoryModel(fileName, date))
+                    }
 
-                        val adapter =
-                            FileHistoryAdapter(
-
-                                historyList,
-
-                                onItemClick = { file ->
-
-                                    startActivity(
-                                        Intent(
-                                            this@FileHistoryActivity,
-                                            FileHistoryDetailActivity::class.java
-                                        ).apply {
-
-                                            putExtra(
-                                                "FILE_NAME",
-                                                file.fileName
-                                            )
-                                        }
-                                    )
-                                },
-
-                                onDelete = { file ->
-
-                                    deleteHistory(
-                                        uid,
-                                        file
-                                    )
+                    rvHistory.adapter = FileHistoryAdapter(
+                        historyList,
+                        onItemClick = { file ->
+                            startActivity(
+                                Intent(this@FileHistoryActivity,
+                                    FileHistoryDetailActivity::class.java).apply {
+                                    putExtra("FILE_NAME", file.fileName)
                                 }
                             )
-
-                        rvHistory.adapter =
-                            adapter
-                    }
-
-                    override fun onCancelled(
-                        error: DatabaseError
-                    ) {
-
-                        Toast.makeText(
-                            this@FileHistoryActivity,
-                            error.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                        },
+                        onDelete = { file ->
+                            deleteHistory(uid, file)
+                        }
+                    )
                 }
-            )
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@FileHistoryActivity, error.message, Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
-    private fun deleteHistory(
-        uid: String,
-        file: FileHistoryModel
-    ) {
+    private fun deleteHistory(uid: String, file: FileHistoryModel) {
 
-        database.child("QuizHistory")
+        database.child("History")
             .child(uid)
-            .addListenerForSingleValueEvent(
-                object : ValueEventListener {
+            .addListenerForSingleValueEvent(object : ValueEventListener {
 
-                    override fun onDataChange(
-                        snapshot: DataSnapshot
-                    ) {
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                        for (data in snapshot.children) {
+                    for (data in snapshot.children) {
 
-                            val fileName =
-                                data.child("fileName")
-                                    .getValue(String::class.java)
+                        val fileName = data.child("fileName").getValue(String::class.java)
+                        val date = data.child("date").getValue(String::class.java)
 
-                            val date =
-                                data.child("date")
-                                    .getValue(String::class.java)
-
-                            if (
-                                fileName == file.fileName &&
-                                date == file.date
-                            ) {
-
-                                data.ref.removeValue()
-                            }
+                        if (fileName == file.fileName && date == file.date) {
+                            data.ref.removeValue()
                         }
-
-                        Toast.makeText(
-                            this@FileHistoryActivity,
-                            "History dihapus",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-                        loadHistory()
                     }
 
-                    override fun onCancelled(
-                        error: DatabaseError
-                    ) {
-
-                        Toast.makeText(
-                            this@FileHistoryActivity,
-                            error.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    Toast.makeText(this@FileHistoryActivity, "History dihapus", Toast.LENGTH_SHORT).show()
+                    loadHistory()
                 }
-            )
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@FileHistoryActivity, error.message, Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 }

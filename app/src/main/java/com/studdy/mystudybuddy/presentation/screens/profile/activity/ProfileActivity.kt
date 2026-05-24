@@ -23,17 +23,20 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var tvEmail: TextView
     private lateinit var imgProfile: ImageView
 
-    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
 
+    private var isGuest = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_profile)
 
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
+
+        val session = getSharedPreferences("user_session", MODE_PRIVATE)
+        isGuest = session.getBoolean("isGuest", false)
 
         initViews()
         loadProfile()
@@ -41,82 +44,54 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-
-        btnBack =
-            findViewById(R.id.btnBack)
-
-        btnEditProfile =
-            findViewById(R.id.btnEditProfile)
-
-        menuLogout =
-            findViewById(R.id.menuLogout)
-
-        tvUsername =
-            findViewById(R.id.tvName)
-
-        tvEmail =
-            findViewById(R.id.tvEmail)
-
-        imgProfile =
-            findViewById(R.id.imgProfile)
+        btnBack = findViewById(R.id.btnBack)
+        btnEditProfile = findViewById(R.id.btnEditProfile)
+        menuLogout = findViewById(R.id.menuLogout)
+        tvUsername = findViewById(R.id.tvName)
+        tvEmail = findViewById(R.id.tvEmail)
+        imgProfile = findViewById(R.id.imgProfile)
     }
 
     private fun loadProfile() {
 
-        val uid = auth.currentUser?.uid ?: return
+        if (isGuest || auth.currentUser == null) {
+
+            tvUsername.text = "Guest"
+            tvEmail.text = "-"
+            imgProfile.setImageResource(R.drawable.profil)
+            return
+        }
+
+        val uid = auth.currentUser!!.uid
 
         database.child("Users")
             .child(uid)
-            .addListenerForSingleValueEvent(
-                object : ValueEventListener {
+            .addListenerForSingleValueEvent(object : ValueEventListener {
 
-                    override fun onDataChange(
-                        snapshot: DataSnapshot
-                    ) {
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                        if (snapshot.exists()) {
+                    val username = snapshot.child("username")
+                        .getValue(String::class.java) ?: "-"
 
-                            val username =
-                                snapshot.child("username")
-                                    .getValue(String::class.java)
-                                    ?: "-"
+                    val email = snapshot.child("email")
+                        .getValue(String::class.java) ?: "-"
 
-                            val email =
-                                snapshot.child("email")
-                                    .getValue(String::class.java)
-                                    ?: "-"
+                    val profileImage = snapshot.child("profileImage")
+                        .getValue(String::class.java) ?: ""
 
-                            val profileImage =
-                                snapshot.child("profileImage")
-                                    .getValue(String::class.java)
-                                    ?: ""
+                    tvUsername.text = username
+                    tvEmail.text = email
 
-                            tvUsername.text = username
-                            tvEmail.text = email
-
-                            // tampilkan foto profil
-                            if (profileImage.isNotEmpty()) {
-
-                                Glide.with(this@ProfileActivity)
-                                    .load(profileImage)
-                                    .placeholder(R.drawable.profil)
-                                    .into(imgProfile)
-                            }
-                        }
-                    }
-
-                    override fun onCancelled(
-                        error: DatabaseError
-                    ) {
-
-                        Toast.makeText(
-                            this@ProfileActivity,
-                            error.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    if (profileImage.isNotEmpty()) {
+                        Glide.with(this@ProfileActivity)
+                            .load(profileImage)
+                            .placeholder(R.drawable.profil)
+                            .into(imgProfile)
                     }
                 }
-            )
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 
     private fun setupListeners() {
@@ -127,30 +102,24 @@ class ProfileActivity : AppCompatActivity() {
 
         btnEditProfile.setOnClickListener {
 
-            startActivity(
-                Intent(
-                    this,
-                    EditProfileActivity::class.java
-                )
-            )
+            if (isGuest) {
+                Toast.makeText(this, "Login untuk edit profil", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            startActivity(Intent(this, EditProfileActivity::class.java))
         }
 
         menuLogout.setOnClickListener {
 
             auth.signOut()
 
-            val intent = Intent(
-                this,
-                LoginActivity::class.java
-            )
+            val session = getSharedPreferences("user_session", MODE_PRIVATE)
+            session.edit().putBoolean("isGuest", true).apply()
 
-            intent.flags =
-                Intent.FLAG_ACTIVITY_NEW_TASK or
-                        Intent.FLAG_ACTIVITY_CLEAR_TASK
-
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
-
-            finish()
         }
     }
 }
