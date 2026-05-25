@@ -25,20 +25,51 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var profile: ImageView
     private lateinit var home: ImageView
 
+    // cek guest
+    private var isGuest = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_dashboard)
+
+        setContentView(
+            R.layout.activity_dashboard
+        )
+
+        // Session guest
+        val session =
+            getSharedPreferences(
+                "user_session",
+                MODE_PRIVATE
+            )
+
+        isGuest =
+            session.getBoolean(
+                "isGuest",
+                false
+            )
 
         // STREAK
-        tvStreak = findViewById(R.id.tvStreak)
+        tvStreak =
+            findViewById(R.id.tvStreak)
 
         // MENU
-        history = findViewById(R.id.history)
-        alur = findViewById(R.id.alur)
-        progres = findViewById(R.id.progres)
-        upload = findViewById(R.id.upload)
-        profile = findViewById(R.id.profile)
-        home = findViewById(R.id.home)
+        history =
+            findViewById(R.id.history)
+
+        alur =
+            findViewById(R.id.alur)
+
+        progres =
+            findViewById(R.id.progres)
+
+        upload =
+            findViewById(R.id.upload)
+
+        profile =
+            findViewById(R.id.profile)
+
+        home =
+            findViewById(R.id.home)
 
         setupStreak()
         setupMenu()
@@ -47,10 +78,21 @@ class DashboardActivity : AppCompatActivity() {
     // 🔥 STREAK
     private fun setupStreak() {
 
-        val streakManager = StreakManager(this)
-        val streak = streakManager.updateStreak()
+        // mode tamu tidak menghitung streak
+        if (isGuest) {
 
-        tvStreak.text = streak.toString()
+            tvStreak.text = "0"
+            return
+        }
+
+        val streakManager =
+            StreakManager(this)
+
+        val streak =
+            streakManager.updateStreak()
+
+        tvStreak.text =
+            streak.toString()
 
         Toast.makeText(
             this,
@@ -64,22 +106,49 @@ class DashboardActivity : AppCompatActivity() {
 
         // HISTORY
         history.setOnClickListener {
+
+            if (isGuest) {
+                showLoginMessage()
+                return@setOnClickListener
+            }
+
             startActivity(
-                Intent(this, FileHistoryActivity::class.java)
+                Intent(
+                    this,
+                    FileHistoryActivity::class.java
+                )
             )
         }
 
         // ALUR
         alur.setOnClickListener {
+
+            if (isGuest) {
+                showLoginMessage()
+                return@setOnClickListener
+            }
+
             startActivity(
-                Intent(this, AlurActivity::class.java)
+                Intent(
+                    this,
+                    AlurActivity::class.java
+                )
             )
         }
 
         // PROGRESS
         progres.setOnClickListener {
+
+            if (isGuest) {
+                showLoginMessage()
+                return@setOnClickListener
+            }
+
             startActivity(
-                Intent(this, ProgresActivity::class.java)
+                Intent(
+                    this,
+                    ProgresActivity::class.java
+                )
             )
         }
 
@@ -93,17 +162,28 @@ class DashboardActivity : AppCompatActivity() {
             ).show()
 
             startActivity(
-                Intent(this, UploadActivity::class.java)
+                Intent(
+                    this,
+                    UploadActivity::class.java
+                )
             )
         }
 
         // PROFILE
         profile.setOnClickListener {
 
+            if (isGuest) {
+                showLoginMessage()
+                return@setOnClickListener
+            }
+
             try {
 
                 startActivity(
-                    Intent(this, ProfileActivity::class.java)
+                    Intent(
+                        this,
+                        ProfileActivity::class.java
+                    )
                 )
 
             } catch (e: Exception) {
@@ -125,5 +205,14 @@ class DashboardActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
         }
+    }
+
+    private fun showLoginMessage() {
+
+        Toast.makeText(
+            this,
+            "Silakan login untuk menggunakan fitur ini",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }
