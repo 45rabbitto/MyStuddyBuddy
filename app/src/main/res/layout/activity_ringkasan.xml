@@ -60,6 +60,17 @@
                 android:fontFamily="@font/poppins"
                 android:textSize="16sp" />
 
+            <Button
+                android:id="@+id/btnFinishRingkasan"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button1"
+                android:text="selesai"
+                android:textColor="@color/white"
+                android:fontFamily="@font/poppins"
+                android:layout_marginBottom="20dp"
+                android:layout_gravity="center" />
+
         </LinearLayout>
 
     </ScrollView>

@@ -18,12 +18,12 @@ class RingkasanActivity : AppCompatActivity() {
     private lateinit var btnBack: ImageView
     private lateinit var tvRingkasan: TextView
     private lateinit var btnGenerate: Button
+    private lateinit var btnFinishRingkasan: Button
 
     // Firebase
     private lateinit var auth: FirebaseAuth
 
     private var fileUri: String? = null
-    private var fileName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +43,31 @@ class RingkasanActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btnBack)
         tvRingkasan = findViewById(R.id.tvRingkasan)
         btnGenerate = findViewById(R.id.btnGenerate)
+
+        // tombol selesai
+        btnFinishRingkasan =
+            findViewById(R.id.btnFinishRingkasan)
     }
 
     private fun setupClickListeners() {
 
         btnBack.setOnClickListener {
             finish()
+        }
+
+        // =========================
+        // TOMBOL SELESAI
+        // =========================
+
+        btnFinishRingkasan.setOnClickListener {
+
+            saveProgressMateri()
+
+            Toast.makeText(
+                this,
+                "Materi selesai dipelajari",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
         btnGenerate.setOnClickListener {
@@ -88,11 +107,6 @@ class RingkasanActivity : AppCompatActivity() {
                         "FILE_URI",
                         fileUri
                     )
-
-                    putExtra(
-                        "FILE_NAME",
-                        fileName
-                    )
                 }
 
             startActivity(intent)
@@ -106,7 +120,7 @@ class RingkasanActivity : AppCompatActivity() {
 
         if (fileUri != null) {
 
-            fileName =
+            val fileName =
                 Uri.parse(fileUri)
                     .lastPathSegment ?: "File PDF"
 
@@ -114,25 +128,14 @@ class RingkasanActivity : AppCompatActivity() {
                 """
                 File berhasil diterima:
                 
-                Nama file:
-                $fileName
+                Nama file: $fileName
                 
-                🔹 Ringkasan Materi
+                🔹 Ringkasan:
+                (sementara ini dummy, nanti bisa AI / parsing PDF)
                 
-                Artificial Intelligence (AI) adalah teknologi
-                yang memungkinkan komputer berpikir dan
-                belajar seperti manusia.
-                
-                Machine Learning merupakan bagian dari AI
-                yang digunakan untuk mempelajari data
-                dan membuat prediksi otomatis.
-                
-                Deep Learning adalah cabang Machine Learning
-                yang menggunakan neural network.
-                
-                AI banyak digunakan pada chatbot,
-                rekomendasi sistem, pengenalan gambar,
-                dan analisis data.
+                - Materi 1
+                - Materi 2
+                - Materi 3
                 """.trimIndent()
 
         } else {
@@ -187,9 +190,6 @@ class RingkasanActivity : AppCompatActivity() {
         val summaryMap =
             HashMap<String, Any>()
 
-        summaryMap["fileName"] =
-            fileName ?: "Unknown File"
-
         summaryMap["summaryText"] =
             summaryText
 
@@ -216,5 +216,42 @@ class RingkasanActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    // ===================================
+    // SIMPAN PROGRESS MATERI
+    // ===================================
+
+    private fun saveProgressMateri() {
+
+        val userId =
+            auth.currentUser?.uid
+                ?: return
+
+        val fileName =
+            Uri.parse(fileUri)
+                .lastPathSegment ?: "Materi"
+
+        val progressMap =
+            HashMap<String, Any>()
+
+        progressMap["fileName"] =
+            fileName
+
+        progressMap["materi_selesai"] =
+            true
+
+        progressMap["progress"] =
+            30
+
+        progressMap["updatedAt"] =
+            System.currentTimeMillis()
+
+        FirebaseDatabase
+            .getInstance()
+            .getReference("Progress")
+            .child(userId)
+            .child(fileName)
+            .setValue(progressMap)
     }
 }
