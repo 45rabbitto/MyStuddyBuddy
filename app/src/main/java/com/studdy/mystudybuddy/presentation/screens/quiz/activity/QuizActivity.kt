@@ -30,8 +30,7 @@ class QuizActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
 
-    private lateinit var mediaPlayer: MediaPlayer
-
+    private var mediaPlayer: MediaPlayer? = null
     private var isMusicOn = true
 
     private var currentQuestionIndex = 0
@@ -50,10 +49,7 @@ class QuizActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         initViews()
-
-        // musik
         setupMusic()
-
         setupData()
         loadQuestion()
         setupListeners()
@@ -77,14 +73,16 @@ class QuizActivity : AppCompatActivity() {
 
     private fun setupMusic() {
 
-        mediaPlayer =
-            MediaPlayer.create(
-                this,
-                R.raw.music_quiz
-            )
+        mediaPlayer = MediaPlayer.create(
+            this,
+            R.raw.music_quiz
+        )
 
-        mediaPlayer.isLooping = true
-        mediaPlayer.start()
+        mediaPlayer?.apply {
+
+            isLooping = true
+            start()
+        }
 
         btnMusic.setImageResource(
             R.drawable.ic_music_on
@@ -94,32 +92,30 @@ class QuizActivity : AppCompatActivity() {
     private fun setupListeners() {
 
         btnBack.setOnClickListener {
+
             finish()
         }
 
-        // tombol musik ON OFF
         btnMusic.setOnClickListener {
 
             if (isMusicOn) {
 
-                mediaPlayer.pause()
+                mediaPlayer?.pause()
 
                 btnMusic.setImageResource(
                     R.drawable.ic_music_off
                 )
 
-                isMusicOn = false
-
             } else {
 
-                mediaPlayer.start()
+                mediaPlayer?.start()
 
                 btnMusic.setImageResource(
                     R.drawable.ic_music_on
                 )
-
-                isMusicOn = true
             }
+
+            isMusicOn = !isMusicOn
         }
 
         optionA.setOnClickListener {
@@ -143,7 +139,6 @@ class QuizActivity : AppCompatActivity() {
             if (currentQuestionIndex > 0) {
 
                 currentQuestionIndex--
-
                 loadQuestion()
             }
         }
@@ -176,6 +171,7 @@ class QuizActivity : AppCompatActivity() {
             if (currentQuestionIndex < questions.size - 1) {
 
                 currentQuestionIndex++
+
                 selectedAnswer = -1
 
                 loadQuestion()
@@ -197,7 +193,7 @@ class QuizActivity : AppCompatActivity() {
             questions[currentQuestionIndex]
 
         tvQuestion.text =
-            "${currentQuestionIndex+1}. ${question.question}"
+            "${currentQuestionIndex + 1}. ${question.question}"
 
         optionA.text =
             question.options[0]
@@ -225,32 +221,33 @@ class QuizActivity : AppCompatActivity() {
         selectedAnswer = index
 
         resetButtons()
+
         highlightSelectedButton()
     }
 
     private fun highlightSelectedButton() {
 
-        when(selectedAnswer){
+        when (selectedAnswer) {
 
-            0->optionA.setBackgroundResource(
+            0 -> optionA.setBackgroundResource(
                 R.drawable.button1
             )
 
-            1->optionB.setBackgroundResource(
+            1 -> optionB.setBackgroundResource(
                 R.drawable.button1
             )
 
-            2->optionC.setBackgroundResource(
+            2 -> optionC.setBackgroundResource(
                 R.drawable.button1
             )
 
-            3->optionD.setBackgroundResource(
+            3 -> optionD.setBackgroundResource(
                 R.drawable.button1
             )
         }
     }
 
-    private fun resetButtons(){
+    private fun resetButtons() {
 
         optionA.setBackgroundResource(
             R.drawable.kontainer
@@ -269,64 +266,86 @@ class QuizActivity : AppCompatActivity() {
         )
     }
 
-    private fun calculateScore(){
+    private fun calculateScore() {
 
-        score=0
+        score = 0
 
-        for(i in questions.indices){
+        for (i in questions.indices) {
 
-            if(userAnswers[i]==questions[i].correctAnswer){
+            if (
+                userAnswers[i] ==
+                questions[i].correctAnswer
+            ) {
 
                 score++
             }
         }
     }
 
-    private fun saveQuizResult(){
+    private fun saveQuizResult() {
 
-        val userId=
-            auth.currentUser?.uid?:return
+        val userId =
+            auth.currentUser?.uid ?: return
 
-        val database=
+        val database =
             FirebaseDatabase.getInstance()
                 .getReference("QuizHistory")
                 .child(userId)
 
-        val quizId=
-            database.push().key?:return
+        val quizId =
+            database.push().key ?: return
 
-        val finalScore=
-            (score*100)/questions.size
+        val finalScore =
+            (score * 100) / questions.size
 
-        val quizMap=
-            HashMap<String,Any>()
+        val quizMap =
+            HashMap<String, Any>()
 
-        quizMap["fileName"]=fileName?:"Unknown File"
-        quizMap["score"]=finalScore
-        quizMap["correctAnswer"]=score
-        quizMap["wrongAnswer"]=questions.size-score
-        quizMap["totalQuestion"]=questions.size
-        quizMap["createdAt"]=System.currentTimeMillis()
+        quizMap["fileName"] =
+            fileName ?: "Unknown File"
+
+        quizMap["score"] =
+            finalScore
+
+        quizMap["correctAnswer"] =
+            score
+
+        quizMap["wrongAnswer"] =
+            questions.size - score
+
+        quizMap["totalQuestion"] =
+            questions.size
+
+        quizMap["createdAt"] =
+            System.currentTimeMillis()
 
         database.child(quizId)
             .setValue(quizMap)
     }
 
-    private fun showResult(){
+    private fun showResult() {
 
-        val result=QuizResult(
-            totalQuestion=questions.size,
-            correctAnswer=score,
-            wrongAnswer=questions.size-score,
-            score=(score*100)/questions.size,
-            explanations=listOf(
+        val result = QuizResult(
+
+            totalQuestion = questions.size,
+
+            correctAnswer = score,
+
+            wrongAnswer = questions.size - score,
+
+            score = (score * 100) / questions.size,
+
+            explanations = listOf(
+
                 "1. Jakarta adalah ibu kota Indonesia",
-                "2. 2+5=7",
-                "3. Jupiter planet terbesar"
+
+                "2. 2 + 5 = 7",
+
+                "3. Jupiter adalah planet terbesar"
             )
         )
 
-        val intent=
+        val intent =
             Intent(
                 this,
                 HasilKuisActivity::class.java
@@ -338,32 +357,45 @@ class QuizActivity : AppCompatActivity() {
         )
 
         startActivity(intent)
+
         finish()
     }
 
-    private fun setupData(){
+    private fun setupData() {
 
         userAnswers.clear()
 
-        fileName=
+        fileName =
             intent.getStringExtra(
                 "FILE_NAME"
             )
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onPause() {
+        super.onPause()
 
-        if(::mediaPlayer.isInitialized){
+        mediaPlayer?.pause()
+    }
 
-            mediaPlayer.stop()
-            mediaPlayer.release()
+    override fun onResume() {
+        super.onResume()
+
+        if (isMusicOn) {
+
+            mediaPlayer?.start()
         }
     }
 
-    companion object{
+    override fun onDestroy() {
+        super.onDestroy()
 
-        val questions=listOf(
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
+    companion object {
+
+        val questions = listOf(
 
             Question(
                 "Apa ibu kota Indonesia?",
@@ -377,7 +409,7 @@ class QuizActivity : AppCompatActivity() {
             ),
 
             Question(
-                "2+5=?",
+                "2 + 5 = ?",
                 listOf(
                     "5",
                     "6",
@@ -402,7 +434,10 @@ class QuizActivity : AppCompatActivity() {
 }
 
 data class Question(
-    val question:String,
-    val options:List<String>,
-    val correctAnswer:Int
+
+    val question: String,
+
+    val options: List<String>,
+
+    val correctAnswer: Int
 )

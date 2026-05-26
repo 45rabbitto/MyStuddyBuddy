@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +13,8 @@ import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.studdy.mystudybuddy.R
-import android.util.Log
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -26,9 +27,11 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var btnSave: Button
 
+    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
     private lateinit var storage: FirebaseStorage
+    private lateinit var storageRef: StorageReference
 
     private var imageUri: Uri? = null
     private var currentImageUrl = ""
@@ -39,10 +42,17 @@ class EditProfileActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_profile)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().reference
 
-        // gunakan default dari google-services.json
-        storage = FirebaseStorage.getInstance()
+        database =
+            FirebaseDatabase
+                .getInstance()
+                .reference
+
+        storage =
+            FirebaseStorage.getInstance()
+
+        storageRef =
+            storage.reference
 
         initViews()
         setupListeners()
@@ -51,15 +61,26 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun initViews() {
 
-        btnBack = findViewById(R.id.btnBack)
-        imgProfileEdit = findViewById(R.id.imgProfileEdit)
-        btnChangePhoto = findViewById(R.id.btnChangePhoto)
+        btnBack =
+            findViewById(R.id.btnBack)
 
-        etName = findViewById(R.id.etName)
-        etEmail = findViewById(R.id.etEmail)
-        etPassword = findViewById(R.id.etPassword)
+        imgProfileEdit =
+            findViewById(R.id.imgProfileEdit)
 
-        btnSave = findViewById(R.id.btnSave)
+        btnChangePhoto =
+            findViewById(R.id.btnChangePhoto)
+
+        etName =
+            findViewById(R.id.etName)
+
+        etEmail =
+            findViewById(R.id.etEmail)
+
+        etPassword =
+            findViewById(R.id.etPassword)
+
+        btnSave =
+            findViewById(R.id.btnSave)
     }
 
     private fun setupListeners() {
@@ -99,17 +120,24 @@ class EditProfileActivity : AppCompatActivity() {
                 etPassword.text.toString().trim()
 
             if (name.isEmpty()) {
-                etName.error = "Nama wajib diisi"
+
+                etName.error =
+                    "Nama wajib diisi"
+
                 return@setOnClickListener
             }
 
             if (email.isEmpty()) {
-                etEmail.error = "Email wajib diisi"
+
+                etEmail.error =
+                    "Email wajib diisi"
+
                 return@setOnClickListener
             }
 
             btnSave.isEnabled = false
 
+            // kalau user pilih foto baru
             if (imageUri != null) {
 
                 uploadImageAndSave(
@@ -130,6 +158,10 @@ class EditProfileActivity : AppCompatActivity() {
         }
     }
 
+    // =========================================
+    // LOAD PROFILE
+    // =========================================
+
     private fun loadProfile() {
 
         val uid =
@@ -138,6 +170,7 @@ class EditProfileActivity : AppCompatActivity() {
         database.child("Users")
             .child(uid)
             .addListenerForSingleValueEvent(
+
                 object : ValueEventListener {
 
                     override fun onDataChange(
@@ -159,9 +192,13 @@ class EditProfileActivity : AppCompatActivity() {
                                 .getValue(String::class.java)
                                 ?: ""
 
-                        if (currentImageUrl.isNotEmpty()) {
+                        if (
+                            currentImageUrl.isNotEmpty()
+                        ) {
 
-                            Glide.with(this@EditProfileActivity)
+                            Glide.with(
+                                this@EditProfileActivity
+                            )
                                 .load(currentImageUrl)
                                 .placeholder(R.drawable.profil)
                                 .into(imgProfileEdit)
@@ -170,10 +207,21 @@ class EditProfileActivity : AppCompatActivity() {
 
                     override fun onCancelled(
                         error: DatabaseError
-                    ) {}
+                    ) {
+
+                        Toast.makeText(
+                            this@EditProfileActivity,
+                            "Gagal memuat profil",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             )
     }
+
+    // =========================================
+    // PILIH FOTO
+    // =========================================
 
     private fun pickImage() {
 
@@ -190,7 +238,9 @@ class EditProfileActivity : AppCompatActivity() {
             ActivityResultContracts.StartActivityForResult()
         ) { result ->
 
-            if (result.resultCode == Activity.RESULT_OK) {
+            if (
+                result.resultCode == Activity.RESULT_OK
+            ) {
 
                 imageUri =
                     result.data?.data
@@ -201,13 +251,18 @@ class EditProfileActivity : AppCompatActivity() {
             }
         }
 
+    // =========================================
+    // UPLOAD FOTO
+    // =========================================
+
     private fun uploadImageAndSave(
         name: String,
         email: String,
         password: String
     ) {
 
-        val uid = auth.currentUser?.uid
+        val uid =
+            auth.currentUser?.uid
 
         if (uid == null) {
 
@@ -235,26 +290,36 @@ class EditProfileActivity : AppCompatActivity() {
             return
         }
 
-        val storageRef = storage.reference
-            .child("profile_images/$uid.jpg")
+        val imageRef =
+            storageRef.child(
+                "profile_images/$uid.jpg"
+            )
 
-        Log.d("UPLOAD", "URI = $uri")
-        Log.d("UPLOAD", "PATH = profile_images/$uid.jpg")
+        Log.d(
+            "UPLOAD",
+            "Mulai upload..."
+        )
 
-        storageRef.putFile(uri)
+        imageRef.putFile(uri)
 
             .addOnSuccessListener {
 
-                Log.d("UPLOAD", "Upload berhasil")
+                Log.d(
+                    "UPLOAD",
+                    "Upload berhasil"
+                )
 
-                storageRef.downloadUrl
+                imageRef.downloadUrl
 
                     .addOnSuccessListener { downloadUri ->
 
                         val imageUrl =
                             downloadUri.toString()
 
-                        Log.d("UPLOAD", imageUrl)
+                        Log.d(
+                            "UPLOAD",
+                            imageUrl
+                        )
 
                         saveProfileData(
                             name,
@@ -271,10 +336,14 @@ class EditProfileActivity : AppCompatActivity() {
                         Toast.makeText(
                             this,
                             "Gagal mengambil URL",
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         ).show()
 
-                        Log.e("UPLOAD", "URL ERROR", e)
+                        Log.e(
+                            "UPLOAD",
+                            "DOWNLOAD URL ERROR",
+                            e
+                        )
                     }
             }
 
@@ -288,9 +357,17 @@ class EditProfileActivity : AppCompatActivity() {
                     Toast.LENGTH_LONG
                 ).show()
 
-                Log.e("UPLOAD", "UPLOAD ERROR", e)
+                Log.e(
+                    "UPLOAD",
+                    "UPLOAD ERROR",
+                    e
+                )
             }
     }
+
+    // =========================================
+    // SAVE DATA PROFILE
+    // =========================================
 
     private fun saveProfileData(
         name: String,
@@ -332,11 +409,15 @@ class EditProfileActivity : AppCompatActivity() {
 
                 Toast.makeText(
                     this,
-                    "Gagal menyimpan",
+                    "Gagal menyimpan data",
                     Toast.LENGTH_SHORT
                 ).show()
             }
     }
+
+    // =========================================
+    // CHECK INTERNET
+    // =========================================
 
     private fun isInternetAvailable(): Boolean {
 
