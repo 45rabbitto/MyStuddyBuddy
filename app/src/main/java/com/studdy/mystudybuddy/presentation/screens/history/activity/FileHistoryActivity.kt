@@ -88,8 +88,10 @@ class FileHistoryActivity : AppCompatActivity() {
                         historyList,
                         onItemClick = { file ->
                             startActivity(
-                                Intent(this@FileHistoryActivity,
-                                    FileHistoryDetailActivity::class.java).apply {
+                                Intent(
+                                    this@FileHistoryActivity,
+                                    FileHistoryDetailActivity::class.java
+                                ).apply {
                                     putExtra("FILE_NAME", file.fileName)
                                 }
                             )
@@ -101,13 +103,15 @@ class FileHistoryActivity : AppCompatActivity() {
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@FileHistoryActivity, error.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@FileHistoryActivity, error.message, Toast.LENGTH_SHORT)
+                        .show()
                 }
             })
     }
 
     private fun deleteHistory(uid: String, file: FileHistoryModel) {
 
+        // Hapus dari History
         database.child("History")
             .child(uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -116,20 +120,101 @@ class FileHistoryActivity : AppCompatActivity() {
 
                     for (data in snapshot.children) {
 
-                        val fileName = data.child("fileName").getValue(String::class.java)
-                        val date = data.child("date").getValue(String::class.java)
+                        val fileName =
+                            data.child("fileName")
+                                .getValue(String::class.java)
 
-                        if (fileName == file.fileName && date == file.date) {
+                        val date =
+                            data.child("date")
+                                .getValue(String::class.java)
+
+                        if (
+                            fileName == file.fileName &&
+                            date == file.date
+                        ) {
+
                             data.ref.removeValue()
                         }
                     }
 
-                    Toast.makeText(this@FileHistoryActivity, "History dihapus", Toast.LENGTH_SHORT).show()
-                    loadHistory()
+                    // =============================
+                    // HAPUS UploadedMaterials
+                    // =============================
+
+                    database.child("UploadedMaterials")
+                        .child(uid)
+                        .addListenerForSingleValueEvent(
+                            object : ValueEventListener {
+
+                                override fun onDataChange(uploadSnapshot: DataSnapshot) {
+
+                                    for (upload in uploadSnapshot.children) {
+
+                                        val uploadFileName =
+                                            upload.child("fileName")
+                                                .getValue(String::class.java)
+
+                                        if (uploadFileName == file.fileName) {
+
+                                            upload.ref.removeValue()
+                                        }
+                                    }
+
+                                    // =============================
+                                    // HAPUS QuizHistory
+                                    // =============================
+
+                                    database.child("QuizHistory")
+                                        .child(uid)
+                                        .addListenerForSingleValueEvent(
+                                            object : ValueEventListener {
+
+                                                override fun onDataChange(
+                                                    quizSnapshot: DataSnapshot
+                                                ) {
+
+                                                    for (quiz in quizSnapshot.children) {
+
+                                                        val quizFileName =
+                                                            quiz.child("fileName")
+                                                                .getValue(String::class.java)
+
+                                                        if (quizFileName == file.fileName) {
+
+                                                            quiz.ref.removeValue()
+                                                        }
+                                                    }
+
+                                                    Toast.makeText(
+                                                        this@FileHistoryActivity,
+                                                        "File dan progress berhasil dihapus",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                    loadHistory()
+                                                }
+
+                                                override fun onCancelled(
+                                                    error: DatabaseError
+                                                ) {
+                                                }
+                                            })
+                                }
+
+                                override fun onCancelled(
+                                    error: DatabaseError
+                                ) {
+                                }
+                            })
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@FileHistoryActivity, error.message, Toast.LENGTH_SHORT).show()
+
+                    Toast.makeText(
+                        this@FileHistoryActivity,
+                        error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
     }

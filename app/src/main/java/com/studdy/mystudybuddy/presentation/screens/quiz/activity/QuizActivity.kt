@@ -12,6 +12,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizResult
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 class QuizActivity : AppCompatActivity() {
 
@@ -321,8 +324,53 @@ class QuizActivity : AppCompatActivity() {
 
         database.child(quizId)
             .setValue(quizMap)
+            .addOnSuccessListener {
+
+                // jika nilai >=70 tambahkan progress 30%
+                if(finalScore >= 70){
+
+                    updateQuizProgress(
+                        fileName ?: ""
+                    )
+                }
+            }
     }
 
+    private fun updateQuizProgress(fileName: String) {
+
+        val userId =
+            auth.currentUser?.uid ?: return
+
+        FirebaseDatabase.getInstance()
+            .getReference("Progress")
+            .child(userId)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        for (data in snapshot.children) {
+
+                            val savedFileName =
+                                data.child("fileName")
+                                    .getValue(String::class.java)
+
+                            if (savedFileName == fileName) {
+
+                                data.ref.child("quizDone")
+                                    .setValue(true)
+
+                                break
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                    }
+                }
+            )
+    }
     private fun showResult() {
 
         val result = QuizResult(
@@ -405,7 +453,7 @@ class QuizActivity : AppCompatActivity() {
                     "Surabaya",
                     "Semarang"
                 ),
-                1
+                1 // Jakarta
             ),
 
             Question(
@@ -416,7 +464,7 @@ class QuizActivity : AppCompatActivity() {
                     "7",
                     "8"
                 ),
-                2
+                2 // 7
             ),
 
             Question(
@@ -427,7 +475,7 @@ class QuizActivity : AppCompatActivity() {
                     "Jupiter",
                     "Saturnus"
                 ),
-                2
+                2 // Jupiter
             )
         )
     }

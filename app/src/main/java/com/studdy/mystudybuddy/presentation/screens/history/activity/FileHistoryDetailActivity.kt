@@ -12,6 +12,7 @@ import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.HasilKuisActivity
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
+import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizResult
 
 class FileHistoryDetailActivity : AppCompatActivity() {
 
@@ -62,72 +63,138 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
 
         btnBukaRingkasan.setOnClickListener {
+
             startActivity(
-                Intent(this, RingkasanActivity::class.java).apply {
-                    putExtra("FILE_NAME", fileName)
-                    putExtra("FILE_URI", fileUri)
+                Intent(
+                    this,
+                    RingkasanActivity::class.java
+                ).apply {
+
+                    putExtra(
+                        "FILE_NAME",
+                        fileName
+                    )
+
+                    putExtra(
+                        "FILE_URI",
+                        fileUri
+                    )
                 }
             )
         }
 
-        // ===========================
-        // QUIZ ROUTING FIX HERE
-        // ===========================
         btnBukaQuiz.setOnClickListener {
 
-            val uid = auth.currentUser?.uid ?: return@setOnClickListener
+            val uid =
+                auth.currentUser?.uid
+                    ?: return@setOnClickListener
 
             database.child("QuizHistory")
                 .child(uid)
                 .orderByChild("fileName")
                 .equalTo(fileName)
-                .addListenerForSingleValueEvent(object : ValueEventListener {
+                .addListenerForSingleValueEvent(
+                    object : ValueEventListener {
 
-                    override fun onDataChange(snapshot: DataSnapshot) {
+                        override fun onDataChange(
+                            snapshot: DataSnapshot
+                        ) {
 
-                        if (!snapshot.exists()) {
+                            // BELUM QUIZ
+                            if (!snapshot.exists()) {
 
-                            // ❌ BELUM PERNAH QUIZ → masuk QuizActivity
-                            startActivity(
-                                Intent(
-                                    this@FileHistoryDetailActivity,
-                                    QuizActivity::class.java
-                                ).apply {
-                                    putExtra("FILE_NAME", fileName)
-                                    putExtra("FILE_URI", fileUri)
-                                }
-                            )
+                                startActivity(
+                                    Intent(
+                                        this@FileHistoryDetailActivity,
+                                        QuizActivity::class.java
+                                    ).apply {
 
-                        } else {
+                                        putExtra(
+                                            "FILE_NAME",
+                                            fileName
+                                        )
 
-                            // ✅ SUDAH PERNAH QUIZ → masuk HasilKuisActivity
+                                        putExtra(
+                                            "FILE_URI",
+                                            fileUri
+                                        )
+                                    }
+                                )
+
+                                return
+                            }
+
+                            // SUDAH QUIZ
                             var score = 0
-                            var date = ""
+                            var correct = 0
+                            var wrong = 0
+                            var total = 0
 
                             for (data in snapshot.children) {
-                                score = data.child("score")
-                                    .getValue(Int::class.java) ?: 0
 
-                                date = data.child("date")
-                                    .getValue(String::class.java) ?: "-"
+                                score =
+                                    data.child("score")
+                                        .getValue(Int::class.java)
+                                        ?: 0
+
+                                correct =
+                                    data.child("correctAnswer")
+                                        .getValue(Int::class.java)
+                                        ?: 0
+
+                                wrong =
+                                    data.child("wrongAnswer")
+                                        .getValue(Int::class.java)
+                                        ?: 0
+
+                                total =
+                                    data.child("totalQuestion")
+                                        .getValue(Int::class.java)
+                                        ?: 0
                             }
+
+                            val result =
+                                QuizResult(
+
+                                    totalQuestion = total,
+
+                                    correctAnswer = correct,
+
+                                    wrongAnswer = wrong,
+
+                                    score = score,
+
+                                    explanations = listOf(
+                                        "Pembahasan soal tersedia"
+                                    )
+                                )
 
                             startActivity(
                                 Intent(
                                     this@FileHistoryDetailActivity,
                                     HasilKuisActivity::class.java
                                 ).apply {
-                                    putExtra("FILE_NAME", fileName)
-                                    putExtra("FILE_URI", fileUri)
-                                    putExtra("SCORE", score)
-                                    putExtra("DATE", date)
+
+                                    putExtra(
+                                        "QUIZ_RESULT",
+                                        result
+                                    )
+
+                                    putExtra(
+                                        "FILE_NAME",
+                                        fileName
+                                    )
                                 }
                             )
                         }
-                    }
 
-                    override fun onCancelled(error: DatabaseError) {}
-                })
+                        override fun onCancelled(
+                            error: DatabaseError
+                        ) {
+
+                        }
+                    }
+                )
         }
     }
 

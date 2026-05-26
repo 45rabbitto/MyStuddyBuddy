@@ -12,6 +12,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 class RingkasanActivity : AppCompatActivity() {
 
@@ -68,6 +71,7 @@ class RingkasanActivity : AppCompatActivity() {
                 "Materi selesai dipelajari",
                 Toast.LENGTH_SHORT
             ).show()
+            finish()
         }
 
         btnGenerate.setOnClickListener {
@@ -229,29 +233,64 @@ class RingkasanActivity : AppCompatActivity() {
                 ?: return
 
         val fileName =
-            Uri.parse(fileUri)
-                .lastPathSegment ?: "Materi"
+            intent.getStringExtra("FILE_NAME")
+                ?: Uri.parse(fileUri)
+                    .lastPathSegment
+                ?: "Materi"
 
-        val progressMap =
-            HashMap<String, Any>()
+        val database =
+            FirebaseDatabase
+                .getInstance()
+                .getReference("ReadingProgress")
+                .child(userId)
 
-        progressMap["fileName"] =
-            fileName
+        // cek apakah file sudah ada
+        database.orderByChild("fileName")
+            .equalTo(fileName)
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
 
-        progressMap["materi_selesai"] =
-            true
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
 
-        progressMap["progress"] =
-            30
+                        // jika sudah pernah selesai baca
+                        if (snapshot.exists()) {
 
-        progressMap["updatedAt"] =
-            System.currentTimeMillis()
+                            Toast.makeText(
+                                this@RingkasanActivity,
+                                "Materi sudah selesai dipelajari",
+                                Toast.LENGTH_SHORT
+                            ).show()
 
-        FirebaseDatabase
-            .getInstance()
-            .getReference("Progress")
-            .child(userId)
-            .child(fileName)
-            .setValue(progressMap)
+                            return
+                        }
+
+                        val id =
+                            database.push().key
+                                ?: return
+
+                        val progressMap =
+                            HashMap<String, Any>()
+
+                        progressMap["fileName"] =
+                            fileName
+
+                        progressMap["completed"] =
+                            true
+
+                        progressMap["updatedAt"] =
+                            System.currentTimeMillis()
+
+                        database.child(id)
+                            .setValue(progressMap)
+                    }
+
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+                    }
+                }
+            )
     }
 }

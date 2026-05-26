@@ -20,8 +20,7 @@ import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActi
 import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurActivity
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class UploadActivity : AppCompatActivity() {
 
@@ -45,121 +44,200 @@ class UploadActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        val session = getSharedPreferences("user_session", MODE_PRIVATE)
-        isGuest = session.getBoolean("isGuest", false)
+        val session =
+            getSharedPreferences(
+                "user_session",
+                MODE_PRIVATE
+            )
+
+        isGuest =
+            session.getBoolean(
+                "isGuest",
+                false
+            )
 
         initViews()
         setupClickListeners()
     }
 
     private fun initViews() {
-        btnBack = findViewById(R.id.btnBack)
-        uploadContainer = findViewById(R.id.uploadContainer)
-        fileContainer = findViewById(R.id.fileContainer)
-        tvKosong = findViewById(R.id.tvKosong)
-        btnRingkasan = findViewById(R.id.btnRingkasan)
-        btnChatbot = findViewById(R.id.btnChatbot)
 
-        btnRingkasan.isEnabled = false
-        btnChatbot.isEnabled = false
+        btnBack=findViewById(R.id.btnBack)
+        uploadContainer=findViewById(R.id.uploadContainer)
+        fileContainer=findViewById(R.id.fileContainer)
+        tvKosong=findViewById(R.id.tvKosong)
+        btnRingkasan=findViewById(R.id.btnRingkasan)
+        btnChatbot=findViewById(R.id.btnChatbot)
+
+        btnRingkasan.isEnabled=false
+        btnChatbot.isEnabled=false
     }
 
-    private fun isLoggedIn(): Boolean {
+    private fun isLoggedIn():Boolean{
         return auth.currentUser != null && !isGuest
     }
 
-    private fun setupClickListeners() {
+    private fun setupClickListeners(){
 
-        btnBack.setOnClickListener {
+        btnBack.setOnClickListener{
             finish()
         }
 
-        uploadContainer.setOnClickListener {
+        uploadContainer.setOnClickListener{
             pickFile()
         }
 
-        btnRingkasan.setOnClickListener {
-            if (fileUri == null) return@setOnClickListener
+        btnRingkasan.setOnClickListener{
 
-            if (isLoggedIn()) saveToHistory("RINGKASAN")
+            if(fileUri==null) return@setOnClickListener
 
             startActivity(
-                Intent(this, RingkasanActivity::class.java).apply {
-                    putExtra("FILE_URI", fileUri.toString())
-                    putExtra("FILE_NAME", fileName)
+                Intent(
+                    this,
+                    RingkasanActivity::class.java
+                ).apply{
+
+                    putExtra(
+                        "FILE_URI",
+                        fileUri.toString()
+                    )
+
+                    putExtra(
+                        "FILE_NAME",
+                        fileName
+                    )
                 }
             )
         }
 
-        btnChatbot.setOnClickListener {
-            if (fileUri == null) return@setOnClickListener
+        btnChatbot.setOnClickListener{
 
-            if (isLoggedIn()) saveToHistory("CHATBOT")
+            if(fileUri==null) return@setOnClickListener
 
             startActivity(
-                Intent(this, ChatbotActivity::class.java).apply {
-                    putExtra("FILE_URI", fileUri.toString())
-                    putExtra("FILE_NAME", fileName)
+                Intent(
+                    this,
+                    ChatbotActivity::class.java
+                ).apply{
+
+                    putExtra(
+                        "FILE_URI",
+                        fileUri.toString()
+                    )
+
+                    putExtra(
+                        "FILE_NAME",
+                        fileName
+                    )
                 }
             )
         }
     }
 
-    private fun pickFile() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "application/pdf"
-            addCategory(Intent.CATEGORY_OPENABLE)
-        }
+    private fun pickFile(){
+
+        val intent=
+            Intent(
+                Intent.ACTION_GET_CONTENT
+            ).apply{
+
+                type="application/pdf"
+                addCategory(
+                    Intent.CATEGORY_OPENABLE
+                )
+            }
+
         launcher.launch(intent)
     }
 
-    private val launcher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+    private val launcher=
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ){result->
 
-            if (result.resultCode == Activity.RESULT_OK) {
+            if(result.resultCode==Activity.RESULT_OK){
 
-                val uri = result.data?.data ?: return@registerForActivityResult
+                val uri=
+                    result.data?.data
+                        ?:return@registerForActivityResult
 
-                fileUri = uri
-                fileName = getFileName(uri)
+                fileUri=uri
+                fileName=getFileName(uri)
 
-                tvKosong.visibility = View.GONE
+                tvKosong.visibility=View.GONE
+
                 fileContainer.removeAllViews()
 
                 fileContainer.addView(
-                    TextView(this).apply {
-                        text = fileName
-                        textSize = 15f
-                        setPadding(20, 20, 20, 20)
-                        setBackgroundResource(R.drawable.kontainer)
 
-                        setOnClickListener {
+                    TextView(this).apply{
+
+                        text=fileName
+                        textSize=15f
+
+                        setPadding(
+                            20,
+                            20,
+                            20,
+                            20
+                        )
+
+                        setBackgroundResource(
+                            R.drawable.kontainer
+                        )
+
+                        setOnClickListener{
                             openAlur()
                         }
                     }
                 )
 
-                // 🔥 LOGIN ONLY FEATURES
-                if (isLoggedIn()) {
-                    saveUploadedMaterial(fileName ?: "")
-                    updateProgress(fileName ?: "")
+                if(isLoggedIn()){
+
+                    saveUploadedMaterial(
+                        fileName ?: ""
+                    )
+
+                    saveToHistory(
+                        fileName ?: ""
+                    )
+
+                    updateProgress(
+                        fileName ?: ""
+                    )
                 }
 
-                btnRingkasan.isEnabled = true
-                btnChatbot.isEnabled = true
+                btnRingkasan.isEnabled=true
+                btnChatbot.isEnabled=true
             }
         }
 
-    private fun getFileName(uri: Uri): String {
-        var name = "file.pdf"
+    private fun getFileName(uri:Uri):String{
 
-        val cursor = contentResolver.query(uri, null, null, null, null)
+        var name="file.pdf"
 
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (index >= 0) {
-                    name = it.getString(index)
+        val cursor=
+            contentResolver.query(
+                uri,
+                null,
+                null,
+                null,
+                null
+            )
+
+        cursor?.use{
+
+            if(it.moveToFirst()){
+
+                val index=
+                    it.getColumnIndex(
+                        OpenableColumns.DISPLAY_NAME
+                    )
+
+                if(index>=0){
+
+                    name=
+                        it.getString(index)
                 }
             }
         }
@@ -167,83 +245,106 @@ class UploadActivity : AppCompatActivity() {
         return name
     }
 
-    // ========================
-    // HISTORY (LOGIN ONLY)
-    // ========================
-    private fun saveToHistory(type: String) {
+    private fun saveToHistory(file:String){
 
-        val userId = auth.currentUser?.uid ?: return
+        val userId=
+            auth.currentUser?.uid ?: return
 
-        val database = FirebaseDatabase.getInstance()
-            .getReference("History")
-            .child(userId)
+        val database=
+            FirebaseDatabase.getInstance()
+                .getReference("History")
+                .child(userId)
 
-        val historyId = database.push().key ?: return
+        val historyId=
+            database.push().key ?: return
 
-        val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
+        val date=
+            SimpleDateFormat(
+                "dd MMM yyyy",
+                Locale.getDefault()
+            ).format(Date())
 
-        val historyMap = hashMapOf<String, Any>(
-            "fileName" to (fileName ?: ""),
-            "date" to date,
-            "type" to type
-        )
+        val historyMap=
+            hashMapOf<String,Any>(
 
-        database.child(historyId).setValue(historyMap)
+                "fileName" to file,
+                "date" to date
+            )
+
+        database.child(historyId)
+            .setValue(historyMap)
     }
 
-    // ========================
-    // MATERIAL (LOGIN ONLY)
-    // ========================
-    private fun saveUploadedMaterial(materialName: String) {
+    private fun saveUploadedMaterial(materialName:String){
 
-        val userId = auth.currentUser?.uid ?: return
+        val userId=
+            auth.currentUser?.uid ?: return
 
-        val database = FirebaseDatabase.getInstance()
-            .getReference("UploadedMaterials")
-            .child(userId)
+        val database=
+            FirebaseDatabase.getInstance()
+                .getReference(
+                    "UploadedMaterials"
+                )
+                .child(userId)
 
-        val materialId = database.push().key ?: return
+        val materialId=
+            database.push().key ?: return
 
-        val materialMap = hashMapOf<String, Any>(
-            "fileName" to materialName,
-            "timestamp" to System.currentTimeMillis()
-        )
+        val materialMap=
+            hashMapOf<String,Any>(
 
-        database.child(materialId).setValue(materialMap)
-            .addOnSuccessListener {
-                Toast.makeText(this, "File berhasil disimpan", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Gagal upload data", Toast.LENGTH_SHORT).show()
-            }
+                "fileName" to materialName,
+                "timestamp" to System.currentTimeMillis()
+            )
+
+        database.child(materialId)
+            .setValue(materialMap)
     }
 
-    // ========================
-    // PROGRESS (LOGIN ONLY)
-    // ========================
-    private fun updateProgress(fileName: String) {
+    private fun updateProgress(fileName:String){
 
-        val prefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+        val prefs=
+            getSharedPreferences(
+                "progress_data",
+                MODE_PRIVATE
+            )
 
-        val materiLama = prefs.getInt("materi_count", 0)
+        val materiLama=
+            prefs.getInt(
+                "materi_count",
+                0
+            )
 
         prefs.edit()
-            .putInt("materi_count", materiLama + 1)
-            .putString("last_file", fileName)
+            .putInt(
+                "materi_count",
+                materiLama+1
+            )
+            .putString(
+                "last_file",
+                fileName
+            )
             .apply()
     }
 
-    // ========================
-    // NAVIGATION
-    // ========================
-    private fun openAlur() {
-
-        if (fileUri == null) return
+    private fun openAlur(){
 
         startActivity(
-            Intent(this, AlurActivity::class.java).apply {
-                putExtra("FILE_NAME", fileName)
-                putExtra("FILE_URI", fileUri.toString())
+
+            Intent(
+                this,
+                AlurActivity::class.java
+            ).apply{
+
+                putExtra(
+                    "FILE_NAME",
+                    fileName
+                )
+
+                putExtra(
+                    "FILE_URI",
+                    fileUri.toString()
+                )
             }
         )
     }

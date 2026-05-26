@@ -29,8 +29,16 @@ class ProgresActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_progres)
 
-        val session = getSharedPreferences("user_session", MODE_PRIVATE)
-        isGuest = session.getBoolean("isGuest", false)
+        val session = getSharedPreferences(
+            "user_session",
+            MODE_PRIVATE
+        )
+
+        isGuest =
+            session.getBoolean(
+                "isGuest",
+                false
+            )
 
         initViews()
         setupRecycler()
@@ -39,122 +47,195 @@ class ProgresActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        btnBack = findViewById(R.id.btnBack)
-        recycler = findViewById(R.id.progressContainer)
-        tvTotalProgress = findViewById(R.id.tvTotalProgress)
+
+        btnBack =
+            findViewById(R.id.btnBack)
+
+        recycler =
+            findViewById(R.id.progressContainer)
+
+        tvTotalProgress =
+            findViewById(R.id.tvTotalProgress)
     }
 
     private fun setupRecycler() {
-        recycler.layoutManager = LinearLayoutManager(this)
-        recycler.adapter = ProgressAdapter(progressList)
+
+        recycler.layoutManager =
+            LinearLayoutManager(this)
+
+        recycler.adapter =
+            ProgressAdapter(progressList)
     }
 
     private fun setupBackButton() {
-        btnBack.setOnClickListener { finish() }
+
+        btnBack.setOnClickListener {
+            finish()
+        }
     }
 
-    // =========================
-    // LOGIN ONLY PROGRESS
-    // =========================
     private fun loadProgress() {
 
-        // ❌ GUEST MODE STOP TOTAL
         if (isGuest || auth.currentUser == null) {
+
             progressList.clear()
+
             recycler.adapter?.notifyDataSetChanged()
-            tvTotalProgress.text = "Total Progress : 0%"
+
+            tvTotalProgress.text =
+                "Total Progress : 0%"
+
             return
         }
 
-        val uid = auth.currentUser!!.uid
+        val uid =
+            auth.currentUser!!.uid
 
         progressList.clear()
 
         database.child("UploadedMaterials")
             .child(uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
 
-                override fun onDataChange(snapshot: DataSnapshot) {
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
 
-                    if (!snapshot.exists()) {
-                        tvTotalProgress.text = "Total Progress : 0%"
-                        return
-                    }
+                        if (!snapshot.exists()) {
 
-                    val totalFile = snapshot.childrenCount.toInt()
+                            tvTotalProgress.text =
+                                "Total Progress : 0%"
 
-                    var totalProgress = 0
-                    var processed = 0
+                            return
+                        }
 
-                    for (data in snapshot.children) {
+                        val totalFile =
+                            snapshot.childrenCount.toInt()
 
-                        val fileName = data.child("fileName")
-                            .getValue(String::class.java) ?: "Materi"
+                        var totalProgress = 0
+                        var processed = 0
 
-                        database.child("QuizHistory")
-                            .child(uid)
-                            .orderByChild("fileName")
-                            .equalTo(fileName)
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                        for (data in snapshot.children) {
 
-                                override fun onDataChange(quizSnapshot: DataSnapshot) {
+                            val fileName =
+                                data.child("fileName")
+                                    .getValue(String::class.java)
+                                    ?: "Materi"
 
-                                    var totalScore = 0
-                                    var count = 0
+                            // cek status baca
+                            database.child("ReadingProgress")
+                                .child(uid)
+                                .orderByChild("fileName")
+                                .equalTo(fileName)
+                                .addListenerForSingleValueEvent(
+                                    object : ValueEventListener {
 
-                                    for (quiz in quizSnapshot.children) {
+                                        override fun onDataChange(
+                                            readSnapshot: DataSnapshot
+                                        ) {
 
-                                        val score = quiz.child("score")
-                                            .getValue(Int::class.java) ?: 0
+                                            var progress = 0
 
-                                        totalScore += score
-                                        count++
-                                    }
+                                            // ====================
+                                            // BACA = 70%
+                                            // ====================
 
-                                    val avgScore =
-                                        if (count == 0) 0
-                                        else totalScore / count
+                                            var readCompleted = false
 
-                                    val progress =
-                                        if (count > 0) {
-                                            30 + ((avgScore * 70) / 100)
-                                        } else {
-                                            30
+                                            for (read in readSnapshot.children) {
+
+                                                readCompleted =
+                                                    read.child("completed")
+                                                        .getValue(Boolean::class.java)
+                                                        ?: false
+                                            }
+
+                                            if (readCompleted) {
+                                                progress += 70
+                                            }
+
+                                            // ====================
+                                            // QUIZ = +30%
+                                            // jika nilai >=70
+                                            // ====================
+
+                                            database.child("QuizHistory")
+                                                .child(uid)
+                                                .orderByChild("fileName")
+                                                .equalTo(fileName)
+                                                .addListenerForSingleValueEvent(
+                                                    object : ValueEventListener {
+
+                                                        override fun onDataChange(
+                                                            quizSnapshot: DataSnapshot
+                                                        ) {
+
+                                                            var bestScore = 0
+
+                                                            for (quiz in quizSnapshot.children) {
+
+                                                                val score =
+                                                                    quiz.child("score")
+                                                                        .getValue(Int::class.java)
+                                                                        ?: 0
+
+                                                                if (score > bestScore) {
+                                                                    bestScore = score
+                                                                }
+                                                            }
+
+                                                            if (bestScore >= 70) {
+                                                                progress += 30
+                                                            }
+
+                                                            progressList.add(
+                                                                ProgressModel(
+                                                                    title = fileName,
+                                                                    progress = progress
+                                                                )
+                                                            )
+
+                                                            totalProgress += progress
+                                                            processed++
+
+                                                            if (processed == totalFile) {
+
+                                                                recycler.adapter?.notifyDataSetChanged()
+
+                                                                val average =
+                                                                    totalProgress / totalFile
+
+                                                                tvTotalProgress.text =
+                                                                    "Total Progress : $average%"
+                                                            }
+                                                        }
+
+                                                        override fun onCancelled(
+                                                            error: DatabaseError
+                                                        ) {
+                                                        }
+                                                    }
+                                                )
                                         }
 
-                                    totalProgress += progress
-                                    processed++
-
-                                    progressList.add(
-                                        ProgressModel(
-                                            title = fileName,
-                                            progress = progress
-                                        )
-                                    )
-
-                                    if (processed == totalFile) {
-
-                                        recycler.adapter?.notifyDataSetChanged()
-
-                                        val average =
-                                            if (totalFile == 0) 0
-                                            else totalProgress / totalFile
-
-                                        tvTotalProgress.text =
-                                            "Total Progress : $average%"
+                                        override fun onCancelled(
+                                            error: DatabaseError
+                                        ) {
+                                        }
                                     }
-                                }
+                                )
+                        }
+                    }
 
-                                override fun onCancelled(error: DatabaseError) {
-                                    tvTotalProgress.text = "Gagal memuat quiz"
-                                }
-                            })
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+
+                        tvTotalProgress.text =
+                            "Gagal memuat data"
                     }
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    tvTotalProgress.text = "Gagal memuat data"
-                }
-            })
+            )
     }
 }
