@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
+    <!-- HEADER -->
     <RelativeLayout
         android:layout_width="390dp"
         android:layout_height="50dp"
@@ -11,6 +12,7 @@
         android:layout_centerHorizontal="true"
         android:background="@drawable/kontainer">
 
+        <!-- Back -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
@@ -21,6 +23,7 @@
             android:clickable="true"
             android:focusable="true" />
 
+        <!-- Judul -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,19 +35,33 @@
             android:textColor="@color/dark_text"
             android:layout_centerHorizontal="true" />
 
+        <!-- Tombol Musik -->
+        <ImageView
+            android:id="@+id/btnMusic"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_music_on"
+            android:clickable="true"
+            android:focusable="true" />
+
     </RelativeLayout>
 
+    <!-- CONTENT -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomButtons"
-        android:layout_below="@id/btnBack"
         android:fillViewport="true">
 
         <LinearLayout
             android:id="@+id/contentQuiz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="16dp"
             android:layout_marginTop="20dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
@@ -54,59 +71,60 @@
                 android:id="@+id/tvQuestion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
+                android:layout_marginBottom="24dp"
                 android:fontFamily="@font/poppins"
                 android:textColor="@color/dark_text"
-                android:layout_marginBottom="24dp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/optionA"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/kontainer"
+                android:fontFamily="@font/poppins"
                 android:minHeight="55dp"
                 android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp" />
+                android:textColor="@color/dark_text" />
 
             <Button
                 android:id="@+id/optionB"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/kontainer"
+                android:fontFamily="@font/poppins"
                 android:minHeight="55dp"
                 android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp" />
+                android:textColor="@color/dark_text" />
 
             <Button
                 android:id="@+id/optionC"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/kontainer"
+                android:fontFamily="@font/poppins"
                 android:minHeight="55dp"
                 android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp" />
+                android:textColor="@color/dark_text" />
 
             <Button
                 android:id="@+id/optionD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/kontainer"
+                android:fontFamily="@font/poppins"
                 android:minHeight="55dp"
                 android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
                 android:textColor="@color/dark_text" />
 
         </LinearLayout>
 
     </ScrollView>
 
+    <!-- BOTTOM BUTTON -->
     <LinearLayout
         android:id="@+id/bottomButtons"
         android:layout_width="match_parent"
