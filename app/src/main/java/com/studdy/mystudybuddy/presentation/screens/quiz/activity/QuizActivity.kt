@@ -9,12 +9,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizResult
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
+import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
+import com.studdy.mystudybuddy.presentation.screens.quiz.QuizQuestionModel
+import com.studdy.mystudybuddy.presentation.screens.history.model.QuizHistoryItem
 
 class QuizActivity : AppCompatActivity() {
 
@@ -34,6 +33,8 @@ class QuizActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
     private var mediaPlayer: MediaPlayer? = null
+    private var clickSound: MediaPlayer? = null
+
     private var isMusicOn = true
 
     private var currentQuestionIndex = 0
@@ -43,6 +44,13 @@ class QuizActivity : AppCompatActivity() {
     private var fileName: String? = null
 
     private val userAnswers = mutableListOf<Int>()
+
+    // =========================
+    // LIST SOAL
+    // =========================
+
+    private val questions =
+        mutableListOf<QuizQuestion>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,8 +62,9 @@ class QuizActivity : AppCompatActivity() {
         initViews()
         setupMusic()
         setupData()
-        loadQuestion()
         setupListeners()
+
+        loadQuestionsFromFirebase()
     }
 
     private fun initViews() {
@@ -74,12 +83,72 @@ class QuizActivity : AppCompatActivity() {
         btnNext = findViewById(R.id.btnNext)
     }
 
+    // =========================
+    // LOAD QUESTION FIREBASE
+    // =========================
+
+    private fun loadQuestionsFromFirebase() {
+
+        FirebaseDatabase.getInstance()
+            .getReference("Questions")
+            .addListenerForSingleValueEvent(
+
+                object : ValueEventListener {
+
+                    override fun onDataChange(snapshot: DataSnapshot) {
+
+                        questions.clear()
+
+                        for (data in snapshot.children) {
+
+                            val question =
+                                data.getValue(
+                                    QuizQuestion::class.java
+                                )
+
+                            if (question != null) {
+
+                                questions.add(question)
+                            }
+                        }
+
+                        if (questions.isNotEmpty()) {
+
+                            loadQuestion()
+
+                        } else {
+
+                            Toast.makeText(
+                                this@QuizActivity,
+                                "Soal kosong",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+
+                        Toast.makeText(
+                            this@QuizActivity,
+                            error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            )
+    }
+
+    // =========================
+    // MUSIC
+    // =========================
+
     private fun setupMusic() {
 
-        mediaPlayer = MediaPlayer.create(
-            this,
-            R.raw.music_quiz
-        )
+        mediaPlayer =
+            MediaPlayer.create(
+                this,
+                R.raw.backsound
+            )
 
         mediaPlayer?.apply {
 
@@ -87,10 +156,20 @@ class QuizActivity : AppCompatActivity() {
             start()
         }
 
+        clickSound =
+            MediaPlayer.create(
+                this,
+                R.raw.button
+            )
+
         btnMusic.setImageResource(
             R.drawable.ic_music_on
         )
     }
+
+    // =========================
+    // LISTENER
+    // =========================
 
     private fun setupListeners() {
 
@@ -142,6 +221,10 @@ class QuizActivity : AppCompatActivity() {
             if (currentQuestionIndex > 0) {
 
                 currentQuestionIndex--
+
+                selectedAnswer =
+                    userAnswers[currentQuestionIndex]
+
                 loadQuestion()
             }
         }
@@ -161,9 +244,7 @@ class QuizActivity : AppCompatActivity() {
 
             if (userAnswers.size <= currentQuestionIndex) {
 
-                userAnswers.add(
-                    selectedAnswer
-                )
+                userAnswers.add(selectedAnswer)
 
             } else {
 
@@ -187,6 +268,10 @@ class QuizActivity : AppCompatActivity() {
             }
         }
     }
+
+    // =========================
+    // LOAD QUESTION
+    // =========================
 
     private fun loadQuestion() {
 
@@ -219,7 +304,13 @@ class QuizActivity : AppCompatActivity() {
         }
     }
 
+    // =========================
+    // SELECT ANSWER
+    // =========================
+
     private fun selectAnswer(index: Int) {
+
+        clickSound?.start()
 
         selectedAnswer = index
 
@@ -232,42 +323,27 @@ class QuizActivity : AppCompatActivity() {
 
         when (selectedAnswer) {
 
-            0 -> optionA.setBackgroundResource(
-                R.drawable.button1
-            )
+            0 -> optionA.setBackgroundResource(R.drawable.button1)
 
-            1 -> optionB.setBackgroundResource(
-                R.drawable.button1
-            )
+            1 -> optionB.setBackgroundResource(R.drawable.button1)
 
-            2 -> optionC.setBackgroundResource(
-                R.drawable.button1
-            )
+            2 -> optionC.setBackgroundResource(R.drawable.button1)
 
-            3 -> optionD.setBackgroundResource(
-                R.drawable.button1
-            )
+            3 -> optionD.setBackgroundResource(R.drawable.button1)
         }
     }
 
     private fun resetButtons() {
 
-        optionA.setBackgroundResource(
-            R.drawable.kontainer
-        )
-
-        optionB.setBackgroundResource(
-            R.drawable.kontainer
-        )
-
-        optionC.setBackgroundResource(
-            R.drawable.kontainer
-        )
-
-        optionD.setBackgroundResource(
-            R.drawable.kontainer
-        )
+        optionA.setBackgroundResource(R.drawable.kontainer)
+        optionB.setBackgroundResource(R.drawable.kontainer)
+        optionC.setBackgroundResource(R.drawable.kontainer)
+        optionD.setBackgroundResource(R.drawable.kontainer)
     }
+
+    // =========================
+    // SCORE
+    // =========================
 
     private fun calculateScore() {
 
@@ -284,6 +360,10 @@ class QuizActivity : AppCompatActivity() {
             }
         }
     }
+
+    // =========================
+    // FIREBASE
+    // =========================
 
     private fun saveQuizResult() {
 
@@ -324,74 +404,42 @@ class QuizActivity : AppCompatActivity() {
 
         database.child(quizId)
             .setValue(quizMap)
-            .addOnSuccessListener {
-
-                // jika nilai >=70 tambahkan progress 30%
-                if(finalScore >= 70){
-
-                    updateQuizProgress(
-                        fileName ?: ""
-                    )
-                }
-            }
     }
 
-    private fun updateQuizProgress(fileName: String) {
+    // =========================
+    // RESULT
+    // =========================
 
-        val userId =
-            auth.currentUser?.uid ?: return
-
-        FirebaseDatabase.getInstance()
-            .getReference("Progress")
-            .child(userId)
-            .addListenerForSingleValueEvent(
-                object : ValueEventListener {
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-
-                        for (data in snapshot.children) {
-
-                            val savedFileName =
-                                data.child("fileName")
-                                    .getValue(String::class.java)
-
-                            if (savedFileName == fileName) {
-
-                                data.ref.child("quizDone")
-                                    .setValue(true)
-
-                                break
-                            }
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-
-                    }
-                }
-            )
-    }
     private fun showResult() {
 
-        val result = QuizResult(
+        mediaPlayer?.stop()
 
-            totalQuestion = questions.size,
+        val pembahasanList =
+            mutableListOf<QuizHistoryItem>()
 
-            correctAnswer = score,
+        for (i in questions.indices) {
 
-            wrongAnswer = questions.size - score,
+            val question =
+                questions[i]
 
-            score = (score * 100) / questions.size,
+            val userAnswerText =
+                question.options[userAnswers[i]]
 
-            explanations = listOf(
+            val correctAnswerText =
+                question.options[question.correctAnswer]
 
-                "1. Jakarta adalah ibu kota Indonesia",
+            pembahasanList.add(
 
-                "2. 2 + 5 = 7",
-
-                "3. Jupiter adalah planet terbesar"
+                QuizHistoryItem(
+                    question = question.question,
+                    correctAnswer = correctAnswerText,
+                    userAnswer = userAnswerText
+                )
             )
-        )
+        }
+
+        QuizQuestionModel.questionList =
+            pembahasanList
 
         val intent =
             Intent(
@@ -399,10 +447,9 @@ class QuizActivity : AppCompatActivity() {
                 HasilKuisActivity::class.java
             )
 
-        intent.putExtra(
-            "QUIZ_RESULT",
-            result
-        )
+        intent.putExtra("SCORE", score)
+
+        intent.putExtra("FILE_NAME", fileName)
 
         startActivity(intent)
 
@@ -414,9 +461,7 @@ class QuizActivity : AppCompatActivity() {
         userAnswers.clear()
 
         fileName =
-            intent.getStringExtra(
-                "FILE_NAME"
-            )
+            intent.getStringExtra("FILE_NAME")
     }
 
     override fun onPause() {
@@ -439,53 +484,8 @@ class QuizActivity : AppCompatActivity() {
 
         mediaPlayer?.release()
         mediaPlayer = null
-    }
 
-    companion object {
-
-        val questions = listOf(
-
-            Question(
-                "Apa ibu kota Indonesia?",
-                listOf(
-                    "Bandung",
-                    "Jakarta",
-                    "Surabaya",
-                    "Semarang"
-                ),
-                1 // Jakarta
-            ),
-
-            Question(
-                "2 + 5 = ?",
-                listOf(
-                    "5",
-                    "6",
-                    "7",
-                    "8"
-                ),
-                2 // 7
-            ),
-
-            Question(
-                "Planet terbesar?",
-                listOf(
-                    "Mars",
-                    "Venus",
-                    "Jupiter",
-                    "Saturnus"
-                ),
-                2 // Jupiter
-            )
-        )
+        clickSound?.release()
+        clickSound = null
     }
 }
-
-data class Question(
-
-    val question: String,
-
-    val options: List<String>,
-
-    val correctAnswer: Int
-)

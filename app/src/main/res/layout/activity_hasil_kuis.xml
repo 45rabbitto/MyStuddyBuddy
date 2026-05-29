@@ -1,119 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@drawable/bg_gradient"
     android:padding="16dp">
 
-    <!-- Header Nilai -->
+    <!-- ================= HEADER ================= -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hasil Kuis"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/dark_text"
+        android:fontFamily="@font/poppins"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- ================= CARD SCORE ================= -->
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="15dp"
         android:background="@drawable/card_bg"
-        android:gravity="center">
+        android:padding="12dp">
 
-        <!-- Benar -->
+        <!-- BENAR -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="90dp"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:background="@drawable/kontainer"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@drawable/kontainer">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Benar"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:textColor="@color/dark_text"
-                android:fontFamily="@font/poppins"
-                android:textStyle="bold"/>
+                android:fontFamily="@font/poppins"/>
 
             <TextView
                 android:id="@+id/tvBenar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:textColor="@color/benar"
+                android:text="0"
+                android:textSize="30sp"
                 android:textStyle="bold"
+                android:textColor="@color/benar"
                 android:fontFamily="@font/poppins"/>
         </LinearLayout>
 
-        <!-- Salah -->
+        <!-- SALAH -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="90dp"
             android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/kontainer"
+            android:layout_marginStart="10dp"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@drawable/kontainer">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Salah"
                 android:textSize="14sp"
+                android:textStyle="bold"
                 android:textColor="@color/dark_text"
-                android:fontFamily="@font/poppins"
-                android:textStyle="bold"/>
+                android:fontFamily="@font/poppins"/>
 
             <TextView
                 android:id="@+id/tvSalah"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:textColor="#E74C3C"
+                android:text="0"
+                android:textSize="30sp"
                 android:textStyle="bold"
+                android:textColor="#E74C3C"
                 android:fontFamily="@font/poppins"/>
         </LinearLayout>
 
-        <!-- Skor -->
+        <!-- SKOR -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="90dp"
             android:layout_weight="1"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/kontainer"
+            android:layout_marginStart="10dp"
             android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:background="@drawable/kontainer">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Skor"
                 android:textSize="14sp"
-                android:fontFamily="@font/poppins"
-                android:textStyle="bold"/>
+                android:textStyle="bold"
+                android:textColor="@color/dark_text"
+                android:fontFamily="@font/poppins"/>
 
             <TextView
                 android:id="@+id/tvSkor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
+                android:text="0"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 android:textColor="@color/gray_text"
                 android:fontFamily="@font/poppins"/>
         </LinearLayout>
+
     </LinearLayout>
 
-    <!-- Judul -->
+    <!-- ================= PEMBAHASAN TITLE ================= -->
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pembahasan"
+        android:text="Pembahasan Jawaban"
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="@color/dark_text"
         android:fontFamily="@font/poppins"
         android:layout_marginTop="24dp"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="12dp"/>
 
-    <!-- Scroll pembahasan -->
+    <!-- ================= PEMBAHASAN ================= -->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -124,14 +146,15 @@
             android:id="@+id/pembahasanContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <!-- isi pembahasan akan ditambahkan otomatis -->
+            android:orientation="vertical"
+            android:padding="16dp">
 
         </LinearLayout>
+
     </ScrollView>
 
-    <!-- Tombol -->
+    <!-- ================= BUTTON ================= -->
+
     <Button
         android:id="@+id/btnDashboard"
         android:layout_width="match_parent"
@@ -139,9 +162,10 @@
         android:layout_marginTop="16dp"
         android:background="@drawable/button1"
         android:text="Kembali ke Dashboard"
-        android:textColor="@color/white"
-        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:textColor="@android:color/white"
         android:textSize="16sp"
+        android:textStyle="bold"
         android:fontFamily="@font/poppins"/>
 
 </LinearLayout>

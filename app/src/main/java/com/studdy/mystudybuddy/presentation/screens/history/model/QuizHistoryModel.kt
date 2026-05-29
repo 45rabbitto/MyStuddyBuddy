@@ -1,9 +1,9 @@
-package com.studdy.mystudybuddy.presentation.screens.quiz.model
+package com.studdy.mystudybuddy.presentation.screens.history.model
 
-data class QuizQuestionModel(
+data class QuizHistoryItem(
 
-    var question:String = "",
-    var correctAnswer:String = "",
-    var userAnswer:String = ""
+    var question: String = "",
+    var correctAnswer: String = "",
+    var userAnswer: String = ""
 
 )
