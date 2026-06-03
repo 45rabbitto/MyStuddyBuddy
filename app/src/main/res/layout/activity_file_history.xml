@@ -91,6 +91,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="Lihat Ringkasan"
+                android:textColor="@android:color/white"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/button1"/>
         </LinearLayout>
@@ -124,6 +125,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="Lihat Hasil Quiz"
+                android:textColor="@android:color/white"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/button1"/>
         </LinearLayout>
