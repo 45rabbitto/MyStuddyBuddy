@@ -61,290 +61,169 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
+        btnBack = findViewById(R.id.btnBack)
+        uploadContainer = findViewById(R.id.uploadContainer)
+        fileContainer = findViewById(R.id.fileContainer)
+        tvKosong = findViewById(R.id.tvKosong)
+        btnRingkasan = findViewById(R.id.btnRingkasan)
+        btnChatbot = findViewById(R.id.btnChatbot)
 
-        btnBack=findViewById(R.id.btnBack)
-        uploadContainer=findViewById(R.id.uploadContainer)
-        fileContainer=findViewById(R.id.fileContainer)
-        tvKosong=findViewById(R.id.tvKosong)
-        btnRingkasan=findViewById(R.id.btnRingkasan)
-        btnChatbot=findViewById(R.id.btnChatbot)
-
-        btnRingkasan.isEnabled=false
-        btnChatbot.isEnabled=false
+        btnRingkasan.isEnabled = false
+        btnChatbot.isEnabled = false
     }
 
-    private fun isLoggedIn():Boolean{
+    private fun isLoggedIn(): Boolean {
         return auth.currentUser != null && !isGuest
     }
 
-    private fun setupClickListeners(){
-
-        btnBack.setOnClickListener{
+    private fun setupClickListeners() {
+        btnBack.setOnClickListener {
             finish()
         }
 
-        uploadContainer.setOnClickListener{
+        uploadContainer.setOnClickListener {
             pickFile()
         }
 
-        btnRingkasan.setOnClickListener{
-
-            if(fileUri==null) return@setOnClickListener
+        btnRingkasan.setOnClickListener {
+            if (fileUri == null) return@setOnClickListener
 
             startActivity(
-                Intent(
-                    this,
-                    RingkasanActivity::class.java
-                ).apply{
-
-                    putExtra(
-                        "FILE_URI",
-                        fileUri.toString()
-                    )
-
-                    putExtra(
-                        "FILE_NAME",
-                        fileName
-                    )
+                Intent(this, RingkasanActivity::class.java).apply {
+                    putExtra("FILE_URI", fileUri.toString())
+                    putExtra("FILE_NAME", fileName)
+                    // MEMBERIKAN IZIN AKSES BACA SECARA LEGAL KE RINGKASAN_ACTIVITY
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             )
         }
 
-        btnChatbot.setOnClickListener{
-
-            if(fileUri==null) return@setOnClickListener
+        btnChatbot.setOnClickListener {
+            if (fileUri == null) return@setOnClickListener
 
             startActivity(
-                Intent(
-                    this,
-                    ChatbotActivity::class.java
-                ).apply{
-
-                    putExtra(
-                        "FILE_URI",
-                        fileUri.toString()
-                    )
-
-                    putExtra(
-                        "FILE_NAME",
-                        fileName
-                    )
+                Intent(this, ChatbotActivity::class.java).apply {
+                    putExtra("FILE_URI", fileUri.toString())
+                    putExtra("FILE_NAME", fileName)
+                    // MEMBERIKAN IZIN AKSES BACA SECARA LEGAL KE CHATBOT_ACTIVITY
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             )
         }
     }
 
-    private fun pickFile(){
-
-        val intent=
-            Intent(
-                Intent.ACTION_GET_CONTENT
-            ).apply{
-
-                type="application/pdf"
-                addCategory(
-                    Intent.CATEGORY_OPENABLE
-                )
-            }
-
+    private fun pickFile() {
+        // MENGGUNAKAN ACTION_OPEN_DOCUMENT AGAR MENDAPATKAN KUNCI IZIN AKSES FILE YANG SAH
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            type = "application/pdf"
+            addCategory(Intent.CATEGORY_OPENABLE)
+        }
         launcher.launch(intent)
     }
 
-    private val launcher=
+    private val launcher =
         registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
-        ){result->
+        ) { result ->
 
-            if(result.resultCode==Activity.RESULT_OK){
+            if (result.resultCode == Activity.RESULT_OK) {
+                val uri = result.data?.data ?: return@registerForActivityResult
 
-                val uri=
-                    result.data?.data
-                        ?:return@registerForActivityResult
+                fileUri = uri
+                fileName = getFileName(uri)
 
-                fileUri=uri
-                fileName=getFileName(uri)
+                // MENGUNCI IZIN AKSES DARI ANDROID SYSTEM SECARA PERMANEN SELAMA APLIKASI BERJALAN
+                try {
+                    contentResolver.takePersistableUriPermission(
+                        uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
 
-                tvKosong.visibility=View.GONE
-
+                tvKosong.visibility = View.GONE
                 fileContainer.removeAllViews()
 
                 fileContainer.addView(
+                    TextView(this).apply {
+                        text = fileName
+                        textSize = 15f
 
-                    TextView(this).apply{
+                        setPadding(20, 20, 20, 20)
+                        setBackgroundResource(R.drawable.kontainer)
 
-                        text=fileName
-                        textSize=15f
-
-                        setPadding(
-                            20,
-                            20,
-                            20,
-                            20
-                        )
-
-                        setBackgroundResource(
-                            R.drawable.kontainer
-                        )
-
-                        setOnClickListener{
+                        setOnClickListener {
                             openAlur()
                         }
                     }
                 )
 
-                if(isLoggedIn()){
-
-                    saveUploadedMaterial(
-                        fileName ?: ""
-                    )
-
-                    saveToHistory(
-                        fileName ?: ""
-                    )
-
-                    updateProgress(
-                        fileName ?: ""
-                    )
+                if (isLoggedIn()) {
+                    saveUploadedMaterial(fileName ?: "")
+                    saveToHistory(fileName ?: "")
+                    updateProgress(fileName ?: "")
                 }
 
-                btnRingkasan.isEnabled=true
-                btnChatbot.isEnabled=true
+                btnRingkasan.isEnabled = true
+                btnChatbot.isEnabled = true
             }
         }
 
-    private fun getFileName(uri:Uri):String{
+    private fun getFileName(uri: Uri): String {
+        var name = "file.pdf"
+        val cursor = contentResolver.query(uri, null, null, null, null)
 
-        var name="file.pdf"
-
-        val cursor=
-            contentResolver.query(
-                uri,
-                null,
-                null,
-                null,
-                null
-            )
-
-        cursor?.use{
-
-            if(it.moveToFirst()){
-
-                val index=
-                    it.getColumnIndex(
-                        OpenableColumns.DISPLAY_NAME
-                    )
-
-                if(index>=0){
-
-                    name=
-                        it.getString(index)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                if (index >= 0) {
+                    name = it.getString(index)
                 }
             }
         }
-
         return name
     }
 
-    private fun saveToHistory(file:String){
+    private fun saveToHistory(file: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val database = FirebaseDatabase.getInstance().getReference("History").child(userId)
+        val historyId = database.push().key ?: return
 
-        val userId=
-            auth.currentUser?.uid ?: return
+        val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
+        val historyMap = hashMapOf<String, Any>("fileName" to file, "date" to date)
 
-        val database=
-            FirebaseDatabase.getInstance()
-                .getReference("History")
-                .child(userId)
-
-        val historyId=
-            database.push().key ?: return
-
-        val date=
-            SimpleDateFormat(
-                "dd MMM yyyy",
-                Locale.getDefault()
-            ).format(Date())
-
-        val historyMap=
-            hashMapOf<String,Any>(
-
-                "fileName" to file,
-                "date" to date
-            )
-
-        database.child(historyId)
-            .setValue(historyMap)
+        database.child(historyId).setValue(historyMap)
     }
 
-    private fun saveUploadedMaterial(materialName:String){
+    private fun saveUploadedMaterial(materialName: String) {
+        val userId = auth.currentUser?.uid ?: return
+        val database = FirebaseDatabase.getInstance().getReference("UploadedMaterials").child(userId)
+        val materialId = database.push().key ?: return
 
-        val userId=
-            auth.currentUser?.uid ?: return
-
-        val database=
-            FirebaseDatabase.getInstance()
-                .getReference(
-                    "UploadedMaterials"
-                )
-                .child(userId)
-
-        val materialId=
-            database.push().key ?: return
-
-        val materialMap=
-            hashMapOf<String,Any>(
-
-                "fileName" to materialName,
-                "timestamp" to System.currentTimeMillis()
-            )
-
-        database.child(materialId)
-            .setValue(materialMap)
+        val materialMap = hashMapOf<String, Any>(
+            "fileName" to materialName,
+            "timestamp" to System.currentTimeMillis()
+        )
+        database.child(materialId).setValue(materialMap)
     }
 
-    private fun updateProgress(fileName:String){
-
-        val prefs=
-            getSharedPreferences(
-                "progress_data",
-                MODE_PRIVATE
-            )
-
-        val materiLama=
-            prefs.getInt(
-                "materi_count",
-                0
-            )
+    private fun updateProgress(fileName: String) {
+        val prefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+        val materiLama = prefs.getInt("materi_count", 0)
 
         prefs.edit()
-            .putInt(
-                "materi_count",
-                materiLama+1
-            )
-            .putString(
-                "last_file",
-                fileName
-            )
+            .putInt("materi_count", materiLama + 1)
+            .putString("last_file", fileName)
             .apply()
     }
 
-    private fun openAlur(){
-
+    private fun openAlur() {
         startActivity(
-
-            Intent(
-                this,
-                AlurActivity::class.java
-            ).apply{
-
-                putExtra(
-                    "FILE_NAME",
-                    fileName
-                )
-
-                putExtra(
-                    "FILE_URI",
-                    fileUri.toString()
-                )
+            Intent(this, AlurActivity::class.java).apply {
+                putExtra("FILE_NAME", fileName)
+                putExtra("FILE_URI", fileUri.toString())
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
         )
     }
