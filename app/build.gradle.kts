@@ -40,7 +40,7 @@ android {
 
         release {
 
-            isMinifyEnabled = false
+            isMinifyEnabled = true
 
             proguardFiles(
                 getDefaultProguardFile(
