@@ -1,142 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
-    <RelativeLayout
-        android:layout_width="390dp"
-        android:layout_height="50dp"
-        android:layout_margin="10dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/kontainer">
+    <!-- ================= HEADER ================= -->
 
+    <RelativeLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_margin="12dp"
+        android:background="@drawable/kontainer"
+        android:padding="10dp">
+
+        <!-- BACK -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_margin="5dp"
             android:layout_alignParentStart="true"
-            android:src="@drawable/back"
-            android:clickable="true"
-            android:focusable="true" />
+            android:layout_centerVertical="true"
+            android:src="@drawable/back" />
 
+        <!-- TITLE -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:text="Kuis"
-            android:layout_marginTop="10dp"
-            android:textSize="20sp"
-            android:fontFamily="@font/poppins"
-            android:textStyle="bold"
             android:textColor="@color/dark_text"
-            android:layout_centerHorizontal="true" />
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/poppins" />
+
+        <!-- MUSIC -->
+        <ImageView
+            android:id="@+id/btnMusic"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_music_on"
+            app:tint="@android:color/black" />
 
     </RelativeLayout>
+
+    <!-- ================= CONTENT ================= -->
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomButtons"
-        android:layout_below="@id/btnBack"
+        android:layout_below="@id/headerLayout"
+        android:layout_above="@id/bottomButtons"
         android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/contentQuiz"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/card_bg"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:layout_margin="16dp"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvQuestion"
+            <!-- CARD QUIZ -->
+            <LinearLayout
+                android:id="@+id/contentQuiz"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:fontFamily="@font/poppins"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="24dp" />
+                android:background="@drawable/card_bg"
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <Button
-                android:id="@+id/optionA"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="55dp"
-                android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp" />
+                <!-- NOMOR -->
+                <TextView
+                    android:id="@+id/tvNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Soal 1"
+                    android:textColor="@color/gray_text"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/poppins"
+                    android:layout_marginBottom="10dp" />
 
-            <Button
-                android:id="@+id/optionB"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="55dp"
-                android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp" />
+                <!-- PERTANYAAN -->
+                <TextView
+                    android:id="@+id/tvQuestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Pertanyaan muncul di sini"
+                    android:textColor="@color/dark_text"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins"
+                    android:layout_marginBottom="25dp" />
 
-            <Button
-                android:id="@+id/optionC"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="55dp"
-                android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text"
-                android:layout_marginBottom="12dp" />
+                <!-- OPTION A -->
+                <Button
+                    android:id="@+id/optionA"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/kontainer"
+                    android:text="Pilihan A"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_text"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/poppins" />
 
-            <Button
-                android:id="@+id/optionD"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="55dp"
-                android:padding="12dp"
-                android:fontFamily="@font/poppins"
-                android:background="@drawable/kontainer"
-                android:textColor="@color/dark_text" />
+                <!-- OPTION B -->
+                <Button
+                    android:id="@+id/optionB"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/kontainer"
+                    android:text="Pilihan B"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_text"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/poppins" />
+
+                <!-- OPTION C -->
+                <Button
+                    android:id="@+id/optionC"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/kontainer"
+                    android:text="Pilihan C"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_text"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/poppins" />
+
+                <!-- OPTION D -->
+                <Button
+                    android:id="@+id/optionD"
+                    android:layout_width="match_parent"
+                    android:layout_height="55dp"
+                    android:background="@drawable/kontainer"
+                    android:text="Pilihan D"
+                    android:textAllCaps="false"
+                    android:textColor="@color/dark_text"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/poppins" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </ScrollView>
+
+    <!-- ================= BOTTOM BUTTON ================= -->
 
     <LinearLayout
         android:id="@+id/bottomButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:background="@drawable/card_bg"
         android:orientation="horizontal"
-        android:padding="20dp"
-        android:gravity="center">
+        android:padding="16dp">
 
+        <!-- PREV -->
         <Button
             android:id="@+id/btnPrev"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/kontainer"
             android:text="Sebelumnya"
-            android:fontFamily="@font/poppins"
-            android:background="@drawable/button1"
-            android:textColor="@android:color/white"
-            android:layout_marginEnd="8dp" />
+            android:textAllCaps="false"
+            android:textColor="@color/dark_text"
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins" />
 
+        <!-- NEXT -->
         <Button
             android:id="@+id/btnNext"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
             android:layout_weight="1"
-            android:text="Selanjutnya"
-            android:fontFamily="@font/poppins"
+            android:layout_marginStart="8dp"
             android:background="@drawable/button1"
+            android:text="Selanjutnya"
+            android:textAllCaps="false"
             android:textColor="@android:color/white"
-            android:layout_marginStart="8dp" />
+            android:textSize="15sp"
+            android:fontFamily="@font/poppins" />
 
     </LinearLayout>
 

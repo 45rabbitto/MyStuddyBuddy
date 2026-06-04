@@ -50,6 +50,55 @@
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"/>
 
+        <!-- PILIH AVATAR -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/avatarBuku"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ava_buku"
+                    android:layout_marginEnd="10dp"/>
+
+                <ImageView
+                    android:id="@+id/avatarCewe"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ava_cewe"
+                    android:layout_marginEnd="10dp"/>
+
+                <ImageView
+                    android:id="@+id/avatarCowo"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ava_cowo"
+                    android:layout_marginEnd="10dp"/>
+
+                <ImageView
+                    android:id="@+id/avatarMieAyam"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ava_miayam"
+                    android:layout_marginEnd="10dp"/>
+
+                <ImageView
+                    android:id="@+id/avatarRobot"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:src="@drawable/ava_robot"/>
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
         <!-- CARD FORM -->
         <LinearLayout
             android:layout_width="match_parent"

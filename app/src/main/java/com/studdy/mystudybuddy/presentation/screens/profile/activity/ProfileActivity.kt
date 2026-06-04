@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
@@ -30,13 +29,27 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_profile)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().reference
 
-        val session = getSharedPreferences("user_session", MODE_PRIVATE)
-        isGuest = session.getBoolean("isGuest", false)
+        database =
+            FirebaseDatabase
+                .getInstance()
+                .reference
+
+        val session =
+            getSharedPreferences(
+                "user_session",
+                MODE_PRIVATE
+            )
+
+        isGuest =
+            session.getBoolean(
+                "isGuest",
+                false
+            )
 
         initViews()
         loadProfile()
@@ -44,82 +57,190 @@ class ProfileActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        btnBack = findViewById(R.id.btnBack)
-        btnEditProfile = findViewById(R.id.btnEditProfile)
-        menuLogout = findViewById(R.id.menuLogout)
-        tvUsername = findViewById(R.id.tvName)
-        tvEmail = findViewById(R.id.tvEmail)
-        imgProfile = findViewById(R.id.imgProfile)
+
+        btnBack =
+            findViewById(R.id.btnBack)
+
+        btnEditProfile =
+            findViewById(R.id.btnEditProfile)
+
+        menuLogout =
+            findViewById(R.id.menuLogout)
+
+        tvUsername =
+            findViewById(R.id.tvName)
+
+        tvEmail =
+            findViewById(R.id.tvEmail)
+
+        imgProfile =
+            findViewById(R.id.imgProfile)
     }
+
+    // =========================================
+    // LOAD PROFILE
+    // =========================================
 
     private fun loadProfile() {
 
-        if (isGuest || auth.currentUser == null) {
+        // =========================
+        // GUEST MODE
+        // =========================
+
+        if (
+            isGuest ||
+            auth.currentUser == null
+        ) {
 
             tvUsername.text = "Guest"
+
             tvEmail.text = "-"
-            imgProfile.setImageResource(R.drawable.profil)
+
+            imgProfile.setImageResource(
+                R.drawable.ava_cewe
+            )
+
             return
         }
 
-        val uid = auth.currentUser!!.uid
+        val uid =
+            auth.currentUser!!.uid
 
         database.child("Users")
             .child(uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+            .addListenerForSingleValueEvent(
 
-                override fun onDataChange(snapshot: DataSnapshot) {
+                object : ValueEventListener {
 
-                    val username = snapshot.child("username")
-                        .getValue(String::class.java) ?: "-"
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
 
-                    val email = snapshot.child("email")
-                        .getValue(String::class.java) ?: "-"
+                        val username =
+                            snapshot.child("username")
+                                .getValue(String::class.java)
+                                ?: "User"
 
-                    val profileImage = snapshot.child("profileImage")
-                        .getValue(String::class.java) ?: ""
+                        val email =
+                            snapshot.child("email")
+                                .getValue(String::class.java)
+                                ?: "-"
 
-                    tvUsername.text = username
-                    tvEmail.text = email
+                        val avatarName =
+                            snapshot.child("profileImage")
+                                .getValue(String::class.java)
+                                ?: "ava_cewe"
 
-                    if (profileImage.isNotEmpty()) {
-                        Glide.with(this@ProfileActivity)
-                            .load(profileImage)
-                            .placeholder(R.drawable.profil)
-                            .into(imgProfile)
+                        tvUsername.text =
+                            username
+
+                        tvEmail.text =
+                            email
+
+                        // =========================
+                        // LOAD AVATAR DRAWABLE
+                        // =========================
+
+                        val imageRes =
+                            resources.getIdentifier(
+                                avatarName,
+                                "drawable",
+                                packageName
+                            )
+
+                        if (imageRes != 0) {
+
+                            imgProfile.setImageResource(
+                                imageRes
+                            )
+
+                        } else {
+
+                            imgProfile.setImageResource(
+                                R.drawable.ava_cewe
+                            )
+                        }
+                    }
+
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
+
+                        Toast.makeText(
+                            this@ProfileActivity,
+                            "Gagal memuat profil",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
-
-                override fun onCancelled(error: DatabaseError) {}
-            })
+            )
     }
+
+    // =========================================
+    // LISTENER
+    // =========================================
 
     private fun setupListeners() {
 
+        // BACK
         btnBack.setOnClickListener {
+
             finish()
         }
 
+        // EDIT PROFILE
         btnEditProfile.setOnClickListener {
 
             if (isGuest) {
-                Toast.makeText(this, "Login untuk edit profil", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Login untuk edit profil",
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 return@setOnClickListener
             }
 
-            startActivity(Intent(this, EditProfileActivity::class.java))
+            startActivity(
+                Intent(
+                    this,
+                    EditProfileActivity::class.java
+                )
+            )
         }
 
+        // LOGOUT
         menuLogout.setOnClickListener {
 
             auth.signOut()
 
-            val session = getSharedPreferences("user_session", MODE_PRIVATE)
-            session.edit().putBoolean("isGuest", true).apply()
+            val session =
+                getSharedPreferences(
+                    "user_session",
+                    MODE_PRIVATE
+                )
 
-            val intent = Intent(this, LoginActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            session.edit()
+                .putBoolean(
+                    "isGuest",
+                    true
+                )
+                .apply()
+
+            val intent =
+                Intent(
+                    this,
+                    LoginActivity::class.java
+                )
+
+            intent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+
             startActivity(intent)
+
+            finish()
         }
     }
 }

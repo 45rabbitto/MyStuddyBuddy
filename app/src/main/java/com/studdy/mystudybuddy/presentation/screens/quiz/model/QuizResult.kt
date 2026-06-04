@@ -4,14 +4,14 @@ import java.io.Serializable
 
 data class QuizResult(
 
-    val totalQuestion: Int,
+    val totalQuestion: Int = 0,
 
-    val correctAnswer: Int,
+    val correctAnswer: Int = 0,
 
-    val wrongAnswer: Int,
+    val wrongAnswer: Int = 0,
 
-    val score: Int,
+    val score: Int = 0,
 
-    val explanations: List<String>
+    val explanations: ArrayList<String> = arrayListOf()
 
 ) : Serializable

@@ -6,9 +6,11 @@
     android:background="@drawable/bg_gradient">
 
     <RelativeLayout
-        android:layout_width="390dp"
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_margin="10dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="16dp"
         android:layout_centerHorizontal="true"
         android:background="@drawable/kontainer" >
 
@@ -81,13 +83,14 @@
     </ScrollView>
 
     <LinearLayout
-        android:layout_width="400dp"
+        android:layout_width="match_parent"
         android:layout_height="60dp"
         android:orientation="horizontal"
         android:background="@drawable/button_line"
         android:gravity="center_vertical"
-        android:layout_gravity="center"
-        android:layout_marginBottom="10dp">
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp">
 
         <EditText
             android:id="@+id/etMessage"

@@ -1,19 +1,19 @@
 package com.studdy.mystudybuddy.presentation.screens.profile.activity
 
-import android.app.Activity
-import android.content.Intent
 import android.net.ConnectivityManager
-import android.net.Uri
 import android.os.Bundle
-import android.widget.*
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
-import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.studdy.mystudybuddy.R
-import java.util.UUID
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -26,20 +26,31 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var etPassword: EditText
     private lateinit var btnSave: Button
 
+    // Avatar
+    private lateinit var avatarBuku: ImageView
+    private lateinit var avatarCewe: ImageView
+    private lateinit var avatarCowo: ImageView
+    private lateinit var avatarMieAyam: ImageView
+    private lateinit var avatarRobot: ImageView
+
+    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
-    private lateinit var storage: FirebaseStorage
 
-    private var imageUri: Uri? = null
-    private var currentImageUrl: String = ""
+    // Avatar terpilih
+    private var selectedAvatar = "ava_cewe"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_edit_profile)
 
         auth = FirebaseAuth.getInstance()
-        database = FirebaseDatabase.getInstance().reference
-        storage = FirebaseStorage.getInstance()
+
+        database =
+            FirebaseDatabase
+                .getInstance()
+                .reference
 
         initViews()
         setupListeners()
@@ -47,15 +58,43 @@ class EditProfileActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        btnBack = findViewById(R.id.btnBack)
-        imgProfileEdit = findViewById(R.id.imgProfileEdit)
-        btnChangePhoto = findViewById(R.id.btnChangePhoto)
 
-        etName = findViewById(R.id.etName)
-        etEmail = findViewById(R.id.etEmail)
-        etPassword = findViewById(R.id.etPassword)
+        btnBack =
+            findViewById(R.id.btnBack)
 
-        btnSave = findViewById(R.id.btnSave)
+        imgProfileEdit =
+            findViewById(R.id.imgProfileEdit)
+
+        btnChangePhoto =
+            findViewById(R.id.btnChangePhoto)
+
+        etName =
+            findViewById(R.id.etName)
+
+        etEmail =
+            findViewById(R.id.etEmail)
+
+        etPassword =
+            findViewById(R.id.etPassword)
+
+        btnSave =
+            findViewById(R.id.btnSave)
+
+        // Avatar
+        avatarBuku =
+            findViewById(R.id.avatarBuku)
+
+        avatarCewe =
+            findViewById(R.id.avatarCewe)
+
+        avatarCowo =
+            findViewById(R.id.avatarCowo)
+
+        avatarMieAyam =
+            findViewById(R.id.avatarMieAyam)
+
+        avatarRobot =
+            findViewById(R.id.avatarRobot)
     }
 
     private fun setupListeners() {
@@ -64,201 +103,235 @@ class EditProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        btnChangePhoto.setOnClickListener {
-            pickImage()
+        // =========================
+        // PILIH AVATAR
+        // =========================
+
+        avatarBuku.setOnClickListener {
+
+            selectedAvatar = "ava_buku"
+
+            imgProfileEdit.setImageResource(
+                R.drawable.ava_buku
+            )
         }
 
-        imgProfileEdit.setOnClickListener {
-            pickImage()
+        avatarCewe.setOnClickListener {
+
+            selectedAvatar = "ava_cewe"
+
+            imgProfileEdit.setImageResource(
+                R.drawable.ava_cewe
+            )
         }
+
+        avatarCowo.setOnClickListener {
+
+            selectedAvatar = "ava_cowo"
+
+            imgProfileEdit.setImageResource(
+                R.drawable.ava_cowo
+            )
+        }
+
+        avatarMieAyam.setOnClickListener {
+
+            selectedAvatar = "ava_miayam"
+
+            imgProfileEdit.setImageResource(
+                R.drawable.ava_miayam
+            )
+        }
+
+        avatarRobot.setOnClickListener {
+
+            selectedAvatar = "ava_robot"
+
+            imgProfileEdit.setImageResource(
+                R.drawable.ava_robot
+            )
+        }
+
+        // =========================
+        // SAVE PROFILE
+        // =========================
 
         btnSave.setOnClickListener {
 
             if (!isInternetAvailable()) {
-                Toast.makeText(this, "Tidak ada koneksi internet", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Tidak ada koneksi internet",
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 return@setOnClickListener
             }
 
-            val name = etName.text.toString().trim()
-            val email = etEmail.text.toString().trim()
-            val password = etPassword.text.toString().trim()
+            val name =
+                etName.text.toString().trim()
+
+            val email =
+                etEmail.text.toString().trim()
+
+            val password =
+                etPassword.text.toString().trim()
 
             if (name.isEmpty()) {
-                etName.error = "Nama wajib diisi"
+
+                etName.error =
+                    "Nama wajib diisi"
+
                 return@setOnClickListener
             }
 
             if (email.isEmpty()) {
-                etEmail.error = "Email wajib diisi"
+
+                etEmail.error =
+                    "Email wajib diisi"
+
                 return@setOnClickListener
             }
 
             btnSave.isEnabled = false
 
-            if (imageUri != null) {
-                uploadImageAndSave(name, email, password)
-            } else {
-                saveProfileData(name, email, password, currentImageUrl)
-            }
+            saveProfileData(
+                name,
+                email,
+                password,
+                selectedAvatar
+            )
         }
     }
+
+    // =========================
+    // LOAD PROFILE
+    // =========================
 
     private fun loadProfile() {
 
-        val uid = auth.currentUser?.uid ?: return
+        val uid =
+            auth.currentUser?.uid ?: return
 
         database.child("Users")
             .child(uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+            .addListenerForSingleValueEvent(
 
-                override fun onDataChange(snapshot: DataSnapshot) {
+                object : ValueEventListener {
 
-                    val username = snapshot.child("username").getValue(String::class.java) ?: ""
-                    val email = snapshot.child("email").getValue(String::class.java) ?: ""
-                    val profileImage = snapshot.child("profileImage").getValue(String::class.java) ?: ""
+                    override fun onDataChange(
+                        snapshot: DataSnapshot
+                    ) {
 
-                    etName.setText(username)
-                    etEmail.setText(email)
+                        etName.setText(
+                            snapshot.child("username")
+                                .getValue(String::class.java)
+                        )
 
-                    currentImageUrl = profileImage
+                        etEmail.setText(
+                            snapshot.child("email")
+                                .getValue(String::class.java)
+                        )
 
-                    if (profileImage.isNotEmpty()) {
-                        Glide.with(this@EditProfileActivity)
-                            .load(profileImage)
-                            .placeholder(R.drawable.profil)
-                            .into(imgProfileEdit)
-                    }
-                }
+                        selectedAvatar =
+                            snapshot.child("profileImage")
+                                .getValue(String::class.java)
+                                ?: "ava_cewe"
 
-                override fun onCancelled(error: DatabaseError) {
-                    Toast.makeText(this@EditProfileActivity, error.message, Toast.LENGTH_SHORT).show()
-                }
-            })
-    }
+                        val avatarRes =
+                            resources.getIdentifier(
+                                selectedAvatar,
+                                "drawable",
+                                packageName
+                            )
 
-    private fun pickImage() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
-        imageLauncher.launch(intent)
-    }
+                        if (avatarRes != 0) {
 
-    private val imageLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-            if (result.resultCode == Activity.RESULT_OK) {
-
-                imageUri = result.data?.data
-
-                if (imageUri == null) {
-                    Toast.makeText(this, "Gagal memilih gambar", Toast.LENGTH_SHORT).show()
-                    return@registerForActivityResult
-                }
-
-                imgProfileEdit.setImageURI(imageUri)
-            }
-        }
-
-    private fun uploadImageAndSave(name: String, email: String, password: String) {
-
-        val uid = auth.currentUser?.uid ?: return
-
-        val uri = imageUri
-        if (uri == null) {
-            btnSave.isEnabled = true
-            Toast.makeText(this, "Image tidak valid", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val fileName = UUID.randomUUID().toString() + ".jpg"
-
-        val storageRef = storage.reference
-            .child("profile_images/$fileName")
-
-        storageRef.putFile(uri)
-            .continueWithTask { task ->
-                if (!task.isSuccessful) throw task.exception!!
-                storageRef.downloadUrl
-            }
-            .addOnSuccessListener { downloadUri ->
-
-                val userMap = hashMapOf<String, Any>(
-                    "username" to name,
-                    "email" to email,
-                    "profileImage" to downloadUri.toString()
-                )
-
-                database.child("Users")
-                    .child(uid)
-                    .setValue(userMap)
-                    .addOnSuccessListener {
-
-                        auth.currentUser?.updateEmail(email)
-
-                        if (password.isNotEmpty()) {
-                            auth.currentUser?.updatePassword(password)
+                            imgProfileEdit.setImageResource(
+                                avatarRes
+                            )
                         }
+                    }
 
-                        btnSave.isEnabled = true
+                    override fun onCancelled(
+                        error: DatabaseError
+                    ) {
 
                         Toast.makeText(
-                            this,
-                            "Profil berhasil diperbarui",
+                            this@EditProfileActivity,
+                            "Gagal memuat profil",
                             Toast.LENGTH_SHORT
                         ).show()
-
-                        finish()
                     }
-            }
-            .addOnFailureListener { e ->
-                btnSave.isEnabled = true
-                Toast.makeText(this, "Upload gagal: ${e.message}", Toast.LENGTH_LONG).show()
-            }
+                }
+            )
     }
+
+    // =========================
+    // SAVE DATA PROFILE
+    // =========================
 
     private fun saveProfileData(
         name: String,
         email: String,
         password: String,
-        imageUrl: String
+        avatar: String
     ) {
 
-        val uid = auth.currentUser?.uid ?: return
+        val uid =
+            auth.currentUser?.uid ?: return
 
-        val userMap = hashMapOf<String, Any>(
-            "username" to name,
-            "email" to email,
-            "profileImage" to imageUrl
-        )
+        val userMap =
+            hashMapOf<String, Any>(
 
-        auth.currentUser?.updateEmail(email)
-            ?.addOnCompleteListener {
+                "username" to name,
 
-                database.child("Users")
-                    .child(uid)
-                    .setValue(userMap)
-                    .addOnSuccessListener {
+                "email" to email,
 
-                        if (password.isNotEmpty()) {
-                            auth.currentUser?.updatePassword(password)
-                        }
+                "profileImage" to avatar
+            )
 
-                        btnSave.isEnabled = true
+        database.child("Users")
+            .child(uid)
+            .updateChildren(userMap)
 
-                        Toast.makeText(this, "Profil berhasil diperbarui", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                    .addOnFailureListener {
+            .addOnSuccessListener {
 
-                        btnSave.isEnabled = true
+                btnSave.isEnabled = true
 
-                        Toast.makeText(this, "Gagal menyimpan profil", Toast.LENGTH_SHORT).show()
-                    }
+                Toast.makeText(
+                    this,
+                    "Profil berhasil diperbarui",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                finish()
+            }
+
+            .addOnFailureListener {
+
+                btnSave.isEnabled = true
+
+                Toast.makeText(
+                    this,
+                    "Gagal menyimpan data",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
+    // =========================
+    // CHECK INTERNET
+    // =========================
+
     private fun isInternetAvailable(): Boolean {
-        val cm = getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = cm.activeNetworkInfo
-        return network != null && network.isConnected
+
+        val cm =
+            getSystemService(
+                CONNECTIVITY_SERVICE
+            ) as ConnectivityManager
+
+        return cm.activeNetworkInfo?.isConnected == true
     }
 }
