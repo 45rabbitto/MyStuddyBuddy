@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -63,15 +64,7 @@ class RingkasanActivity : AppCompatActivity() {
         // =========================
 
         btnFinishRingkasan.setOnClickListener {
-
-            saveProgressMateri()
-
-            Toast.makeText(
-                this,
-                "Materi selesai dipelajari",
-                Toast.LENGTH_SHORT
-            ).show()
-            finish()
+            showFeedbackDialog()
         }
 
         btnGenerate.setOnClickListener {
@@ -148,6 +141,67 @@ class RingkasanActivity : AppCompatActivity() {
                 "Tidak ada file yang dikirim dari UploadActivity"
         }
     }
+    private fun showFeedbackDialog() {
+
+        val view =
+            layoutInflater.inflate(
+                R.layout.avtivity_feedback,
+                null
+            )
+
+        val ivLike =
+            view.findViewById<ImageView>(
+                R.id.ivLike
+            )
+
+        val ivDislike =
+            view.findViewById<ImageView>(
+                R.id.ivDislike
+            )
+
+        val dialog =
+            AlertDialog.Builder(this)
+                .setView(view)
+                .setCancelable(false)
+                .create()
+
+        dialog.show()
+
+        dialog.window?.setBackgroundDrawableResource(
+            android.R.color.transparent
+        )
+
+        ivLike.setOnClickListener {
+
+            saveFeedback("LIKE")
+
+            saveProgressMateri()
+
+            Toast.makeText(
+                this,
+                "Terima kasih atas feedback Anda 😊",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            dialog.dismiss()
+        }
+
+        ivDislike.setOnClickListener {
+
+            saveFeedback("DISLIKE")
+
+            saveProgressMateri()
+
+            Toast.makeText(
+                this,
+                "Feedback tersimpan",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            dialog.dismiss()
+        }
+    }
+
 
     // ===================================
     // SIMPAN RINGKASAN KE FIREBASE
@@ -220,6 +274,46 @@ class RingkasanActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    private fun saveFeedback(
+        feedback: String
+    ) {
+
+        val userId =
+            auth.currentUser?.uid
+                ?: return
+
+        val fileName =
+            intent.getStringExtra("FILE_NAME")
+                ?: Uri.parse(fileUri)
+                    .lastPathSegment
+                ?: "Materi"
+
+        val database =
+            FirebaseDatabase
+                .getInstance()
+                .getReference("Feedback")
+                .child(userId)
+
+        val feedbackId =
+            database.push().key
+                ?: return
+
+        val feedbackMap =
+            HashMap<String, Any>()
+
+        feedbackMap["feedback"] =
+            feedback
+
+        feedbackMap["fileName"] =
+            fileName
+
+        feedbackMap["createdAt"] =
+            System.currentTimeMillis()
+
+        database.child(feedbackId)
+            .setValue(feedbackMap)
     }
 
     // ===================================
