@@ -27,6 +27,7 @@ android {
 
         testInstrumentationRunner =
             "androidx.test.runner.AndroidJUnitRunner"
+
     }
 
     buildFeatures {
@@ -145,10 +146,6 @@ dependencies {
 
     implementation(
         "androidx.constraintlayout:constraintlayout:2.1.4"
-    )
-
-    implementation(
-        "com.tom-roush:pdfbox-android:2.0.27.0"
     )
 
     // =====================================
