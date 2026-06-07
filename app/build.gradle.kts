@@ -104,6 +104,16 @@ dependencies {
         "com.google.firebase:firebase-storage-ktx"
     )
 
+    //pdfbox
+    implementation(
+        "com.tom-roush:pdfbox-android:2.0.27.0"
+    )
+
+    //firestore
+    implementation(
+        "com.google.firebase:firebase-firestore:25.1.0"
+    )
+
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation(libs.firebase.database)
