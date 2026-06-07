@@ -16,6 +16,7 @@ import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import com.studdy.mystudybuddy.utils.PdfBoxHelper
 
 class RingkasanActivity : AppCompatActivity() {
 
@@ -121,18 +122,19 @@ class RingkasanActivity : AppCompatActivity() {
                 Uri.parse(fileUri)
                     .lastPathSegment ?: "File PDF"
 
+            val extractedText =
+                PdfBoxHelper.extractTextFromPdf(
+                    this,
+                    Uri.parse(fileUri)
+                )
+
             tvRingkasan.text =
                 """
-                File berhasil diterima:
+                Nama File:
+                $fileName
                 
-                Nama file: $fileName
-                
-                🔹 Ringkasan:
-                (sementara ini dummy, nanti bisa AI / parsing PDF)
-                
-                - Materi 1
-                - Materi 2
-                - Materi 3
+                Isi PDF:
+                ${extractedText.take(3000)}
                 """.trimIndent()
 
         } else {
