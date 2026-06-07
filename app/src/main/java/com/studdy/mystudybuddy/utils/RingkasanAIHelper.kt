@@ -1,65 +1,87 @@
 package com.studdy.mystudybuddy.utils
 
 import android.content.Context
-import ai.onnxruntime.OrtEnvironment
-import ai.onnxruntime.OrtSession
-import java.io.InputStream
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 class RingkasanAIHelper(private val context: Context) {
 
-    private var ortEnv: OrtEnvironment = OrtEnvironment.getEnvironment()
-    private var encoderSession: OrtSession? = null
-    private var decoderSession: OrtSession? = null
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .build()
 
-    // Blok init sengaja dikosongkan agar model raksasa tidak dimuat di Main Thread saat aplikasi baru dibuka
-    init { }
+    // Untuk emulator Android (10.0.2.2 = localhost komputer)
+    private val BASE_URL = "http://10.0.2.2:8000"
 
-    private fun loadModelFromAssets(fileName: String): ByteArray? {
+    // Untuk HP fisik, ganti dengan IP komputer (contoh: http://192.168.1.100:8000)
+    // private val BASE_URL = "http://192.168.1.100:8000"
+
+    /**
+     * Kirim teks ke backend Python (MobileBERT ONNX)
+     * dan dapatkan ringkasan
+     */
+    suspend fun prosesRingkasan(teks: String): String {
         return try {
-            val inputStream: InputStream = context.assets.open(fileName)
-            val size = inputStream.available()
-            val buffer = ByteArray(size)
-            inputStream.read(buffer)
-            inputStream.close()
-            buffer
+            // Validasi teks
+            if (teks.length < 50) {
+                return "Teks terlalu pendek (minimal 50 karakter). Panjang teks: ${teks.length} karakter"
+            }
+
+            // Buat request body
+            val jsonBody = JSONObject().apply {
+                put("text", teks)
+            }.toString()
+
+            // Buat request
+            val request = Request.Builder()
+                .url("$BASE_URL/summarize")
+                .post(jsonBody.toRequestBody("application/json".toMediaType()))
+                .build()
+
+            // Eksekusi request
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() ?: ""
+
+            if (response.isSuccessful) {
+                val jsonResponse = JSONObject(responseBody)
+                val summary = jsonResponse.getString("summary")
+
+                return if (summary.isNotBlank()) {
+                    summary
+                } else {
+                    "Ringkasan berhasil dibuat tetapi kosong. Coba upload teks yang lebih panjang."
+                }
+            } else {
+                return "Error dari server: ${response.code}\nDetail: $responseBody"
+            }
+
+        } catch (e: java.net.ConnectException) {
+            return "Tidak dapat terhubung ke server AI. Pastikan backend Python berjalan di http://10.0.2.2:8000\n\nError: ${e.message}"
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            return "Error saat memproses ringkasan: ${e.message}"
         }
     }
 
     /**
-     * Fungsi utama untuk memproses teks asli menjadi ringkasan menggunakan model ONNX.
-     * Proses pemuatan model dipindahkan ke sini agar berjalan aman di dalam Background Thread.
+     * Cek kesehatan backend
      */
-    fun prosesRingkasan(teksInput: String): String {
-        try {
-            // 1. Muat Encoder Session jika belum ada
-            if (encoderSession == null) {
-                val encoderBytes = loadModelFromAssets("encoder_model.onnx")
-                if (encoderBytes != null) {
-                    encoderSession = ortEnv.createSession(encoderBytes)
-                } else {
-                    return "Gagal membaca file encoder_model.onnx dari folder assets."
-                }
-            }
+    suspend fun cekKesehatanBackend(): Boolean {
+        return try {
+            val request = Request.Builder()
+                .url("$BASE_URL/health")
+                .get()
+                .build()
 
-            // 2. Muat Decoder Session jika belum ada
-            if (decoderSession == null) {
-                val decoderBytes = loadModelFromAssets("decoder_model_merged.onnx")
-                if (decoderBytes != null) {
-                    decoderSession = ortEnv.createSession(decoderBytes)
-                } else {
-                    return "Gagal membaca file decoder_model_merged.onnx dari folder assets."
-                }
-            }
-
-            // 3. Eksekusi logika ringkasan setelah kedua model sukses dimuat
-            return "Berhasil merangkum! Model Encoder & Decoder ONNX berhasil mendeteksi teks sepanjang ${teksInput.length} karakter secara lokal."
-
+            val response = client.newCall(request).execute()
+            response.isSuccessful
         } catch (e: Exception) {
-            e.printStackTrace()
-            return "Eror saat memproses AI di background: ${e.localizedMessage}"
+            false
         }
     }
 }

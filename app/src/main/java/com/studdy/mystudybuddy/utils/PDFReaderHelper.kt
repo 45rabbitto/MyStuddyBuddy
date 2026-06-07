@@ -2,46 +2,43 @@ package com.studdy.mystudybuddy.utils
 
 import android.content.Context
 import android.net.Uri
-import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
-import java.io.InputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class PDFReaderHelper(private val context: Context) {
 
-    init {
-        PDFBoxResourceLoader.init(context)
-    }
-
-    /**
-     * Fungsi untuk membaca seluruh teks di dalam file PDF berdasarkan URI file
-     */
-    fun ekstrakTeksDariPDF(fileUri: Uri): String {
-        var inputStream: InputStream? = null
+    suspend fun ekstrakTeksDariPDF(uri: Uri): String = withContext(Dispatchers.IO) {
         var document: PDDocument? = null
-        return try {
-            // Membuka stream dari URI file yang dipilih user
-            inputStream = context.contentResolver.openInputStream(fileUri)
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+                ?: return@withContext "Gagal membuka file: InputStream null"
 
-            // Memuat dokumen PDF
             document = PDDocument.load(inputStream)
-
-            // Mengambil seluruh teks menggunakan PDFTextStripper
             val stripper = PDFTextStripper()
-            val teksHasil = stripper.getText(document)
+            val text = stripper.getText(document)
 
-            // Jika teks kosong, beri tahu user
-            if (teksHasil.trim().isEmpty()) {
-                "PDF berhasil dibaca, tetapi tidak ditemukan teks di dalamnya (kemungkinan berupa gambar/scan)."
-            } else {
-                teksHasil
+            document.close()
+            inputStream.close()
+
+            if (text.isBlank()) {
+                return@withContext "PDF berhasil dibaca, tetapi tidak ditemukan teks. File mungkin hanya berisi gambar."
             }
+
+            // Bersihkan teks: hilangkan multiple spaces, newlines berlebih
+            val cleanedText = text
+                .replace(Regex("\\s+"), " ")
+                .trim()
+
+            return@withContext cleanedText
+
+        } catch (e: OutOfMemoryError) {
+            return@withContext "Error: File PDF terlalu besar untuk diproses. Coba file dengan ukuran lebih kecil."
         } catch (e: Exception) {
             e.printStackTrace()
-            "Gagal membaca file PDF: ${e.localizedMessage}"
+            return@withContext "Gagal mengekstrak teks dari PDF: ${e.message}"
         } finally {
-            // Memastikan stream dan dokumen ditutup setelah selesai digunakan agar tidak bocor
-            inputStream?.close()
             document?.close()
         }
     }

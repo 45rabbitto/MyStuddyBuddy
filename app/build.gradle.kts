@@ -20,6 +20,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters.addAll(listOf("arm64-v8a", "x86_64"))
+        }
     }
 
     buildFeatures {
@@ -30,13 +34,7 @@ android {
 
     buildTypes {
         release {
-<<<<<<< HEAD
-
             isMinifyEnabled = true
-
-=======
-            isMinifyEnabled = false
->>>>>>> 5101da80f9a3187fe6e9bb06566f7640f3a80b2f
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,7 +55,6 @@ android {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
-    // Tambahan khusus agar file model .onnx berukuran besar tidak dikompres/rusak
     aaptOptions {
         noCompress("onnx")
     }
@@ -85,6 +82,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
+    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
     // =====================================
     // COMPOSE
@@ -159,4 +158,22 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    // OkHttp untuk panggil backend
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
 }
