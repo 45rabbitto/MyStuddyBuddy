@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.studdy.mystudybuddy.R
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,6 +14,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Inisialisasi PDFBox
+        PDFBoxResourceLoader.init(applicationContext)
 
         setContentView(R.layout.activity_dashboard)
 

@@ -21,6 +21,9 @@ import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.Alur
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 import java.text.SimpleDateFormat
 import java.util.*
+import com.google.firebase.firestore.FirebaseFirestore
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
 
 class UploadActivity : AppCompatActivity() {
 
@@ -164,6 +167,15 @@ class UploadActivity : AppCompatActivity() {
                 fileUri=uri
                 fileName=getFileName(uri)
 
+                // PDF → Text
+                val pdfText = extractTextFromPdf(uri)
+
+                // Simpan ke Firestore
+                savePdfTextToFirestore(
+                    fileName ?: "",
+                    pdfText
+                )
+
                 tvKosong.visibility=View.GONE
 
                 fileContainer.removeAllViews()
@@ -243,6 +255,67 @@ class UploadActivity : AppCompatActivity() {
         }
 
         return name
+    }
+
+    private fun extractTextFromPdf(uri: Uri): String {
+
+        return try {
+
+            val inputStream = contentResolver.openInputStream(uri)
+                ?: return ""
+
+            val document = PDDocument.load(inputStream)
+            val stripper = PDFTextStripper()
+
+            val text = stripper.getText(document)
+
+            document.close()
+            inputStream.close()
+
+            text
+
+        } catch (e: Exception) {
+
+            e.printStackTrace()
+            ""
+        }
+    }
+
+    private fun savePdfTextToFirestore(
+        fileName: String,
+        content: String
+    ) {
+
+        val userId = auth.currentUser?.uid ?: "guest"
+
+        val data = hashMapOf(
+            "userId" to userId,
+            "fileName" to fileName,
+            "content" to content,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        FirebaseFirestore.getInstance()
+            .collection("documents")
+            .add(data)
+            .addOnSuccessListener {
+
+                Toast.makeText(
+                    this,
+                    "Isi PDF berhasil disimpan",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }
+            .addOnFailureListener {
+
+                Toast.makeText(
+                    this,
+                    "Gagal menyimpan isi PDF",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+            }
     }
 
     private fun saveToHistory(file:String){
