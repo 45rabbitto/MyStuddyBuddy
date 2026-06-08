@@ -1,18 +1,20 @@
 package com.studdy.mystudybuddy.utils
 
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import com.studdy.mystudybuddy.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.FileReader
 import java.io.IOException
+import java.util.Properties
 import java.util.concurrent.TimeUnit
 
-class ChatbotApiService {
+class ChatbotApiService(private val context: Context) {
 
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -21,25 +23,45 @@ class ChatbotApiService {
 
     private val gson = Gson()
 
-    private val API_KEY = BuildConfig.OPENAI_API_KEY
+    private val apiKey: String by lazy {
+        loadApiKeyFromLocalProperties()
+    }
 
     private val BASE_URL = "https://api.openai.com/v1"
     private val MODEL = "gpt-4o-mini"
 
+    private fun loadApiKeyFromLocalProperties(): String {
+        return try {
+            val properties = Properties()
+            val file = FileReader("local.properties")
+            properties.load(file)
+            file.close()
+            val key = properties.getProperty("OPENAI_API_KEY")
+            if (key.isNullOrBlank()) "MISSING_API_KEY" else key
+        } catch (e: Exception) {
+            "MISSING_API_KEY"
+        }
+    }
+
     suspend fun chatWithSummary(question: String, summaryContext: String): String {
         return withContext(Dispatchers.IO) {
             try {
+                if (apiKey == "MISSING_API_KEY") {
+                    return@withContext "❌ API Key tidak ditemukan. Silakan tambahkan OPENAI_API_KEY di file local.properties"
+                }
+
                 val systemPrompt = """
-                    Anda adalah asisten belajar AI bernama "My Study Buddy".
+                    Anda adalah asisten belajar AI yang ramah dan membantu bernama "Study Buddy".
                     
                     MATERI RINGKASAN:
+                    ---
                     $summaryContext
+                    ---
                     
                     ATURAN:
                     1. Jawab berdasarkan MATERI DI ATAS
-                    2. Gunakan bahasa Indonesia
-                    3. Jawab singkat, jelas, dan edukatif
-                    4. Jika pertanyaan di luar materi, katakan "Maaf, itu di luar materi yang sedang dipelajari"
+                    2. Gunakan bahasa Indonesia yang baik
+                    3. Jawab singkat dan jelas
                 """.trimIndent()
 
                 val requestBody = mapOf(
@@ -53,10 +75,9 @@ class ChatbotApiService {
                 )
 
                 val jsonBody = gson.toJson(requestBody)
-
                 val request = Request.Builder()
                     .url("$BASE_URL/chat/completions")
-                    .addHeader("Authorization", "Bearer $API_KEY")
+                    .addHeader("Authorization", "Bearer $apiKey")
                     .addHeader("Content-Type", "application/json")
                     .post(jsonBody.toRequestBody("application/json".toMediaType()))
                     .build()
@@ -66,12 +87,13 @@ class ChatbotApiService {
 
                 if (response.isSuccessful) {
                     val jsonResponse = gson.fromJson(responseBody, OpenAiResponse::class.java)
-                    return@withContext jsonResponse.choices?.firstOrNull()?.message?.content?.trim() ?: "Maaf, tidak ada jawaban."
+                    val answer = jsonResponse.choices?.firstOrNull()?.message?.content ?: "Maaf, tidak ada jawaban."
+                    return@withContext answer.replace(Regex("```\\w*"), "").trim()
                 } else {
                     val errorMsg = when (response.code) {
                         401 -> "❌ API Key tidak valid"
-                        429 -> "⏰ Terlalu banyak permintaan, coba lagi nanti"
-                        402 -> "💰 Kredit OpenAI habis"
+                        429 -> "❌ Terlalu banyak request, coba lagi nanti"
+                        402 -> "❌ Kredit habis, daftar akun baru"
                         else -> "❌ Error ${response.code}"
                     }
                     return@withContext errorMsg
@@ -87,16 +109,16 @@ class ChatbotApiService {
     suspend fun checkConnection(): String {
         return withContext(Dispatchers.IO) {
             try {
+                if (apiKey == "MISSING_API_KEY") return@withContext "❌ API Key tidak ditemukan"
                 val request = Request.Builder()
-                    .url("https://api.openai.com/v1/models")
-                    .addHeader("Authorization", "Bearer $API_KEY")
+                    .url("$BASE_URL/models")
+                    .addHeader("Authorization", "Bearer $apiKey")
                     .get()
                     .build()
-
                 val response = client.newCall(request).execute()
-                if (response.isSuccessful) "✅ OpenAI Connected" else "⚠️ Connection Failed"
+                if (response.isSuccessful) "✅ Koneksi berhasil" else "⚠️ Gagal koneksi"
             } catch (e: Exception) {
-                return@withContext "❌ Error: ${e.message}"
+                "❌ Error: ${e.message}"
             }
         }
     }
