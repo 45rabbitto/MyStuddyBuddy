@@ -114,10 +114,10 @@ class HasilKuisActivity : AppCompatActivity() {
             questions.size
 
         val correct =
-            score.coerceIn(0, total)
+            intent.getIntExtra("CORRECT", 0)
 
         val wrong =
-            (total - correct).coerceAtLeast(0)
+            intent.getIntExtra("WRONG", 0)
 
         // =========================
         // SET TEXT
