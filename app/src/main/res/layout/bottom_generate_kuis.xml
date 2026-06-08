@@ -6,84 +6,71 @@
     android:padding="24dp"
     android:background="@drawable/bg_gradient">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pilih Jumlah Soal"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins"
+        android:textColor="@color/dark_text"
+        android:layout_gravity="center"
+        android:layout_marginBottom="24dp"/>
 
-        <ImageView
-            android:id="@+id/btnBackPopup"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/back"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:clickable="true"
-            android:focusable="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pilih Jumlah Soal"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/poppins"
-            android:textColor="@color/dark_text"
-            android:layout_centerInParent="true"/>
-    </RelativeLayout>
-
-    <RadioGroup
-        android:id="@+id/radioJumlahSoal"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="24dp">
 
-        <RadioButton
-            android:id="@+id/rb10"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnMinus"
+            android:layout_width="50dp"
             android:layout_height="50dp"
-            android:text="10 Soal"
-            android:textSize="16sp"
+            android:text="-"
+            android:textSize="22sp"
+            android:textColor="@color/dark_text"
+            android:background="@drawable/kontainer"
+            android:textAllCaps="false"
+            android:fontFamily="@font/poppins"/>
+
+        <TextView
+            android:id="@+id/tvJumlahSoal"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="5"
+            android:textSize="28sp"
+            android:textStyle="bold"
             android:textColor="@color/dark_text"
             android:fontFamily="@font/poppins"
-            android:background="@drawable/kontainer"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"/>
 
-        <RadioButton
-            android:id="@+id/rb20"
-            android:layout_width="match_parent"
+        <Button
+            android:id="@+id/btnPlus"
+            android:layout_width="50dp"
             android:layout_height="50dp"
-            android:text="20 Soal"
-            android:textSize="16sp"
+            android:text="+"
+            android:textSize="22sp"
             android:textColor="@color/dark_text"
-            android:fontFamily="@font/poppins"
             android:background="@drawable/kontainer"
-            android:padding="12dp"
-            android:layout_marginBottom="12dp"/>
+            android:textAllCaps="false"
+            android:fontFamily="@font/poppins"/>
 
-        <RadioButton
-            android:id="@+id/rb25"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="25 Soal"
-            android:textSize="16sp"
-            android:textColor="@color/dark_text"
-            android:fontFamily="@font/poppins"
-            android:background="@drawable/kontainer"
-            android:padding="12dp"/>
-    </RadioGroup>
+    </LinearLayout>
 
     <Button
-        android:id="@+id/btnMulaiKuis"
+        android:id="@+id/btnStartQuiz"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_marginTop="24dp"
         android:background="@drawable/button1"
         android:text="Mulai Kuis"
         android:textColor="@color/white"
         android:textStyle="bold"
         android:textSize="16sp"
+        android:textAllCaps="false"
         android:fontFamily="@font/poppins"/>
 
 </LinearLayout>

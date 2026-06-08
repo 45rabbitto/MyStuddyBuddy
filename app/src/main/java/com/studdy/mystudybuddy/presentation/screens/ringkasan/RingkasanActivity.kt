@@ -30,6 +30,7 @@ class RingkasanActivity : AppCompatActivity() {
     private val firestore = FirebaseFirestore.getInstance()
 
     private var fileUri: String? = null
+    private var currentSummaryText: String = ""  // Menyimpan ringkasan saat ini
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,16 +68,78 @@ class RingkasanActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Simpan ringkasan ke Firebase Realtime Database
-            saveSummaryToFirebase(text)
+            // Simpan ringkasan
+            currentSummaryText = text
 
-            // Pindah ke Quiz
+            // Tampilkan dialog untuk memilih jumlah soal
+            showJumlahSoalDialog()
+        }
+    }
+
+    // ===================================
+    // DIALOG PILIH JUMLAH SOAL
+    // ===================================
+    private fun showJumlahSoalDialog() {
+        // Inflate layout dialog
+        val dialogView = layoutInflater.inflate(R.layout.bottom_generate_kuis, null)
+
+        // Inisialisasi view komponen dialog
+        val tvJumlahSoal = dialogView.findViewById<TextView>(R.id.tvJumlahSoal)
+        val btnMinus = dialogView.findViewById<Button>(R.id.btnMinus)
+        val btnPlus = dialogView.findViewById<Button>(R.id.btnPlus)
+        val btnStartQuiz = dialogView.findViewById<Button>(R.id.btnStartQuiz)
+
+        var jumlahSoal = 5 // Default 5 soal
+
+        tvJumlahSoal.text = jumlahSoal.toString()
+
+        // Tombol Minus (-)
+        btnMinus.setOnClickListener {
+            if (jumlahSoal > 3) {
+                jumlahSoal--
+                tvJumlahSoal.text = jumlahSoal.toString()
+            } else {
+                Toast.makeText(this, "Minimal 3 soal", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Tombol Plus (+)
+        btnPlus.setOnClickListener {
+            if (jumlahSoal < 20) {
+                jumlahSoal++
+                tvJumlahSoal.text = jumlahSoal.toString()
+            } else {
+                Toast.makeText(this, "Maksimal 20 soal", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Buat AlertDialog
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        // Tombol Mulai Kuis
+        btnStartQuiz.setOnClickListener {
+            dialog.dismiss()
+
+            // Simpan ringkasan ke Firebase Realtime Database
+            saveSummaryToFirebase(currentSummaryText)
+
+            // Pindah ke QuizActivity dengan membawa data
             val intent = Intent(this, QuizActivity::class.java).apply {
-                putExtra("RINGKASAN", text)
+                putExtra("RINGKASAN", currentSummaryText)
                 putExtra("FILE_URI", fileUri)
+                putExtra("FILE_NAME", intent.getStringExtra("FILE_NAME"))
+                putExtra("JUMLAH_SOAL", jumlahSoal)
             }
             startActivity(intent)
         }
+
+        dialog.show()
+
+        // Atur agar background dialog transparan (opsional)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
     private fun loadPdfData() {
@@ -188,7 +251,7 @@ class RingkasanActivity : AppCompatActivity() {
 
         database.child(summaryId).setValue(summaryMap)
             .addOnSuccessListener {
-                Toast.makeText(this, "Ringkasan berhasil disimpan", Toast.LENGTH_SHORT).show()
+                // Toast sudah ditampilkan di tombol generate
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Gagal menyimpan ringkasan", Toast.LENGTH_SHORT).show()
