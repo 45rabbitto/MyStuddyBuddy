@@ -395,20 +395,53 @@ class QuizActivity : AppCompatActivity() {
         val quizId =
             database.push().key ?: return
 
+        val questionList = ArrayList<String>()
+        val userAnswerList = ArrayList<String>()
+        val correctAnswerList = ArrayList<String>()
+
+        for (i in questions.indices) {
+
+            questionList.add(
+                questions[i].question
+            )
+
+            userAnswerList.add(
+                questions[i].options[userAnswers[i]]
+            )
+
+            correctAnswerList.add(
+                questions[i].options[
+                    questions[i].correctAnswer
+                ]
+            )
+        }
+
         val finalScore =
             (score * 100) / questions.size
 
+        val quizData = hashMapOf<String, Any>(
+
+            "fileName" to (fileName ?: "Materi"),
+
+            "score" to finalScore,
+
+            "correctAnswer" to score,
+
+            "wrongAnswer" to (questions.size - score),
+
+            "totalQuestion" to questions.size,
+
+            "questions" to questionList,
+
+            "userAnswers" to userAnswerList,
+
+            "correctAnswers" to correctAnswerList,
+
+            "createdAt" to System.currentTimeMillis()
+        )
+
         database.child(quizId)
-            .setValue(
-                hashMapOf(
-                    "fileName" to (fileName ?: "Materi"),
-                    "score" to finalScore,
-                    "correctAnswer" to score,
-                    "wrongAnswer" to (questions.size - score),
-                    "totalQuestion" to questions.size,
-                    "createdAt" to System.currentTimeMillis()
-                )
-            )
+            .setValue(quizData)
     }
 
     private fun showResult() {

@@ -105,10 +105,16 @@ class HasilKuisActivity : AppCompatActivity() {
                 "USER_ANSWERS"
             ) ?: arrayListOf()
 
+
         val correctAnswers =
-            intent.getStringArrayListExtra(
-                "CORRECT_ANSWERS"
-            ) ?: arrayListOf()
+            intent.getStringArrayListExtra("CORRECT_ANSWERS")
+                ?: arrayListOf()
+
+        showPembahasan(
+            questions,
+            userAnswers,
+            correctAnswers
+        )
 
         val total =
             questions.size
@@ -118,6 +124,7 @@ class HasilKuisActivity : AppCompatActivity() {
 
         val wrong =
             intent.getIntExtra("WRONG", 0)
+
 
         // =========================
         // SET TEXT
@@ -142,15 +149,6 @@ class HasilKuisActivity : AppCompatActivity() {
             correctAnswers
         )
 
-        // =========================
-        // SAVE FIREBASE
-        // =========================
-
-        saveQuizResultToFirebase(
-            fileName,
-            score,
-            total
-        )
 
         // =========================
         // BUTTON DASHBOARD
