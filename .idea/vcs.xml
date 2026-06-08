@@ -4,6 +4,5 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/MyStuddyBuddy_backup" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/MyStuddyBuddy_new" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/app/src/main/python" vcs="Git" />
   </component>
 </project>

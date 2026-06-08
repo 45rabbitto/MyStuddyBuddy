@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.studdy.mystudybuddy.R
-import com.studdy.mystuddybuddy.presentation.chatbot.model.ChatMessage
+import com.studdy.mystudybuddy.presentation.chatbot.model.ChatMessage
 
 class ChatAdapter(
     private val messages: MutableList<ChatMessage>
@@ -16,8 +16,8 @@ class ChatAdapter(
         itemView: View
     ) : RecyclerView.ViewHolder(itemView) {
 
-        val tvMessage: TextView =
-            itemView.findViewById(R.id.tvUserMessage)
+        val tvUserMessage: TextView? = itemView.findViewById(R.id.tvUserMessage)
+        val tvAiMessage: TextView? = itemView.findViewById(R.id.tvAiMessage)
     }
 
     override fun onCreateViewHolder(
@@ -31,13 +31,8 @@ class ChatAdapter(
             R.layout.item_chat_ai
         }
 
-        val view =
-            LayoutInflater.from(parent.context)
-                .inflate(
-                    layout,
-                    parent,
-                    false
-                )
+        val view = LayoutInflater.from(parent.context)
+            .inflate(layout, parent, false)
 
         return ChatViewHolder(view)
     }
@@ -46,37 +41,23 @@ class ChatAdapter(
         holder: ChatViewHolder,
         position: Int
     ) {
-
         val item = messages[position]
 
-        holder.tvMessage.text =
-            item.message
-    }
-
-    override fun getItemCount(): Int {
-
-        return messages.size
-    }
-
-    override fun getItemViewType(
-        position: Int
-    ): Int {
-
-        return if (messages[position].isUser) {
-            0
+        if (item.isUser) {
+            holder.tvUserMessage?.text = item.message
         } else {
-            1
+            holder.tvAiMessage?.text = item.message
         }
     }
 
-    fun addMessage(
-        message: ChatMessage
-    ) {
+    override fun getItemCount(): Int = messages.size
 
+    override fun getItemViewType(position: Int): Int {
+        return if (messages[position].isUser) 0 else 1
+    }
+
+    fun addMessage(message: ChatMessage) {
         messages.add(message)
-
-        notifyItemInserted(
-            messages.size - 1
-        )
+        notifyItemInserted(messages.size - 1)
     }
 }

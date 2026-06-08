@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
 import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurActivity
@@ -32,17 +33,23 @@ class UploadActivity : AppCompatActivity() {
     private lateinit var btnChatbot: Button
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
 
     private var isGuest = false
 
     private var fileUri: Uri? = null
     private var fileName: String? = null
 
+    // TAMBAHAN: Untuk menyimpan ID ringkasan dari Firestore
+    private var currentSummaryId: String? = null
+    private var currentSummaryText: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upload)
 
         auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()  // TAMBAHAN
 
         val session =
             getSharedPreferences(
@@ -88,32 +95,82 @@ class UploadActivity : AppCompatActivity() {
         btnRingkasan.setOnClickListener {
             if (fileUri == null) return@setOnClickListener
 
+            // TAMBAHAN: Simpan ringkasan ke Firestore terlebih dahulu
+            // Tapi karena ringkasan belum ada, kita tetap kirim FILE_URI
+            // Ringkasan akan dibuat di RingkasanActivity
+
             startActivity(
                 Intent(this, RingkasanActivity::class.java).apply {
                     putExtra("FILE_URI", fileUri.toString())
                     putExtra("FILE_NAME", fileName)
-                    // MEMBERIKAN IZIN AKSES BACA SECARA LEGAL KE RINGKASAN_ACTIVITY
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             )
         }
 
+        // ========== PERBAIKAN: btnChatbot ==========
         btnChatbot.setOnClickListener {
             if (fileUri == null) return@setOnClickListener
 
-            startActivity(
-                Intent(this, ChatbotActivity::class.java).apply {
+            // TAMBAHAN: Cek apakah sudah ada ringkasan untuk file ini di Firestore
+            val userId = auth.currentUser?.uid
+
+            if (userId != null && !isGuest) {
+                // Cari ringkasan terbaru untuk file ini
+                lifecycleScope.launch {
+                    try {
+                        val querySnapshot = firestore.collection("summaries")
+                            .whereEqualTo("userId", userId)
+                            .whereEqualTo("fileName", fileName)
+                            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                            .limit(1)
+                            .get()
+                            .await()
+
+                        if (!querySnapshot.isEmpty) {
+                            val document = querySnapshot.documents[0]
+                            currentSummaryId = document.id
+                            currentSummaryText = document.getString("summary")
+                        }
+
+                        // Pindah ke ChatbotActivity dengan mengirim SUMMARY_ID
+                        val intent = Intent(this@UploadActivity, ChatbotActivity::class.java).apply {
+                            // KIRIM SUMMARY_ID (jika ada)
+                            if (currentSummaryId != null) {
+                                putExtra("SUMMARY_ID", currentSummaryId)
+                                putExtra("SUMMARY_TEXT", currentSummaryText)
+                            }
+                            // TETAP KIRIM FILE_URI untuk backup (tanpa menghapus yang lama)
+                            putExtra("FILE_URI", fileUri.toString())
+                            putExtra("FILE_NAME", fileName)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(intent)
+
+                    } catch (e: Exception) {
+                        // Jika gagal ambil dari Firestore, kirim FILE_URI saja
+                        val intent = Intent(this@UploadActivity, ChatbotActivity::class.java).apply {
+                            putExtra("FILE_URI", fileUri.toString())
+                            putExtra("FILE_NAME", fileName)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(intent)
+                    }
+                }
+            } else {
+                // Guest user: langsung kirim FILE_URI
+                val intent = Intent(this, ChatbotActivity::class.java).apply {
                     putExtra("FILE_URI", fileUri.toString())
                     putExtra("FILE_NAME", fileName)
-                    // MEMBERIKAN IZIN AKSES BACA SECARA LEGAL KE CHATBOT_ACTIVITY
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
-            )
+                startActivity(intent)
+            }
         }
+        // ========== END PERBAIKAN ==========
     }
 
     private fun pickFile() {
-        // MENGGUNAKAN ACTION_OPEN_DOCUMENT AGAR MENDAPATKAN KUNCI IZIN AKSES FILE YANG SAH
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             type = "application/pdf"
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -132,7 +189,6 @@ class UploadActivity : AppCompatActivity() {
                 fileUri = uri
                 fileName = getFileName(uri)
 
-                // MENGUNCI IZIN AKSES DARI ANDROID SYSTEM SECARA PERMANEN SELAMA APLIKASI BERJALAN
                 try {
                     contentResolver.takePersistableUriPermission(
                         uri,
@@ -149,10 +205,8 @@ class UploadActivity : AppCompatActivity() {
                     TextView(this).apply {
                         text = fileName
                         textSize = 15f
-
                         setPadding(20, 20, 20, 20)
                         setBackgroundResource(R.drawable.kontainer)
-
                         setOnClickListener {
                             openAlur()
                         }
@@ -173,7 +227,6 @@ class UploadActivity : AppCompatActivity() {
     private fun getFileName(uri: Uri): String {
         var name = "file.pdf"
         val cursor = contentResolver.query(uri, null, null, null, null)
-
         cursor?.use {
             if (it.moveToFirst()) {
                 val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -189,10 +242,8 @@ class UploadActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance().getReference("History").child(userId)
         val historyId = database.push().key ?: return
-
         val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
         val historyMap = hashMapOf<String, Any>("fileName" to file, "date" to date)
-
         database.child(historyId).setValue(historyMap)
     }
 
@@ -200,7 +251,6 @@ class UploadActivity : AppCompatActivity() {
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance().getReference("UploadedMaterials").child(userId)
         val materialId = database.push().key ?: return
-
         val materialMap = hashMapOf<String, Any>(
             "fileName" to materialName,
             "timestamp" to System.currentTimeMillis()
@@ -211,7 +261,6 @@ class UploadActivity : AppCompatActivity() {
     private fun updateProgress(fileName: String) {
         val prefs = getSharedPreferences("progress_data", MODE_PRIVATE)
         val materiLama = prefs.getInt("materi_count", 0)
-
         prefs.edit()
             .putInt("materi_count", materiLama + 1)
             .putString("last_file", fileName)
