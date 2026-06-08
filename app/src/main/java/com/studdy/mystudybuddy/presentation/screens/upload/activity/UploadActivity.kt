@@ -22,6 +22,9 @@ import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.Alur
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 import java.text.SimpleDateFormat
 import java.util.*
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
 
 class UploadActivity : AppCompatActivity() {
 
@@ -33,35 +36,23 @@ class UploadActivity : AppCompatActivity() {
     private lateinit var btnChatbot: Button
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore
+    private lateinit var firestore: FirebaseFirestore  // ← TAMBAH
 
     private var isGuest = false
-
     private var fileUri: Uri? = null
     private var fileName: String? = null
-
-    // TAMBAHAN: Untuk menyimpan ID ringkasan dari Firestore
-    private var currentSummaryId: String? = null
-    private var currentSummaryText: String? = null
+    private var savedDocumentId: String? = null  // ← TAMBAH: untuk menyimpan ID dokumen Firestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        PDFBoxResourceLoader.init(applicationContext)
         setContentView(R.layout.activity_upload)
 
         auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()  // TAMBAHAN
+        firestore = FirebaseFirestore.getInstance()  // ← TAMBAH
 
-        val session =
-            getSharedPreferences(
-                "user_session",
-                MODE_PRIVATE
-            )
-
-        isGuest =
-            session.getBoolean(
-                "isGuest",
-                false
-            )
+        val session = getSharedPreferences("user_session", MODE_PRIVATE)
+        isGuest = session.getBoolean("isGuest", false)
 
         initViews()
         setupClickListeners()
@@ -74,7 +65,6 @@ class UploadActivity : AppCompatActivity() {
         tvKosong = findViewById(R.id.tvKosong)
         btnRingkasan = findViewById(R.id.btnRingkasan)
         btnChatbot = findViewById(R.id.btnChatbot)
-
         btnRingkasan.isEnabled = false
         btnChatbot.isEnabled = false
     }
@@ -84,94 +74,35 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
-        uploadContainer.setOnClickListener {
-            pickFile()
-        }
+        uploadContainer.setOnClickListener { pickFile() }
 
         btnRingkasan.setOnClickListener {
             if (fileUri == null) return@setOnClickListener
-
-            // TAMBAHAN: Simpan ringkasan ke Firestore terlebih dahulu
-            // Tapi karena ringkasan belum ada, kita tetap kirim FILE_URI
-            // Ringkasan akan dibuat di RingkasanActivity
-
             startActivity(
                 Intent(this, RingkasanActivity::class.java).apply {
                     putExtra("FILE_URI", fileUri.toString())
                     putExtra("FILE_NAME", fileName)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    putExtra("DOCUMENT_ID", savedDocumentId)  // ← TAMBAH: kirim ID dokumen Firestore
                 }
             )
         }
 
-        // ========== PERBAIKAN: btnChatbot ==========
         btnChatbot.setOnClickListener {
             if (fileUri == null) return@setOnClickListener
-
-            // TAMBAHAN: Cek apakah sudah ada ringkasan untuk file ini di Firestore
-            val userId = auth.currentUser?.uid
-
-            if (userId != null && !isGuest) {
-                // Cari ringkasan terbaru untuk file ini
-                lifecycleScope.launch {
-                    try {
-                        val querySnapshot = firestore.collection("summaries")
-                            .whereEqualTo("userId", userId)
-                            .whereEqualTo("fileName", fileName)
-                            .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                            .limit(1)
-                            .get()
-                            .await()
-
-                        if (!querySnapshot.isEmpty) {
-                            val document = querySnapshot.documents[0]
-                            currentSummaryId = document.id
-                            currentSummaryText = document.getString("summary")
-                        }
-
-                        // Pindah ke ChatbotActivity dengan mengirim SUMMARY_ID
-                        val intent = Intent(this@UploadActivity, ChatbotActivity::class.java).apply {
-                            // KIRIM SUMMARY_ID (jika ada)
-                            if (currentSummaryId != null) {
-                                putExtra("SUMMARY_ID", currentSummaryId)
-                                putExtra("SUMMARY_TEXT", currentSummaryText)
-                            }
-                            // TETAP KIRIM FILE_URI untuk backup (tanpa menghapus yang lama)
-                            putExtra("FILE_URI", fileUri.toString())
-                            putExtra("FILE_NAME", fileName)
-                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        }
-                        startActivity(intent)
-
-                    } catch (e: Exception) {
-                        // Jika gagal ambil dari Firestore, kirim FILE_URI saja
-                        val intent = Intent(this@UploadActivity, ChatbotActivity::class.java).apply {
-                            putExtra("FILE_URI", fileUri.toString())
-                            putExtra("FILE_NAME", fileName)
-                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        }
-                        startActivity(intent)
-                    }
-                }
-            } else {
-                // Guest user: langsung kirim FILE_URI
-                val intent = Intent(this, ChatbotActivity::class.java).apply {
+            startActivity(
+                Intent(this, ChatbotActivity::class.java).apply {
                     putExtra("FILE_URI", fileUri.toString())
                     putExtra("FILE_NAME", fileName)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    putExtra("DOCUMENT_ID", savedDocumentId)  // ← TAMBAH
                 }
-                startActivity(intent)
-            }
+            )
         }
-        // ========== END PERBAIKAN ==========
     }
 
     private fun pickFile() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "application/pdf"
             addCategory(Intent.CATEGORY_OPENABLE)
         }
@@ -179,37 +110,30 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private val launcher =
-        registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val uri = result.data?.data ?: return@registerForActivityResult
 
                 fileUri = uri
                 fileName = getFileName(uri)
 
-                try {
-                    contentResolver.takePersistableUriPermission(
-                        uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                val pdfText = extractTextFromPdf(uri)
+
+                if (pdfText.isNotBlank()) {
+                    savePdfTextToFirestore(fileName ?: "unknown.pdf", pdfText)  // ← GANTI ke Firestore
+                } else {
+                    Toast.makeText(this, "PDF tidak berhasil dibaca", Toast.LENGTH_LONG).show()
                 }
 
                 tvKosong.visibility = View.GONE
                 fileContainer.removeAllViews()
-
                 fileContainer.addView(
                     TextView(this).apply {
                         text = fileName
                         textSize = 15f
                         setPadding(20, 20, 20, 20)
                         setBackgroundResource(R.drawable.kontainer)
-                        setOnClickListener {
-                            openAlur()
-                        }
+                        setOnClickListener { openAlur() }
                     }
                 )
 
@@ -230,12 +154,76 @@ class UploadActivity : AppCompatActivity() {
         cursor?.use {
             if (it.moveToFirst()) {
                 val index = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                if (index >= 0) {
-                    name = it.getString(index)
-                }
+                if (index >= 0) name = it.getString(index)
             }
         }
         return name
+    }
+
+    private fun extractTextFromPdf(uri: Uri): String {
+
+        return try {
+
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+
+                val document = PDDocument.load(inputStream)
+
+                val text =
+                    PDFTextStripper().getText(document)
+
+                document.close()
+
+                text
+
+            } ?: ""
+
+        } catch (e: Exception) {
+
+            android.util.Log.e(
+                "PDF_ERROR",
+                e.stackTraceToString()
+            )
+
+            ""
+        }
+    }
+
+    // ↓ GANTI: gunakan Firestore, simpan full teks (tidak dipotong)
+    private fun savePdfTextToFirestore(fileName: String, content: String) {
+        val userId = auth.currentUser?.uid ?: "guest"
+
+        val data = hashMapOf(
+            "fileName" to fileName,
+            "content" to content,           // ← tidak dipotong lagi
+            "userId" to userId,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        firestore.collection("PdfContents")
+            .add(data)
+            .addOnSuccessListener { documentRef ->
+
+                savedDocumentId = documentRef.id
+
+                android.util.Log.d(
+                    "FIRESTORE",
+                    "Document ID = ${documentRef.id}"
+                )
+
+                android.util.Log.d(
+                    "FIRESTORE",
+                    "Jumlah karakter = ${content.length}"
+                )
+
+                Toast.makeText(
+                    this,
+                    "Isi PDF berhasil disimpan",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Gagal menyimpan: ${e.message}", Toast.LENGTH_LONG).show()
+            }
     }
 
     private fun saveToHistory(file: String) {
@@ -243,19 +231,22 @@ class UploadActivity : AppCompatActivity() {
         val database = FirebaseDatabase.getInstance().getReference("History").child(userId)
         val historyId = database.push().key ?: return
         val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
-        val historyMap = hashMapOf<String, Any>("fileName" to file, "date" to date)
-        database.child(historyId).setValue(historyMap)
+        database.child(historyId).setValue(
+            hashMapOf<String, Any>("fileName" to file, "date" to date)
+        )
     }
 
     private fun saveUploadedMaterial(materialName: String) {
         val userId = auth.currentUser?.uid ?: return
-        val database = FirebaseDatabase.getInstance().getReference("UploadedMaterials").child(userId)
+        val database = FirebaseDatabase.getInstance()
+            .getReference("UploadedMaterials").child(userId)
         val materialId = database.push().key ?: return
-        val materialMap = hashMapOf<String, Any>(
-            "fileName" to materialName,
-            "timestamp" to System.currentTimeMillis()
+        database.child(materialId).setValue(
+            hashMapOf<String, Any>(
+                "fileName" to materialName,
+                "timestamp" to System.currentTimeMillis()
+            )
         )
-        database.child(materialId).setValue(materialMap)
     }
 
     private fun updateProgress(fileName: String) {
@@ -272,7 +263,7 @@ class UploadActivity : AppCompatActivity() {
             Intent(this, AlurActivity::class.java).apply {
                 putExtra("FILE_NAME", fileName)
                 putExtra("FILE_URI", fileUri.toString())
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                putExtra("DOCUMENT_ID", savedDocumentId)  // ← TAMBAH
             }
         )
     }

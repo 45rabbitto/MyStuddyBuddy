@@ -7,18 +7,16 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
-import com.studdy.mystudybuddy.utils.PDFReaderHelper
-import com.studdy.mystudybuddy.utils.RingkasanAIHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Date
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 class RingkasanActivity : AppCompatActivity() {
 
@@ -29,11 +27,10 @@ class RingkasanActivity : AppCompatActivity() {
 
     // Firebase
     private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore
+    private val firestore = FirebaseFirestore.getInstance()
 
     private var fileUri: String? = null
-    private var currentSummary: String = ""
-    private var currentExtractedText: String = ""
+    private var currentSummaryText: String = ""  // Menyimpan ringkasan saat ini
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +38,10 @@ class RingkasanActivity : AppCompatActivity() {
 
         // Firebase
         auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()
 
         initViews()
         setupClickListeners()
-        setupData()
+        loadPdfData()
     }
 
     private fun initViews() {
@@ -61,144 +57,261 @@ class RingkasanActivity : AppCompatActivity() {
         }
 
         btnFinishRingkasan.setOnClickListener {
-            saveProgressMateri()
-            Toast.makeText(this, "Materi selesai dipelajari", Toast.LENGTH_SHORT).show()
-            finish()
+            showFeedbackDialog()
         }
 
         btnGenerate.setOnClickListener {
-            val summary = tvRingkasan.text.toString()
+            val text = tvRingkasan.text.toString()
 
-            if (summary.isEmpty() || summary.contains("Belum") || summary.contains("sedang memproses") || summary.contains("Error")) {
-                Toast.makeText(this, "Ringkasan belum siap atau gagal diproses", Toast.LENGTH_SHORT).show()
+            if (text.isEmpty() || text.contains("Belum")) {
+                Toast.makeText(this, "Ringkasan belum tersedia", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Simpan ke Firestore sebelum lanjut ke quiz
-            saveSummaryToFirestore(currentSummary, currentExtractedText)
+            // Simpan ringkasan
+            currentSummaryText = text
 
+            // Tampilkan dialog untuk memilih jumlah soal
+            showJumlahSoalDialog()
+        }
+    }
+
+    // ===================================
+    // DIALOG PILIH JUMLAH SOAL
+    // ===================================
+    private fun showJumlahSoalDialog() {
+        // Inflate layout dialog
+        val dialogView = layoutInflater.inflate(R.layout.bottom_generate_kuis, null)
+
+        // Inisialisasi view komponen dialog
+        val tvJumlahSoal = dialogView.findViewById<TextView>(R.id.tvJumlahSoal)
+        val btnMinus = dialogView.findViewById<Button>(R.id.btnMinus)
+        val btnPlus = dialogView.findViewById<Button>(R.id.btnPlus)
+        val btnStartQuiz = dialogView.findViewById<Button>(R.id.btnStartQuiz)
+
+        var jumlahSoal = 5 // Default 5 soal
+
+        tvJumlahSoal.text = jumlahSoal.toString()
+
+        // Tombol Minus (-)
+        btnMinus.setOnClickListener {
+            if (jumlahSoal > 3) {
+                jumlahSoal--
+                tvJumlahSoal.text = jumlahSoal.toString()
+            } else {
+                Toast.makeText(this, "Minimal 3 soal", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Tombol Plus (+)
+        btnPlus.setOnClickListener {
+            if (jumlahSoal < 20) {
+                jumlahSoal++
+                tvJumlahSoal.text = jumlahSoal.toString()
+            } else {
+                Toast.makeText(this, "Maksimal 20 soal", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Buat AlertDialog
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        // Tombol Mulai Kuis
+        btnStartQuiz.setOnClickListener {
+            dialog.dismiss()
+
+            // Simpan ringkasan ke Firebase Realtime Database
+            saveSummaryToFirebase(currentSummaryText)
+
+            // Pindah ke QuizActivity dengan membawa data
             val intent = Intent(this, QuizActivity::class.java).apply {
-                putExtra("RINGKASAN", currentSummary)
+                putExtra("RINGKASAN", currentSummaryText)
                 putExtra("FILE_URI", fileUri)
+                putExtra("FILE_NAME", intent.getStringExtra("FILE_NAME"))
+                putExtra("JUMLAH_SOAL", jumlahSoal)
             }
             startActivity(intent)
         }
+
+        dialog.show()
+
+        // Atur agar background dialog transparan (opsional)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
     }
 
-    private fun setupData() {
-        fileUri = intent.getStringExtra("FILE_URI")
-        val fileName = intent.getStringExtra("FILE_NAME") ?: "Dokumen"
+    private fun loadPdfData() {
+        val documentId = intent.getStringExtra("DOCUMENT_ID")
+        val fileName = intent.getStringExtra("FILE_NAME")
+        val pdfText = intent.getStringExtra("PDF_TEXT")
 
-        if (fileUri != null) {
-            val parsedUri = Uri.parse(fileUri)
+        // Prioritas: jika ada PDF_TEXT dari Intent (cara lama)
+        if (!pdfText.isNullOrEmpty()) {
+            displayPdfContent(fileName ?: "File PDF", pdfText)
+            return
+        }
 
-            // Set teks awal
-            tvRingkasan.text = "📄 File: $fileName\n\n🔄 Mengekstrak teks dari PDF...\n🤖 AI MobileBERT akan meringkas..."
+        // Jika tidak ada PDF_TEXT tapi ada DOCUMENT_ID, ambil dari Firestore
+        if (documentId != null) {
+            loadPdfTextFromFirestore(documentId)
+        } else if (fileName != null) {
+            // Fallback: hanya tampilkan nama file
+            tvRingkasan.text = """
+                Nama File:
+                $fileName
 
-            // Jalankan proses di background
-            lifecycleScope.launch(Dispatchers.IO) {
-                try {
-                    // STEP 1: Ekstrak teks dari PDF pakai PDFBox
-                    val pdfReader = PDFReaderHelper(this@RingkasanActivity)
-                    val extractedText = pdfReader.ekstrakTeksDariPDF(parsedUri)
-
-                    if (extractedText.startsWith("Gagal") || extractedText.startsWith("Error")) {
-                        withContext(Dispatchers.Main) {
-                            tvRingkasan.text = " $extractedText"
-                        }
-                        return@launch
-                    }
-
-                    currentExtractedText = extractedText
-
-                    withContext(Dispatchers.Main) {
-                        tvRingkasan.text = " File: $fileName\n\n✅ Teks berhasil diekstrak (${extractedText.length} karakter)\n\n🤖 AI MobileBERT sedang meringkas..."
-                    }
-
-                    // STEP 2: Kirim ke backend Python (MobileBERT ONNX)
-                    val aiHelper = RingkasanAIHelper(this@RingkasanActivity)
-                    val summary = aiHelper.prosesRingkasan(extractedText)
-
-                    currentSummary = summary
-
-                    // STEP 3: Tampilkan hasil di UI
-                    withContext(Dispatchers.Main) {
-                        tvRingkasan.text = """
-                             File: $fileName
-                            
-                            🔹 RINGKASAN (AI MobileBERT):
-                            
-                            $summary
-                            
-                            ─────────────────────────────
-                            📊 Statistik:
-                            • Teks asli: ${extractedText.length} karakter
-                            • Ringkasan: ${summary.length} karakter
-                            • Model: MobileBERT ONNX (Lokal)
-                        """.trimIndent()
-                    }
-
-                    // STEP 4: Simpan ke Firestore
-                    saveSummaryToFirestore(summary, extractedText)
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    withContext(Dispatchers.Main) {
-                        tvRingkasan.text = " Error: ${e.message}\n\nTips: Pastikan backend Python berjalan di http://10.0.2.2:8000"
-                    }
-                }
-            }
-
-        } else {
-            tvRingkasan.text = " Tidak ada file yang dikirim dari UploadActivity"
+                Isi PDF:
+                (Teks belum tersedia)
+            """.trimIndent()
         }
     }
 
-    /**
-     * Simpan ke Firestore (bukan Realtime Database)
-     */
-    private fun saveSummaryToFirestore(summary: String, extractedText: String) {
+    private fun loadPdfTextFromFirestore(documentId: String) {
+        firestore.collection("PdfContents")
+            .document(documentId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val content = document.getString("content") ?: ""
+                    val fileName = document.getString("fileName") ?: "File PDF"
+                    displayPdfContent(fileName, content)
+                } else {
+                    tvRingkasan.text = "Dokumen tidak ditemukan"
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Gagal memuat teks: ${e.message}", Toast.LENGTH_LONG).show()
+                tvRingkasan.text = "Gagal memuat teks PDF"
+            }
+    }
+
+    private fun displayPdfContent(fileName: String, content: String) {
+        tvRingkasan.text = """
+            Nama File:
+            $fileName
+
+            Isi PDF:
+            ${content.take(3000)}
+        """.trimIndent()
+    }
+
+    private fun showFeedbackDialog() {
+        val view = layoutInflater.inflate(R.layout.avtivity_feedback, null)
+
+        val ivLike = view.findViewById<ImageView>(R.id.ivLike)
+        val ivDislike = view.findViewById<ImageView>(R.id.ivDislike)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(view)
+            .setCancelable(false)
+            .create()
+
+        dialog.show()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        ivLike.setOnClickListener {
+            saveFeedback("LIKE")
+            saveProgressMateri()
+            Toast.makeText(this, "Terima kasih atas feedback Anda 😊", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        ivDislike.setOnClickListener {
+            saveFeedback("DISLIKE")
+            saveProgressMateri()
+            Toast.makeText(this, "Feedback tersimpan", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+    }
+
+    // ===================================
+    // SIMPAN RINGKASAN KE FIREBASE RTDB
+    // ===================================
+    private fun saveSummaryToFirebase(summaryText: String) {
         val userId = auth.currentUser?.uid
+
         if (userId == null) {
             Toast.makeText(this, "User belum login", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val documentData = hashMapOf(
-            "summary" to summary,
-            "extractedText" to extractedText.take(1000), // Batasi panjang
-            "textLength" to extractedText.length,
-            "summaryLength" to summary.length,
-            "createdAt" to Date(),
-            "userId" to userId
-        )
+        val database = FirebaseDatabase.getInstance().getReference("Summaries").child(userId)
+        val summaryId = database.push().key
 
-        firestore.collection("summaries")
-            .add(documentData)
+        if (summaryId == null) {
+            Toast.makeText(this, "Gagal membuat ID", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val summaryMap = HashMap<String, Any>()
+        summaryMap["summaryText"] = summaryText
+        summaryMap["createdAt"] = System.currentTimeMillis()
+
+        database.child(summaryId).setValue(summaryMap)
             .addOnSuccessListener {
-                // Berhasil disimpan
+                // Toast sudah ditampilkan di tombol generate
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Gagal simpan ke Firestore: ${e.message}", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal menyimpan ringkasan", Toast.LENGTH_SHORT).show()
             }
     }
 
+    private fun saveFeedback(feedback: String) {
+        val userId = auth.currentUser?.uid ?: return
+
+        val fileName = intent.getStringExtra("FILE_NAME")
+            ?: Uri.parse(fileUri).lastPathSegment
+            ?: "Materi"
+
+        val database = FirebaseDatabase.getInstance().getReference("Feedback").child(userId)
+        val feedbackId = database.push().key ?: return
+
+        val feedbackMap = HashMap<String, Any>()
+        feedbackMap["feedback"] = feedback
+        feedbackMap["fileName"] = fileName
+        feedbackMap["createdAt"] = System.currentTimeMillis()
+
+        database.child(feedbackId).setValue(feedbackMap)
+    }
+
+    // ===================================
+    // SIMPAN PROGRESS MATERI
+    // ===================================
     private fun saveProgressMateri() {
         val userId = auth.currentUser?.uid ?: return
-        val fileName = intent.getStringExtra("FILE_NAME") ?: "Materi"
 
-        val progressData = hashMapOf(
-            "fileName" to fileName,
-            "completed" to true,
-            "updatedAt" to Date()
-        )
+        val fileName = intent.getStringExtra("FILE_NAME")
+            ?: Uri.parse(fileUri).lastPathSegment
+            ?: "Materi"
 
-        firestore.collection("readingProgress")
-            .document("$userId")
-            .collection("materi")
-            .add(progressData)
-            .addOnFailureListener {
-                Toast.makeText(this, "Gagal menyimpan progress", Toast.LENGTH_SHORT).show()
-            }
+        val database = FirebaseDatabase.getInstance().getReference("ReadingProgress").child(userId)
+
+        // cek apakah file sudah ada
+        database.orderByChild("fileName")
+            .equalTo(fileName)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        Toast.makeText(
+                            this@RingkasanActivity,
+                            "Materi sudah selesai dipelajari",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return
+                    }
+
+                    val id = database.push().key ?: return
+                    val progressMap = HashMap<String, Any>()
+                    progressMap["fileName"] = fileName
+                    progressMap["completed"] = true
+                    progressMap["updatedAt"] = System.currentTimeMillis()
+
+                    database.child(id).setValue(progressMap)
+                }
+
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 }
