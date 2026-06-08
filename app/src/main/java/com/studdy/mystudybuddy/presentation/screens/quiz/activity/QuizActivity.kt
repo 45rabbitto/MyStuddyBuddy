@@ -3,38 +3,30 @@ package com.studdy.mystudybuddy.presentation.screens.quiz.activity
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
-import com.studdy.mystudybuddy.presentation.screens.quiz.QuizQuestionModel
-import com.studdy.mystudybuddy.presentation.screens.history.model.QuizHistoryItem
 
 class QuizActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var btnMusic: ImageView
-
     private lateinit var tvQuestion: TextView
-
     private lateinit var optionA: Button
     private lateinit var optionB: Button
     private lateinit var optionC: Button
     private lateinit var optionD: Button
-
     private lateinit var btnPrev: Button
     private lateinit var btnNext: Button
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var auth: FirebaseAuth
-
     private var mediaPlayer: MediaPlayer? = null
     private var clickSound: MediaPlayer? = null
-
     private var isMusicOn = true
 
     private var currentQuestionIndex = 0
@@ -43,27 +35,20 @@ class QuizActivity : AppCompatActivity() {
 
     private var fileName: String? = null
     private var summaryText: String? = null
-    private var jumlahSoal: Int = 5  // Default 5 soal
+    private var jumlahSoal: Int = 5
 
     private val userAnswers = mutableListOf<Int>()
-
-    // LIST SOAL (dari AI)
     private val questions = mutableListOf<QuizQuestion>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_kuis)
-
         auth = FirebaseAuth.getInstance()
-
         initViews()
         setupMusic()
         setupData()
         setupListeners()
-
-        // Generate soal dari AI berdasarkan ringkasan
-        generateQuestionsFromAI()
+        generateDummyQuestions()
     }
 
     private fun initViews() {
@@ -76,6 +61,20 @@ class QuizActivity : AppCompatActivity() {
         optionD = findViewById(R.id.optionD)
         btnPrev = findViewById(R.id.btnPrev)
         btnNext = findViewById(R.id.btnNext)
+        progressBar = findViewById(R.id.progressBar)
+        setQuizVisible(false)
+    }
+
+    private fun setQuizVisible(visible: Boolean) {
+        val v = if (visible) View.VISIBLE else View.GONE
+        tvQuestion.visibility = v
+        optionA.visibility = v
+        optionB.visibility = v
+        optionC.visibility = v
+        optionD.visibility = v
+        btnPrev.visibility = v
+        btnNext.visibility = v
+        progressBar.visibility = if (visible) View.GONE else View.VISIBLE
     }
 
     private fun setupData() {
@@ -83,107 +82,228 @@ class QuizActivity : AppCompatActivity() {
         fileName = intent.getStringExtra("FILE_NAME")
         summaryText = intent.getStringExtra("RINGKASAN")
         jumlahSoal = intent.getIntExtra("JUMLAH_SOAL", 5)
-
-        Toast.makeText(this, "Membuat $jumlahSoal soal dari ringkasan...", Toast.LENGTH_LONG).show()
     }
 
     // =========================
-    // GENERATE SOAL DARI AI
+    // DUMMY QUESTIONS
+    // Nanti ganti fungsi ini saja dengan pemanggilan AI
     // =========================
-    private fun generateQuestionsFromAI() {
-        // TODO: Panggil API AI untuk generate soal berdasarkan summaryText
-        // Contoh: Gunakan Gemini API, OpenAI, atau custom backend
+    private fun generateDummyQuestions() {
 
-        // Sementara, gunakan data dummy atau Firebase sebagai fallback
-        // Untuk production, Anda perlu implementasi panggilan ke AI
+        // Simulasi loading sebentar agar UX terasa natural
+        progressBar.visibility = View.VISIBLE
 
-        loadQuestionsFromFirebase()
-    }
-
-    // Sementara load dari Firebase (untuk testing)
-    // Nanti diganti dengan hasil dari AI
-    private fun loadQuestionsFromFirebase() {
-        FirebaseDatabase.getInstance()
-            .getReference("Questions")
-            .limitToFirst(jumlahSoal)  // Ambil sesuai jumlah soal yang dipilih
-            .addListenerForSingleValueEvent(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        questions.clear()
-
-                        for (data in snapshot.children) {
-                            val question = data.getValue(QuizQuestion::class.java)
-                            if (question != null) {
-                                questions.add(question)
-                            }
-
-                            // Batasi sesuai jumlah soal
-                            if (questions.size >= jumlahSoal) break
-                        }
-
-                        if (questions.isNotEmpty()) {
-                            loadQuestion()
-                        } else {
-                            Toast.makeText(
-                                this@QuizActivity,
-                                "Gagal memuat soal, silakan coba lagi",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            finish()
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(
-                            this@QuizActivity,
-                            "Error: ${error.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        finish()
-                    }
-                }
+        val allDummyQuestions = mutableListOf(
+            QuizQuestion(
+                question = "Apa fungsi utama dari sistem operasi?",
+                options = listOf(
+                    "Mengelola hardware dan software",
+                    "Membuat dokumen teks",
+                    "Menjalankan browser internet",
+                    "Menyimpan file secara permanen"
+                ),
+                correctAnswer = 0
+            ),
+            QuizQuestion(
+                question = "Struktur data yang menggunakan prinsip FIFO adalah?",
+                options = listOf(
+                    "Stack",
+                    "Queue",
+                    "Tree",
+                    "Graph"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Bahasa pemrograman yang digunakan untuk membuat aplikasi Android adalah?",
+                options = listOf(
+                    "Swift",
+                    "Python",
+                    "Kotlin",
+                    "PHP"
+                ),
+                correctAnswer = 2
+            ),
+            QuizQuestion(
+                question = "Apa kepanjangan dari CPU?",
+                options = listOf(
+                    "Central Process Unit",
+                    "Computer Personal Unit",
+                    "Central Personal Utility",
+                    "Central Processing Unit"
+                ),
+                correctAnswer = 3
+            ),
+            QuizQuestion(
+                question = "Protokol yang digunakan untuk mengakses halaman web adalah?",
+                options = listOf(
+                    "FTP",
+                    "HTTP",
+                    "SMTP",
+                    "SSH"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Apa yang dimaksud dengan RAM?",
+                options = listOf(
+                    "Penyimpanan permanen data",
+                    "Memori sementara yang digunakan saat program berjalan",
+                    "Prosesor utama komputer",
+                    "Kartu grafis untuk rendering"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Algoritma pengurutan yang memiliki kompleksitas O(n log n) adalah?",
+                options = listOf(
+                    "Bubble Sort",
+                    "Selection Sort",
+                    "Merge Sort",
+                    "Insertion Sort"
+                ),
+                correctAnswer = 2
+            ),
+            QuizQuestion(
+                question = "Dalam basis data relasional, perintah untuk mengambil data adalah?",
+                options = listOf(
+                    "INSERT",
+                    "UPDATE",
+                    "DELETE",
+                    "SELECT"
+                ),
+                correctAnswer = 3
+            ),
+            QuizQuestion(
+                question = "Apa itu polymorphism dalam pemrograman berorientasi objek?",
+                options = listOf(
+                    "Kemampuan objek untuk menyembunyikan data",
+                    "Kemampuan satu fungsi berperilaku berbeda tergantung konteks",
+                    "Proses mewarisi sifat dari class lain",
+                    "Membuat objek dari sebuah class"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Apa fungsi dari Git dalam pengembangan software?",
+                options = listOf(
+                    "Menjalankan server database",
+                    "Mendesain antarmuka pengguna",
+                    "Version control untuk mengelola perubahan kode",
+                    "Mengcompile kode program"
+                ),
+                correctAnswer = 2
+            ),
+            QuizQuestion(
+                question = "Singkatan API dalam pengembangan software adalah?",
+                options = listOf(
+                    "Application Programming Interface",
+                    "Automatic Process Integration",
+                    "Application Process Input",
+                    "Automated Programming Input"
+                ),
+                correctAnswer = 0
+            ),
+            QuizQuestion(
+                question = "Tipe data yang hanya menyimpan nilai true atau false disebut?",
+                options = listOf(
+                    "Integer",
+                    "String",
+                    "Boolean",
+                    "Float"
+                ),
+                correctAnswer = 2
+            ),
+            QuizQuestion(
+                question = "Apa itu inheritance dalam OOP?",
+                options = listOf(
+                    "Menyembunyikan detail implementasi",
+                    "Membungkus data dan fungsi dalam satu unit",
+                    "Mewariskan sifat dan perilaku dari class induk ke class anak",
+                    "Membuat banyak objek dari satu class"
+                ),
+                correctAnswer = 2
+            ),
+            QuizQuestion(
+                question = "Format file yang umum digunakan untuk pertukaran data antar aplikasi adalah?",
+                options = listOf(
+                    "PDF",
+                    "JSON",
+                    "PNG",
+                    "MP4"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Apa fungsi dari firewall dalam jaringan komputer?",
+                options = listOf(
+                    "Mempercepat koneksi internet",
+                    "Menyimpan data di cloud",
+                    "Memfilter lalu lintas jaringan berdasarkan aturan keamanan",
+                    "Mengenkripsi seluruh data di hard disk"
+                ),
+                correctAnswer = 2
+            ),
+            QuizQuestion(
+                question = "Dalam Android, komponen yang digunakan untuk menampilkan satu layar UI disebut?",
+                options = listOf(
+                    "Service",
+                    "Activity",
+                    "BroadcastReceiver",
+                    "ContentProvider"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Apa itu encapsulation dalam OOP?",
+                options = listOf(
+                    "Membuat objek dari class",
+                    "Membungkus data dan method dalam satu unit serta menyembunyikan detail implementasi",
+                    "Mewariskan properti ke class turunan",
+                    "Menggunakan satu nama fungsi untuk banyak implementasi"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Struktur data yang berbentuk hierarki seperti pohon disebut?",
+                options = listOf(
+                    "Array",
+                    "Queue",
+                    "Stack",
+                    "Tree"
+                ),
+                correctAnswer = 3
+            ),
+            QuizQuestion(
+                question = "Apa itu cloud computing?",
+                options = listOf(
+                    "Komputer yang dipasang di langit-langit ruangan",
+                    "Layanan komputasi melalui internet tanpa infrastruktur lokal",
+                    "Software untuk menggambar desain grafis",
+                    "Jaringan komputer dalam satu gedung"
+                ),
+                correctAnswer = 1
+            ),
+            QuizQuestion(
+                question = "Perintah Git untuk menyimpan perubahan ke repository adalah?",
+                options = listOf(
+                    "git push",
+                    "git pull",
+                    "git commit",
+                    "git merge"
+                ),
+                correctAnswer = 2
             )
-    }
-
-    // =========================
-    // NANTI DIGANTI DENGAN AI GENERATION
-    // =========================
-    // Contoh method untuk generate soal dari AI:
-    /*
-    private fun generateQuestionsFromAI() {
-        // Tampilkan loading
-        showLoading(true)
-
-        // Panggil API AI (contoh dengan Retrofit)
-        val apiService = AiApiService.create()
-        val request = AiRequest(
-            prompt = "Buatkan $jumlahSoal soal pilihan ganda dari ringkasan berikut:\n$summaryText",
-            maxTokens = 1000
         )
 
-        apiService.generateQuestions(request).enqueue(object : Callback<AiResponse> {
-            override fun onResponse(call: Call<AiResponse>, response: Response<AiResponse>) {
-                showLoading(false)
-                if (response.isSuccessful) {
-                    val questionsList = parseQuestionsFromAiResponse(response.body())
-                    questions.addAll(questionsList)
-                    if (questions.isNotEmpty()) {
-                        loadQuestion()
-                    } else {
-                        Toast.makeText(this@QuizActivity, "Gagal generate soal", Toast.LENGTH_SHORT).show()
-                        finish()
-                    }
-                }
-            }
+        // Acak urutan soal lalu ambil sejumlah jumlahSoal
+        allDummyQuestions.shuffle()
+        questions.clear()
+        questions.addAll(allDummyQuestions.take(jumlahSoal))
 
-            override fun onFailure(call: Call<AiResponse>, t: Throwable) {
-                showLoading(false)
-                Toast.makeText(this@QuizActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
-                finish()
-            }
-        })
+        setQuizVisible(true)
+        loadQuestion()
     }
-    */
 
     private fun setupMusic() {
         mediaPlayer = MediaPlayer.create(this, R.raw.backsound)
@@ -191,15 +311,12 @@ class QuizActivity : AppCompatActivity() {
             isLooping = true
             start()
         }
-
         clickSound = MediaPlayer.create(this, R.raw.button)
         btnMusic.setImageResource(R.drawable.ic_music_on)
     }
 
     private fun setupListeners() {
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
         btnMusic.setOnClickListener {
             if (isMusicOn) {
@@ -220,11 +337,8 @@ class QuizActivity : AppCompatActivity() {
         btnPrev.setOnClickListener {
             if (currentQuestionIndex > 0) {
                 currentQuestionIndex--
-                selectedAnswer = if (currentQuestionIndex < userAnswers.size) {
-                    userAnswers[currentQuestionIndex]
-                } else {
-                    -1
-                }
+                selectedAnswer = if (currentQuestionIndex < userAnswers.size)
+                    userAnswers[currentQuestionIndex] else -1
                 loadQuestion()
             }
         }
@@ -243,11 +357,8 @@ class QuizActivity : AppCompatActivity() {
 
             if (currentQuestionIndex < questions.size - 1) {
                 currentQuestionIndex++
-                selectedAnswer = if (currentQuestionIndex < userAnswers.size) {
-                    userAnswers[currentQuestionIndex]
-                } else {
-                    -1
-                }
+                selectedAnswer = if (currentQuestionIndex < userAnswers.size)
+                    userAnswers[currentQuestionIndex] else -1
                 loadQuestion()
             } else {
                 calculateScore()
@@ -259,11 +370,8 @@ class QuizActivity : AppCompatActivity() {
 
     private fun loadQuestion() {
         resetButtons()
-
         val question = questions[currentQuestionIndex]
-
         tvQuestion.text = "${currentQuestionIndex + 1}. ${question.question}"
-
         optionA.text = question.options[0]
         optionB.text = question.options[1]
         optionC.text = question.options[2]
@@ -303,7 +411,7 @@ class QuizActivity : AppCompatActivity() {
     private fun calculateScore() {
         score = 0
         for (i in questions.indices) {
-            if (userAnswers[i] == questions[i].correctAnswer) {
+            if (i < userAnswers.size && userAnswers[i] == questions[i].correctAnswer) {
                 score++
             }
         }
@@ -311,73 +419,54 @@ class QuizActivity : AppCompatActivity() {
 
     private fun saveQuizResult() {
         val userId = auth.currentUser?.uid ?: return
-
         val database = FirebaseDatabase.getInstance()
-            .getReference("QuizHistory")
-            .child(userId)
-
+            .getReference("QuizHistory").child(userId)
         val quizId = database.push().key ?: return
-
         val finalScore = (score * 100) / questions.size
 
-        val quizMap = HashMap<String, Any>()
-        quizMap["fileName"] = fileName ?: "Unknown File"
-        quizMap["score"] = finalScore
-        quizMap["correctAnswer"] = score
-        quizMap["wrongAnswer"] = questions.size - score
-        quizMap["totalQuestion"] = questions.size
-        quizMap["createdAt"] = System.currentTimeMillis()
-
-        database.child(quizId).setValue(quizMap)
+        database.child(quizId).setValue(
+            hashMapOf<String, Any>(
+                "fileName" to (fileName ?: "Unknown"),
+                "score" to finalScore,
+                "correctAnswer" to score,
+                "wrongAnswer" to (questions.size - score),
+                "totalQuestion" to questions.size,
+                "createdAt" to System.currentTimeMillis()
+            )
+        )
     }
 
     private fun showResult() {
         mediaPlayer?.stop()
 
-        val pembahasanList = mutableListOf<QuizHistoryItem>()
+        val questionList = ArrayList<String>()
+        val userAnswerList = ArrayList<String>()
+        val correctAnswerList = ArrayList<String>()
 
         for (i in questions.indices) {
-            val question = questions[i]
-            val userAnswerText = question.options[userAnswers[i]]
-            val correctAnswerText = question.options[question.correctAnswer]
-
-            pembahasanList.add(
-                QuizHistoryItem(
-                    question = question.question,
-                    correctAnswer = correctAnswerText,
-                    userAnswer = userAnswerText
-                )
-            )
+            questionList.add(questions[i].question)
+            userAnswerList.add(questions[i].options[userAnswers[i]])
+            correctAnswerList.add(questions[i].options[questions[i].correctAnswer])
         }
 
-        QuizQuestionModel.questionList = pembahasanList
-
-        val intent = Intent(this, HasilKuisActivity::class.java)
-        intent.putExtra("SCORE", score)
-        intent.putExtra("FILE_NAME", fileName)
-        intent.putExtra("TOTAL_QUESTIONS", questions.size)
-
-        startActivity(intent)
+        startActivity(
+            Intent(this, HasilKuisActivity::class.java).apply {
+                putExtra("SCORE", score)
+                putExtra("FILE_NAME", fileName)
+                putExtra("TOTAL_QUESTIONS", questions.size)
+                putStringArrayListExtra("QUESTIONS", questionList)
+                putStringArrayListExtra("USER_ANSWERS", userAnswerList)
+                putStringArrayListExtra("CORRECT_ANSWERS", correctAnswerList)
+            }
+        )
         finish()
     }
 
-    override fun onPause() {
-        super.onPause()
-        mediaPlayer?.pause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (isMusicOn) {
-            mediaPlayer?.start()
-        }
-    }
-
+    override fun onPause() { super.onPause(); mediaPlayer?.pause() }
+    override fun onResume() { super.onResume(); if (isMusicOn) mediaPlayer?.start() }
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.release()
-        mediaPlayer = null
-        clickSound?.release()
-        clickSound = null
+        mediaPlayer?.release(); mediaPlayer = null
+        clickSound?.release(); clickSound = null
     }
 }
