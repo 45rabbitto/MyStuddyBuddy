@@ -1,4 +1,3 @@
-
 package com.studdy.mystudybuddy.data.remote.api
 
 import retrofit2.Retrofit
@@ -35,9 +34,9 @@ data class HealthResponse(
 )
 
 object RetrofitClient {
-    // Untuk emulator Android (10.0.2.2 = localhost)
-    // Untuk HP fisik, ganti dengan IP komputer Anda
-    private const val BASE_URL = "http://10.0.2.2:8000/"
+    // GANTI URL DI BAWAH INI DENGAN URL DARI RAILWAY
+    // Pastikan menggunakan https:// dan diakhiri dengan /
+    private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
 
     val instance: SummaryApiService by lazy {
         val retrofit = Retrofit.Builder()

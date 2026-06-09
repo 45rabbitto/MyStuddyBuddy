@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.data
+package com.studdy.mystudybuddy.data.repository
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -34,7 +34,7 @@ class ProgressRepository(context: Context) {
     fun saveChatbotCount(value: Int) =
         prefs.edit().putInt(KEY_CHATBOT, value).apply()
 
-    // ================= INCREMENT (PENTING ⭐) =================
+    // ================= INCREMENT =================
     fun incrementUpload() = saveUploadCount(getUploadCount() + 1)
     fun incrementSummary() = saveSummaryCount(getSummaryCount() + 1)
     fun incrementQuiz() = saveQuizCount(getQuizCount() + 1)

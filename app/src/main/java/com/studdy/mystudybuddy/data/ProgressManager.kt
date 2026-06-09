@@ -1,6 +1,6 @@
-package com.studdy.mystudybuddy.data
+package com.studdy.mystudybuddy.data.repository
 
-class MainActivity.ktProgressManager(private val repo: ProgressRepository) {
+class ProgressManager(private val repo: ProgressRepository) {
 
     private val TARGET_UPLOAD = 5
     private val TARGET_SUMMARY = 5

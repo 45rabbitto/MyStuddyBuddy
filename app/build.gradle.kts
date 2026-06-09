@@ -58,6 +58,16 @@ android {
     aaptOptions {
         noCompress("onnx")
     }
+
+    // 🔥 FIX PDFBOX CRASH (INI PENTING BANGET)
+    packaging {
+        resources {
+            pickFirsts += setOf(
+                "**/glyphlist.txt",
+                "com/tom_roush/pdfbox/resources/glyphlist/glyphlist.txt"
+            )
+        }
+    }
 }
 
 kapt {
@@ -65,9 +75,8 @@ kapt {
 }
 
 dependencies {
-    // =====================================
+
     // CORE & ANDROID UI
-    // =====================================
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
@@ -75,22 +84,15 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
-    // =====================================
     // FIREBASE
-    // =====================================
     implementation(platform("com.google.firebase:firebase-bom:33.10.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-database-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
-    implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
 
-    // =====================================
     // COMPOSE
-    // =====================================
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
-
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -100,80 +102,45 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // =====================================
     // NAVIGATION & VIEWMODEL
-    // =====================================
     implementation("androidx.navigation:navigation-compose:2.8.5")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
-    // =====================================
-    // ROOM (DATABASE LOKAL)
-    // =====================================
+    // ROOM
     implementation("androidx.room:room-runtime:2.7.2")
     implementation("androidx.room:room-ktx:2.7.2")
     kapt("androidx.room:room-compiler:2.7.2")
 
-    // =====================================
-    // HILT (DEPENDENCY INJECTION)
-    // =====================================
+    // HILT
     implementation("com.google.dagger:hilt-android:2.56")
     kapt("com.google.dagger:hilt-compiler:2.56")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
-    // =====================================
-    // NETWORK (RETROFIT & OKHTTP)
-    // =====================================
+    // NETWORK
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    // =====================================
     // DATASTORE & COROUTINES
-    // =====================================
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // =====================================
-    // IMAGE LOADING (COIL & GLIDE)
-    // =====================================
+    // IMAGE
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
-    // =====================================
-    // MACHINE LEARNING & AI (ONNX RUNTIME)
-    // =====================================
+    // ML
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
 
-    // =====================================
-    // PARSING PDF (PDFBOX)
-    // =====================================
+    // 🔥 PDF BOX (INI SUDAH BENAR)
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
-    // =====================================
     // TESTING
-    // =====================================
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-
-
-    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-
-    // OkHttp untuk panggil backend
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-
 }
