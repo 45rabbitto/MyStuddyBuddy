@@ -1,4 +1,4 @@
-package com.studdy.mystudybuddy.data
+package com.studdy.mystudybuddy.data.repository
 
 class ProgressManager(private val repo: ProgressRepository) {
 
