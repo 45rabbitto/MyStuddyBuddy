@@ -167,7 +167,12 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                             var wrong = 0
                             var total = 0
 
+                            var questions = arrayListOf<String>()
+                            var userAnswers = arrayListOf<String>()
+                            var correctAnswers = arrayListOf<String>()
+
                             for (data in snapshot.children) {
+
 
                                 score =
                                     data.child("score")
@@ -188,6 +193,30 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                     data.child("totalQuestion")
                                         .getValue(Int::class.java)
                                         ?: 0
+
+                                questions =
+                                    data.child("questions")
+                                        .children
+                                        .mapNotNull {
+                                            it.getValue(String::class.java)
+                                        }
+                                        .toCollection(ArrayList())
+
+                                userAnswers =
+                                    data.child("userAnswers")
+                                        .children
+                                        .mapNotNull {
+                                            it.getValue(String::class.java)
+                                        }
+                                        .toCollection(ArrayList())
+
+                                correctAnswers =
+                                    data.child("correctAnswers")
+                                        .children
+                                        .mapNotNull {
+                                            it.getValue(String::class.java)
+                                        }
+                                        .toCollection(ArrayList())
                             }
 
                             startActivity(
@@ -197,29 +226,26 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                     HasilKuisActivity::class.java
                                 ).apply {
 
-                                    putExtra(
-                                        "SCORE",
-                                        score
+                                    putExtra("SCORE", score)
+                                    putExtra("CORRECT", correct)
+                                    putExtra("WRONG", wrong)
+                                    putExtra("TOTAL", total)
+
+                                    putExtra("FILE_NAME", fileName)
+
+                                    putStringArrayListExtra(
+                                        "QUESTIONS",
+                                        questions
                                     )
 
-                                    putExtra(
-                                        "CORRECT",
-                                        correct
+                                    putStringArrayListExtra(
+                                        "USER_ANSWERS",
+                                        userAnswers
                                     )
 
-                                    putExtra(
-                                        "WRONG",
-                                        wrong
-                                    )
-
-                                    putExtra(
-                                        "TOTAL",
-                                        total
-                                    )
-
-                                    putExtra(
-                                        "FILE_NAME",
-                                        fileName
+                                    putStringArrayListExtra(
+                                        "CORRECT_ANSWERS",
+                                        correctAnswers
                                     )
                                 }
                             )

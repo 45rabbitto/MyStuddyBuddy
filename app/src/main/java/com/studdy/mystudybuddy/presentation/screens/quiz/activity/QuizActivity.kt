@@ -9,17 +9,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.*
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
-import com.studdy.mystudybuddy.presentation.screens.quiz.QuizQuestionModel
-import com.studdy.mystudybuddy.presentation.screens.history.model.QuizHistoryItem
 
 class QuizActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
     private lateinit var btnMusic: ImageView
 
+    private lateinit var tvNumber: TextView
     private lateinit var tvQuestion: TextView
 
     private lateinit var optionA: Button
@@ -42,29 +41,24 @@ class QuizActivity : AppCompatActivity() {
     private var score = 0
 
     private var fileName: String? = null
+    private var summaryText: String? = null
+    private var jumlahSoal = 5
 
     private val userAnswers = mutableListOf<Int>()
-
-    // =========================
-    // LIST SOAL
-    // =========================
-
-    private val questions =
-        mutableListOf<QuizQuestion>()
+    private val questions = mutableListOf<QuizQuestion>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_kuis)
 
         auth = FirebaseAuth.getInstance()
 
         initViews()
-        setupMusic()
         setupData()
+        setupMusic()
         setupListeners()
 
-        loadQuestionsFromFirebase()
+        generateDummyQuestions()
     }
 
     private fun initViews() {
@@ -72,6 +66,7 @@ class QuizActivity : AppCompatActivity() {
         btnBack = findViewById(R.id.btnBack)
         btnMusic = findViewById(R.id.btnMusic)
 
+        tvNumber = findViewById(R.id.tvNumber)
         tvQuestion = findViewById(R.id.tvQuestion)
 
         optionA = findViewById(R.id.optionA)
@@ -83,98 +78,36 @@ class QuizActivity : AppCompatActivity() {
         btnNext = findViewById(R.id.btnNext)
     }
 
-    // =========================
-    // LOAD QUESTION FIREBASE
-    // =========================
+    private fun setupData() {
 
-    private fun loadQuestionsFromFirebase() {
+        fileName = intent.getStringExtra("FILE_NAME")
+        summaryText = intent.getStringExtra("RINGKASAN")
+        jumlahSoal = intent.getIntExtra("JUMLAH_SOAL", 5)
 
-        FirebaseDatabase.getInstance()
-            .getReference("Questions")
-            .addListenerForSingleValueEvent(
-
-                object : ValueEventListener {
-
-                    override fun onDataChange(snapshot: DataSnapshot) {
-
-                        questions.clear()
-
-                        for (data in snapshot.children) {
-
-                            val question =
-                                data.getValue(
-                                    QuizQuestion::class.java
-                                )
-
-                            if (question != null) {
-
-                                questions.add(question)
-                            }
-                        }
-
-                        if (questions.isNotEmpty()) {
-
-                            loadQuestion()
-
-                        } else {
-
-                            Toast.makeText(
-                                this@QuizActivity,
-                                "Soal kosong",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    }
-
-                    override fun onCancelled(error: DatabaseError) {
-
-                        Toast.makeText(
-                            this@QuizActivity,
-                            error.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            )
+        userAnswers.clear()
     }
-
-    // =========================
-    // MUSIC
-    // =========================
 
     private fun setupMusic() {
 
         mediaPlayer =
-            MediaPlayer.create(
-                this,
-                R.raw.backsound
-            )
+            MediaPlayer.create(this, R.raw.backsound)
 
         mediaPlayer?.apply {
-
             isLooping = true
             start()
         }
 
         clickSound =
-            MediaPlayer.create(
-                this,
-                R.raw.button
-            )
+            MediaPlayer.create(this, R.raw.button)
 
         btnMusic.setImageResource(
             R.drawable.ic_music_on
         )
     }
 
-    // =========================
-    // LISTENER
-    // =========================
-
     private fun setupListeners() {
 
         btnBack.setOnClickListener {
-
             finish()
         }
 
@@ -223,7 +156,10 @@ class QuizActivity : AppCompatActivity() {
                 currentQuestionIndex--
 
                 selectedAnswer =
-                    userAnswers[currentQuestionIndex]
+                    if (currentQuestionIndex < userAnswers.size)
+                        userAnswers[currentQuestionIndex]
+                    else
+                        -1
 
                 loadQuestion()
             }
@@ -256,22 +192,113 @@ class QuizActivity : AppCompatActivity() {
 
                 currentQuestionIndex++
 
-                selectedAnswer = -1
+                selectedAnswer =
+                    if (currentQuestionIndex < userAnswers.size)
+                        userAnswers[currentQuestionIndex]
+                    else
+                        -1
 
                 loadQuestion()
 
             } else {
 
+                // simpan jawaban soal terakhir
+                if (userAnswers.size <= currentQuestionIndex) {
+                    userAnswers.add(selectedAnswer)
+                } else {
+                    userAnswers[currentQuestionIndex] = selectedAnswer
+                }
+
                 calculateScore()
+
                 saveQuizResult()
+
                 showResult()
             }
         }
     }
 
-    // =========================
-    // LOAD QUESTION
-    // =========================
+    private fun generateDummyQuestions() {
+
+        val allQuestions = mutableListOf(
+
+            QuizQuestion(
+                "Apa fungsi utama sistem operasi?",
+                listOf(
+                    "Mengelola hardware dan software",
+                    "Membuat dokumen",
+                    "Menyimpan data",
+                    "Membuka browser"
+                ),
+                0
+            ),
+
+            QuizQuestion(
+                "Bahasa resmi Android saat ini adalah?",
+                listOf(
+                    "Java",
+                    "PHP",
+                    "Kotlin",
+                    "Swift"
+                ),
+                2
+            ),
+
+            QuizQuestion(
+                "Apa kepanjangan CPU?",
+                listOf(
+                    "Central Process Unit",
+                    "Computer Processing Unit",
+                    "Central Processing Unit",
+                    "Central Program Unit"
+                ),
+                2
+            ),
+
+            QuizQuestion(
+                "Git digunakan untuk?",
+                listOf(
+                    "Database",
+                    "Version Control",
+                    "UI Design",
+                    "Hosting"
+                ),
+                1
+            ),
+
+            QuizQuestion(
+                "Perintah SQL mengambil data?",
+                listOf(
+                    "INSERT",
+                    "DELETE",
+                    "UPDATE",
+                    "SELECT"
+                ),
+                3
+            ),
+
+            QuizQuestion(
+                "FIFO digunakan pada?",
+                listOf(
+                    "Stack",
+                    "Queue",
+                    "Tree",
+                    "Graph"
+                ),
+                1
+            )
+        )
+
+        allQuestions.shuffle()
+
+        questions.clear()
+
+        questions.addAll(
+            allQuestions.take(jumlahSoal)
+        )
+
+        loadQuestion()
+    }
 
     private fun loadQuestion() {
 
@@ -280,8 +307,11 @@ class QuizActivity : AppCompatActivity() {
         val question =
             questions[currentQuestionIndex]
 
+        tvNumber.text =
+            "Soal ${currentQuestionIndex + 1} dari ${questions.size}"
+
         tvQuestion.text =
-            "${currentQuestionIndex + 1}. ${question.question}"
+            question.question
 
         optionA.text =
             question.options[0]
@@ -303,10 +333,6 @@ class QuizActivity : AppCompatActivity() {
             highlightSelectedButton()
         }
     }
-
-    // =========================
-    // SELECT ANSWER
-    // =========================
 
     private fun selectAnswer(index: Int) {
 
@@ -341,10 +367,6 @@ class QuizActivity : AppCompatActivity() {
         optionD.setBackgroundResource(R.drawable.kontainer)
     }
 
-    // =========================
-    // SCORE
-    // =========================
-
     private fun calculateScore() {
 
         score = 0
@@ -352,18 +374,13 @@ class QuizActivity : AppCompatActivity() {
         for (i in questions.indices) {
 
             if (
-                userAnswers[i] ==
-                questions[i].correctAnswer
+                i < userAnswers.size &&
+                userAnswers[i] == questions[i].correctAnswer
             ) {
-
                 score++
             }
         }
     }
-
-    // =========================
-    // FIREBASE
-    // =========================
 
     private fun saveQuizResult() {
 
@@ -378,95 +395,112 @@ class QuizActivity : AppCompatActivity() {
         val quizId =
             database.push().key ?: return
 
-        val finalScore =
-            (score * 100) / questions.size
-
-        val quizMap =
-            HashMap<String, Any>()
-
-        quizMap["fileName"] =
-            fileName ?: "Unknown File"
-
-        quizMap["score"] =
-            finalScore
-
-        quizMap["correctAnswer"] =
-            score
-
-        quizMap["wrongAnswer"] =
-            questions.size - score
-
-        quizMap["totalQuestion"] =
-            questions.size
-
-        quizMap["createdAt"] =
-            System.currentTimeMillis()
-
-        database.child(quizId)
-            .setValue(quizMap)
-    }
-
-    // =========================
-    // RESULT
-    // =========================
-
-    private fun showResult() {
-
-        mediaPlayer?.stop()
-
-        val pembahasanList =
-            mutableListOf<QuizHistoryItem>()
+        val questionList = ArrayList<String>()
+        val userAnswerList = ArrayList<String>()
+        val correctAnswerList = ArrayList<String>()
 
         for (i in questions.indices) {
 
-            val question =
-                questions[i]
+            questionList.add(
+                questions[i].question
+            )
 
-            val userAnswerText =
-                question.options[userAnswers[i]]
+            userAnswerList.add(
+                questions[i].options[userAnswers[i]]
+            )
 
-            val correctAnswerText =
-                question.options[question.correctAnswer]
-
-            pembahasanList.add(
-
-                QuizHistoryItem(
-                    question = question.question,
-                    correctAnswer = correctAnswerText,
-                    userAnswer = userAnswerText
-                )
+            correctAnswerList.add(
+                questions[i].options[
+                    questions[i].correctAnswer
+                ]
             )
         }
 
-        QuizQuestionModel.questionList =
-            pembahasanList
+        val finalScore =
+            (score * 100) / questions.size
 
-        val intent =
-            Intent(
-                this,
-                HasilKuisActivity::class.java
+        val quizData = hashMapOf<String, Any>(
+
+            "fileName" to (fileName ?: "Materi"),
+
+            "score" to finalScore,
+
+            "correctAnswer" to score,
+
+            "wrongAnswer" to (questions.size - score),
+
+            "totalQuestion" to questions.size,
+
+            "questions" to questionList,
+
+            "userAnswers" to userAnswerList,
+
+            "correctAnswers" to correctAnswerList,
+
+            "createdAt" to System.currentTimeMillis()
+        )
+
+        database.child(quizId)
+            .setValue(quizData)
+    }
+
+    private fun showResult() {
+
+        val correct = score
+        val wrong = questions.size - score
+
+        val questionList = ArrayList<String>()
+        val userAnswerList = ArrayList<String>()
+        val correctAnswerList = ArrayList<String>()
+
+        for (i in questions.indices) {
+
+            questionList.add(questions[i].question)
+
+            userAnswerList.add(
+                questions[i].options[userAnswers[i]]
             )
 
-        intent.putExtra("SCORE", score)
+            correctAnswerList.add(
+                questions[i].options[
+                    questions[i].correctAnswer
+                ]
+            )
+        }
 
-        intent.putExtra("FILE_NAME", fileName)
+        startActivity(
+            Intent(this, HasilKuisActivity::class.java).apply {
 
-        startActivity(intent)
+                putExtra("CORRECT", score)
+                putExtra("WRONG", questions.size - score)
+                putExtra("SCORE", (score * 100) / questions.size)
+
+                putExtra("TOTAL_QUESTIONS", questions.size)
+
+                putExtra("FILE_NAME", fileName)
+
+                putStringArrayListExtra(
+                    "QUESTIONS",
+                    questionList
+                )
+
+                putStringArrayListExtra(
+                    "USER_ANSWERS",
+                    userAnswerList
+                )
+
+                putStringArrayListExtra(
+                    "CORRECT_ANSWERS",
+                    correctAnswerList
+                )
+            }
+        )
 
         finish()
     }
 
-    private fun setupData() {
-
-        userAnswers.clear()
-
-        fileName =
-            intent.getStringExtra("FILE_NAME")
-    }
-
     override fun onPause() {
         super.onPause()
-
         mediaPlayer?.pause()
     }
 
@@ -474,7 +508,6 @@ class QuizActivity : AppCompatActivity() {
         super.onResume()
 
         if (isMusicOn) {
-
             mediaPlayer?.start()
         }
     }

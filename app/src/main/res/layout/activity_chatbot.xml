@@ -14,7 +14,6 @@
         android:layout_centerHorizontal="true"
         android:background="@drawable/kontainer" >
 
-
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
@@ -48,39 +47,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nama File"
-            android:textSize="14sp"
-            android:textColor="@color/dark_text"
+            android:textSize="12sp"
+            android:textColor="@color/gray_text"
             android:layout_centerHorizontal="true"
-            android:layout_below="@id/btnBack"/>
-
+            android:layout_below="@id/btnBack"
+            android:layout_marginTop="2dp"/>
 
     </RelativeLayout>
 
-    <ScrollView
-        android:id="@+id/chatScroll"
+    <!-- TAMBAHAN: RecyclerView untuk chat (GANTI ScrollView) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvChat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
-
-        <LinearLayout
-            android:id="@+id/chatContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvChatResult"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Belum ada percakapan"
-                android:textColor="@color/gray_text"
-                android:fontFamily="@font/poppins"
-                android:layout_gravity="center" />
-
-        </LinearLayout>
-
-    </ScrollView>
+        android:padding="12dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -101,7 +84,8 @@
             android:paddingStart="16dp"
             android:fontFamily="@font/poppins"
             android:textColor="@color/dark_text"
-            android:textColorHint="@color/gray_text"/>
+            android:textColorHint="@color/gray_text"
+            android:background="@android:drawable/editbox_background"/>
 
         <ImageButton
             android:id="@+id/btnSend"

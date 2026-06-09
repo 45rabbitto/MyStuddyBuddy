@@ -41,27 +41,27 @@
         <LinearLayout
             android:id="@+id/uploadContainer"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="265dp"
             android:layout_marginTop="24dp"
             android:background="@drawable/kontainer"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="24dp"
-            android:clickable="true"
-            android:focusable="true">
+            android:padding="24dp">
 
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/upload"
-                android:layout_marginTop="-40dp"/>
+                android:layout_marginTop="-40dp"
+                android:src="@drawable/upload" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Unggah disini"
                 android:fontFamily="@font/poppins"
+                android:text="Unggah disini"
                 android:textColor="@color/dark_text"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -72,6 +72,14 @@
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/poppins"
                 android:text="PDF (Maks. 20MB)"
+                android:textColor="@color/gray_text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:fontFamily="@font/poppins"
+                android:text="(file berupa pdf text)"
                 android:textColor="@color/gray_text" />
 
         </LinearLayout>

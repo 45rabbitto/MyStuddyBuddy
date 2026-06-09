@@ -25,8 +25,7 @@ class QuizHistoryActivity : AppCompatActivity() {
 
     private lateinit var resultContainer: LinearLayout
 
-    private val auth =
-        FirebaseAuth.getInstance()
+    private val auth = FirebaseAuth.getInstance()
 
     private val database =
         FirebaseDatabase.getInstance().reference
@@ -71,8 +70,7 @@ class QuizHistoryActivity : AppCompatActivity() {
                 "FILE_NAME"
             ) ?: "Dokumen"
 
-        tvFileName.text =
-            fileName
+        tvFileName.text = fileName
 
         val uid =
             auth.currentUser?.uid
@@ -119,7 +117,7 @@ class QuizHistoryActivity : AppCompatActivity() {
 
                         val questions =
                             mutableListOf<
-                                    Triple<String,String,String>
+                                    Triple<String, String, String>
                                     >()
 
                         for (data in snapshot.children) {
@@ -134,38 +132,49 @@ class QuizHistoryActivity : AppCompatActivity() {
                                     .getValue(Int::class.java)
                                     ?: 0
 
-                            // Ambil soal dari Firebase
-                            val questionSnapshot =
+                            val questionList =
                                 data.child("questions")
-
-                            if(questionSnapshot.exists()){
-
-                                for(q in questionSnapshot.children){
-
-                                    val soal =
-                                        q.child("question")
-                                            .getValue(String::class.java)
-                                            ?: ""
-
-                                    val benar =
-                                        q.child("correctAnswer")
-                                            .getValue(String::class.java)
-                                            ?: ""
-
-                                    val user =
-                                        q.child("userAnswer")
-                                            .getValue(String::class.java)
-                                            ?: ""
-
-                                    questions.add(
-
-                                        Triple(
-                                            soal,
-                                            benar,
-                                            user
+                                    .children
+                                    .mapNotNull {
+                                        it.getValue(
+                                            String::class.java
                                         )
+                                    }
+
+                            val userAnswerList =
+                                data.child("userAnswers")
+                                    .children
+                                    .mapNotNull {
+                                        it.getValue(
+                                            String::class.java
+                                        )
+                                    }
+
+                            val correctAnswerList =
+                                data.child("correctAnswers")
+                                    .children
+                                    .mapNotNull {
+                                        it.getValue(
+                                            String::class.java
+                                        )
+                                    }
+
+                            for (i in questionList.indices) {
+
+                                questions.add(
+
+                                    Triple(
+                                        questionList[i],
+
+                                        correctAnswerList.getOrElse(i) {
+                                            "-"
+                                        },
+
+                                        userAnswerList.getOrElse(i) {
+                                            "-"
+                                        }
                                     )
-                                }
+                                )
                             }
                         }
 
@@ -175,40 +184,23 @@ class QuizHistoryActivity : AppCompatActivity() {
                         tvScore.text =
                             "Skor : $latestScore"
 
-                        // fallback jika data Firebase kosong
-                        if(questions.isEmpty()){
-
-                            questions.addAll(
-
-                                listOf(
-
-                                    Triple(
-                                        "Apa fungsi inti sel?",
-                                        "Mengatur aktivitas sel",
-                                        "Membentuk energi"
-                                    ),
-
-                                    Triple(
-                                        "Organel penghasil energi?",
-                                        "Mitokondria",
-                                        "Ribosom"
-                                    ),
-
-                                    Triple(
-                                        "Tempat fotosintesis?",
-                                        "Kloroplas",
-                                        "Membran sel"
-                                    )
-                                )
-                            )
-                        }
-
                         tvTotalQuestion.text =
                             "${questions.size} Soal"
 
-                        showQuestions(
-                            questions
-                        )
+                        if (questions.isNotEmpty()) {
+
+                            showQuestions(
+                                questions
+                            )
+
+                        } else {
+
+                            Toast.makeText(
+                                this@QuizHistoryActivity,
+                                "Pembahasan belum tersedia untuk quiz ini",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
 
                     override fun onCancelled(
@@ -226,12 +218,12 @@ class QuizHistoryActivity : AppCompatActivity() {
     }
 
     private fun showQuestions(
-        questions: List<Triple<String,String,String>>
+        questions: List<Triple<String, String, String>>
     ) {
 
         resultContainer.removeAllViews()
 
-        for ((index,item) in questions.withIndex()) {
+        for ((index, item) in questions.withIndex()) {
 
             val view =
                 LayoutInflater.from(this)
@@ -257,17 +249,15 @@ class QuizHistoryActivity : AppCompatActivity() {
                 )
 
             tvQuestion.text =
-                "${index+1}. ${item.first}"
+                "${index + 1}. ${item.first}"
 
             tvCorrect.text =
-                "Jawaban benar: ${item.second}"
+                "Jawaban Benar : ${item.second}"
 
             tvWrong.text =
-                "Jawaban user: ${item.third}"
+                "Jawaban Kamu : ${item.third}"
 
-            resultContainer.addView(
-                view
-            )
+            resultContainer.addView(view)
         }
     }
 

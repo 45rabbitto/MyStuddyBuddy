@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:gravity="start"
+    android:padding="8dp">
 
     <TextView
-        android:id="@+id/tvUserMessage"
-        android:layout_width="match_parent"
+        android:id="@+id/tvAiMessage"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginBottom="10dp"
         android:background="@drawable/button_line"
-        android:fontFamily="@font/poppins"
-        android:padding="14dp"
-        android:text="Pesan AI"
-        android:textColor="@color/primary_button" />
+        android:padding="12dp"
+        android:textColor="#7C3AED"
+        android:textSize="14sp"
+        android:maxWidth="280dp" />
+
 </LinearLayout>
