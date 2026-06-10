@@ -2,7 +2,7 @@ package com.studdy.mystudybuddy.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Modern bright color palette
+
 val PrimaryPurple = Color(0xFF7C3AED)
 val PrimaryLight = Color(0xFFA78BFA)
 val PrimaryDark = Color(0xFF5B21B6)

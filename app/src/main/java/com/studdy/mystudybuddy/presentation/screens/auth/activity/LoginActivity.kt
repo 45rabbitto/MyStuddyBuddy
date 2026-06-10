@@ -25,7 +25,7 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        // 🔥 AUTO LOGIN (kalau sudah login langsung ke dashboard)
+        // AUTO LOGIN
         if (auth.currentUser != null) {
             startActivity(Intent(this, DashboardActivity::class.java))
             finish()

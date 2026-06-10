@@ -36,12 +36,12 @@ class UploadActivity : AppCompatActivity() {
     private lateinit var btnChatbot: Button
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var firestore: FirebaseFirestore  // ← TAMBAH
+    private lateinit var firestore: FirebaseFirestore
 
     private var isGuest = false
     private var fileUri: Uri? = null
     private var fileName: String? = null
-    private var savedDocumentId: String? = null  // ← TAMBAH: untuk menyimpan ID dokumen Firestore
+    private var savedDocumentId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +49,7 @@ class UploadActivity : AppCompatActivity() {
         setContentView(R.layout.activity_upload)
 
         auth = FirebaseAuth.getInstance()
-        firestore = FirebaseFirestore.getInstance()  // ← TAMBAH
+        firestore = FirebaseFirestore.getInstance()
 
         val session = getSharedPreferences("user_session", MODE_PRIVATE)
         isGuest = session.getBoolean("isGuest", false)
@@ -188,13 +188,13 @@ class UploadActivity : AppCompatActivity() {
         }
     }
 
-    // ↓ GANTI: gunakan Firestore, simpan full teks (tidak dipotong)
+
     private fun savePdfTextToFirestore(fileName: String, content: String) {
         val userId = auth.currentUser?.uid ?: "guest"
 
         val data = hashMapOf(
             "fileName" to fileName,
-            "content" to content,           // ← tidak dipotong lagi
+            "content" to content,
             "userId" to userId,
             "timestamp" to System.currentTimeMillis()
         )

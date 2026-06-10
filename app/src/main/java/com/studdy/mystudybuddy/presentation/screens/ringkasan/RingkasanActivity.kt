@@ -80,7 +80,7 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun processPdf(uri: Uri) {
-        tvRingkasan.text = "📖 Membaca file PDF: $currentFileName\n\n⏳ Mengekstrak teks..."
+        tvRingkasan.text = " Membaca file PDF: $currentFileName\n\n Mengekstrak teks..."
         showLoading(true)
 
         lifecycleScope.launch {
@@ -89,12 +89,12 @@ class RingkasanActivity : AppCompatActivity() {
                 val extractedText = PDFUtils.extractTextFromPdf(this@RingkasanActivity, uri)
 
                 if (extractedText.isEmpty()) {
-                    tvRingkasan.text = "❌ Gagal mengekstrak teks dari PDF."
+                    tvRingkasan.text = " Gagal mengekstrak teks dari PDF."
                     showLoading(false)
                     return@launch
                 }
 
-                tvRingkasan.text = "📝 Teks berhasil diekstrak (${extractedText.length} karakter)\n\n🤖 AI sedang meringkas..."
+                tvRingkasan.text = " Teks berhasil diekstrak (${extractedText.length} karakter)\n\n AI sedang meringkas..."
 
                 // STEP 2: Dapatkan userId
                 val userId = auth.currentUser?.uid ?: "user_123"
@@ -114,7 +114,7 @@ class RingkasanActivity : AppCompatActivity() {
                         ${summaryModel.summary}
                         
                         ─────────────────────────
-                        📊 Statistik:
+                         Statistik:
                         • Teks asli: ${summaryModel.originalLength} karakter
                         • Ringkasan: ${summaryModel.summaryLength} karakter
                         • Model: MobileBERT ONNX (Railway)
@@ -123,7 +123,7 @@ class RingkasanActivity : AppCompatActivity() {
                     Toast.makeText(this@RingkasanActivity, "Ringkasan berhasil dibuat!", Toast.LENGTH_SHORT).show()
 
                 }.onFailure { error ->
-                    tvRingkasan.text = "❌ Gagal membuat ringkasan: ${error.message}"
+                    tvRingkasan.text = "❌Gagal membuat ringkasan: ${error.message}"
                     Toast.makeText(this@RingkasanActivity, "Error: ${error.message}", Toast.LENGTH_LONG).show()
                 }
 

@@ -10,11 +10,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        // Inisialisasi Firebase
         FirebaseApp.initializeApp(this)
-
-        // Inisialisasi PDFBox
         PDFBoxResourceLoader.init(this)
     }
 }

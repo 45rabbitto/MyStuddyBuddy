@@ -13,7 +13,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class exDocumentRepository @Inject constructor() { // HAPUS parameter firestoreService di sini
+class exDocumentRepository @Inject constructor() {
 
     suspend fun uploadAndSummarizeDocument(
         context: Context,
@@ -45,9 +45,6 @@ class exDocumentRepository @Inject constructor() { // HAPUS parameter firestoreS
                 isProcessed = true
             )
 
-            // KARENA FIRESTORE SUDAH DIHAPUS:
-            // Langkah ini harus diganti dengan simpan ke API atau simpan lokal
-            // Untuk sementara, kita return success saja
             return@withContext Result.success(document)
 
         } catch (e: Exception) {
@@ -56,8 +53,6 @@ class exDocumentRepository @Inject constructor() { // HAPUS parameter firestoreS
     }
 
     suspend fun getAllDocuments(userId: String): List<DocumentModel> {
-        // Karena Firestore dihapus, fungsi ini tidak bisa ambil data dari Firestore.
-        // Ganti dengan memanggil API Railway jika ada endpoint untuk ambil history.
         return emptyList()
     }
 

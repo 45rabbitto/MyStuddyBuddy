@@ -22,14 +22,11 @@ class StreakManager(private val context: Context) {
 
             when {
                 diff == 0 -> {
-                    // sudah login hari ini, tidak berubah
                 }
                 diff == 1 -> {
-                    // lanjut streak
                     streak += 1
                 }
                 else -> {
-                    // putus streak
                     streak = 1
                 }
             }

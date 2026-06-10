@@ -28,7 +28,7 @@ fun HomeScreen(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val userName = "Alex" // Would come from DataStore
+    val userName = "Alex"
 
     Scaffold(
         topBar = {

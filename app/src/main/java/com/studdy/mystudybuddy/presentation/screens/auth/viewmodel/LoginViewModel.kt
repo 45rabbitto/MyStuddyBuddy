@@ -29,8 +29,6 @@ class LoginViewModel : ViewModel() {
             _uiState.value.copy(
                 isLoading = true
             )
-
-        // simulasi login
         if (
             _uiState.value.username == "admin" &&
             _uiState.value.password == "123"

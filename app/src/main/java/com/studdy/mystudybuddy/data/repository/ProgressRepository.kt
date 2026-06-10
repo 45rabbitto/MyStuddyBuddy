@@ -15,13 +15,13 @@ class ProgressRepository(context: Context) {
         private const val KEY_CHATBOT = "chatbot_count"
     }
 
-    // ================= GET DATA =================
+    // GET DATA =================
     fun getUploadCount() = prefs.getInt(KEY_UPLOAD, 0)
     fun getSummaryCount() = prefs.getInt(KEY_SUMMARY, 0)
     fun getQuizCount() = prefs.getInt(KEY_QUIZ, 0)
     fun getChatbotCount() = prefs.getInt(KEY_CHATBOT, 0)
 
-    // ================= SAVE DATA =================
+    // SAVE DATA
     fun saveUploadCount(value: Int) =
         prefs.edit().putInt(KEY_UPLOAD, value).apply()
 
@@ -34,7 +34,7 @@ class ProgressRepository(context: Context) {
     fun saveChatbotCount(value: Int) =
         prefs.edit().putInt(KEY_CHATBOT, value).apply()
 
-    // ================= INCREMENT =================
+    // INCREMENT
     fun incrementUpload() = saveUploadCount(getUploadCount() + 1)
     fun incrementSummary() = saveSummaryCount(getSummaryCount() + 1)
     fun incrementQuiz() = saveQuizCount(getQuizCount() + 1)

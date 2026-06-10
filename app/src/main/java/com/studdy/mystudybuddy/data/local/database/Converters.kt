@@ -5,7 +5,7 @@ import java.util.Date
 
 class Converters {
 
-    // ================= Date Converter =================
+    //  Date Converter
 
     @TypeConverter
     fun fromTimestamp(value: Long?): Date? {
@@ -19,7 +19,7 @@ class Converters {
         return date?.time
     }
 
-    // ================= List<String> Converter =================
+    //  List<String> Converter
 
     @TypeConverter
     fun fromStringList(list: List<String>?): String? {

@@ -23,13 +23,11 @@ class ChatbotApiService(private val context: Context) {
 
     private val gson = Gson()
 
-    // ========== GITHUB MODELS CONFIGURATION ==========
+    //  GITHUB MODELS CONFIGURATION
     private val BASE_URL = "https://models.github.ai/inference"
 
-    // Model name dengan prefix "openai/" untuk GPT-4o-mini [citation:6]
     private val MODEL_NAME = "openai/gpt-4o-mini"
 
-    // Ambil GitHub Token dari local.properties
     private val githubToken: String by lazy {
         loadTokenFromLocalProperties()
     }
@@ -41,7 +39,6 @@ class ChatbotApiService(private val context: Context) {
             properties.load(file)
             file.close()
 
-            // Coba ambil GITHUB_TOKEN
             val token = properties.getProperty("GITHUB_TOKEN")
             if (token.isNullOrBlank()) {
                 "MISSING_TOKEN"
@@ -53,24 +50,20 @@ class ChatbotApiService(private val context: Context) {
         }
     }
 
-    /**
-     * Chat dengan GitHub Models (GPT-4o-mini FREE!)
-     */
+
     suspend fun chatWithSummary(question: String, summaryContext: String): String {
         return withContext(Dispatchers.IO) {
             try {
-                // Validasi token
                 if (githubToken == "MISSING_TOKEN") {
-                    return@withContext """❌ GitHub Token tidak ditemukan!"""
+                    return@withContext """ GitHub Token tidak ditemukan!"""
                 }
 
                 if (summaryContext.isEmpty()) {
                     return@withContext "⚠️ Ringkasan materi kosong. Silakan upload PDF terlebih dahulu."
                 }
 
-                // System prompt dengan konteks ringkasan
                 val systemPrompt = """
-                    Anda adalah asisten belajar AI yang ramah dan membantu bernama "Study Buddy".
+                    Anda adalah asisten belajar AI yang ramah dan membantu bernama "My Study Buddy".
                     
                     TUGAS ANDA:
                     Bantu user memahami materi yang sedang mereka pelajari. 
@@ -86,10 +79,9 @@ class ChatbotApiService(private val context: Context) {
                     2. Jika pertanyaan tidak relevan dengan materi, katakan: "Maaf, pertanyaan Anda tidak relevan dengan materi yang sedang dipelajari."
                     3. Gunakan bahasa Indonesia yang baik, jelas, dan mudah dipahami.
                     4. Berikan jawaban yang edukatif dan membantu pemahaman user.
-                    5. Jawaban singkat, padat, dan langsung ke poin (maksimal 3-4 paragraf).
+                    5. Jawaban singkat, padat, dan langsung ke poin (maksimal satu paragraf).
                 """.trimIndent()
 
-                // Request body untuk GitHub Models API [citation:2][citation:6]
                 val requestBody = mapOf(
                     "model" to MODEL_NAME,
                     "messages" to listOf(
@@ -119,22 +111,21 @@ class ChatbotApiService(private val context: Context) {
                     return@withContext answer.trim()
 
                 } else {
-                    // Handle error response
                     val errorMsg = when (response.code) {
-                        401 -> "❌ Token tidak valid. Periksa kembali GITHUB_TOKEN di local.properties"
-                        403 -> "❌ Token tidak memiliki permission. Pastikan Models permission sudah Read-only"
-                        429 -> "❌ Rate limit tercapai. Coba lagi nanti (gratis, limited per hari) [citation:10]"
-                        404 -> "❌ Model tidak ditemukan. Cek nama model: $MODEL_NAME"
-                        else -> "❌ Error ${response.code}: $responseBody"
+                        401 -> " Token tidak valid. Periksa kembali GITHUB_TOKEN di local.properties"
+                        403 -> " Token tidak memiliki permission. Pastikan Models permission sudah Read-only"
+                        429 -> " Rate limit tercapai. Coba lagi nanti (gratis, limited per hari) [citation:10]"
+                        404 -> " Model tidak ditemukan. Cek nama model: $MODEL_NAME"
+                        else -> " Error ${response.code}: $responseBody"
                     }
                     return@withContext errorMsg
                 }
 
             } catch (e: IOException) {
-                return@withContext "❌ Gagal terhubung ke server. Periksa koneksi internet Anda."
+                return@withContext " Gagal terhubung ke server. Periksa koneksi internet Anda."
             } catch (e: Exception) {
                 e.printStackTrace()
-                return@withContext "❌ Error: ${e.message}"
+                return@withContext " Error: ${e.message}"
             }
         }
     }
@@ -146,7 +137,7 @@ class ChatbotApiService(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 if (githubToken == "MISSING_TOKEN") {
-                    return@withContext "❌ Token tidak ditemukan"
+                    return@withContext " Token tidak ditemukan"
                 }
 
                 val request = Request.Builder()
@@ -160,16 +151,16 @@ class ChatbotApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     "✅ Koneksi ke GitHub Models berhasil! Menggunakan $MODEL_NAME"
                 } else {
-                    "⚠️ Gagal koneksi: ${response.code}"
+                    "Gagal koneksi: ${response.code}"
                 }
             } catch (e: Exception) {
-                "❌ Error: ${e.message}"
+                " Error: ${e.message}"
             }
         }
     }
 }
 
-// ========== RESPONSE MODEL UNTUK GITHUB MODELS API ==========
+//  RESPONSE MODEL UNTUK GITHUB MODELS API
 data class GitHubModelsResponse(
     val choices: List<GitHubChoice>? = null,
     val usage: GitHubUsage? = null

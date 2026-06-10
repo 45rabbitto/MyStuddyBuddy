@@ -34,8 +34,6 @@ data class HealthResponse(
 )
 
 object RetrofitClient {
-    // GANTI URL DI BAWAH INI DENGAN URL DARI RAILWAY
-    // Pastikan menggunakan https:// dan diakhiri dengan /
     private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
 
     val instance: SummaryApiService by lazy {
