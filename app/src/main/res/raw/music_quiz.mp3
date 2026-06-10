@@ -1,0 +1,4 @@
+mediaPlayer = MediaPlayer.create(
+    this,
+    R.raw.music_quiz
+)

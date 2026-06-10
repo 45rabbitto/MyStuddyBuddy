@@ -26,9 +26,20 @@ class WelcomeActivity : AppCompatActivity() {
         btnMulai = findViewById(R.id.btnMulai)
     }
 
-    private fun setupClickListeners() {
 
+    private fun setupClickListeners() {
         btnLogin.setOnClickListener {
+
+            // user bukan guest
+            val prefs = getSharedPreferences(
+                "user_session",
+                MODE_PRIVATE
+            )
+
+            prefs.edit()
+                .putBoolean("isGuest", false)
+                .apply()
+
             startActivity(
                 Intent(
                     this,
@@ -38,7 +49,22 @@ class WelcomeActivity : AppCompatActivity() {
         }
 
         btnMulai.setOnClickListener {
-            startActivity(Intent(this, DashboardActivity::class.java))
+
+            val prefs = getSharedPreferences(
+                "user_session",
+                MODE_PRIVATE
+            )
+
+            prefs.edit()
+                .putBoolean("isGuest", true)
+                .apply()
+
+            startActivity(
+                Intent(
+                    this,
+                    DashboardActivity::class.java
+                )
+            )
         }
     }
 }

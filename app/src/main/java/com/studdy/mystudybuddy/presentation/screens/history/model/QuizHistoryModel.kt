@@ -1,8 +1,9 @@
-package com.studdy.mystudybuddy.presentation.history.model
+package com.studdy.mystudybuddy.presentation.screens.history.model
 
-data class QuizHistoryModel(
-    val title: String,
-    val totalQuestion: Int,
-    val score: Int,
-    val date: String
+data class QuizHistoryItem(
+
+    var question: String = "",
+    var correctAnswer: String = "",
+    var userAnswer: String = ""
+
 )

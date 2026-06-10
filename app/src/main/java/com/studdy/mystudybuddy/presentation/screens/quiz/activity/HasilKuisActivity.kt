@@ -1,77 +1,305 @@
 package com.studdy.mystudybuddy.presentation.screens.quiz.activity
 
-import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.media.MediaPlayer
 import android.os.Bundle
-import android.widget.*
+import android.view.Gravity
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActivity
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class HasilKuisActivity : AppCompatActivity() {
 
     private lateinit var btnDashboard: Button
+
     private lateinit var tvSkor: TextView
+    private lateinit var tvBenar: TextView
+    private lateinit var tvSalah: TextView
+
+    private lateinit var pembahasanContainer: LinearLayout
+
+    private val database =
+        FirebaseDatabase.getInstance().reference
+
+    private val auth =
+        FirebaseAuth.getInstance()
+
+    private var finishSound: MediaPlayer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_hasil_kuis)
 
-        btnDashboard = findViewById(R.id.btnDashboard)
-        tvSkor = findViewById(R.id.tvSkor)
+        // =========================
+        // SOUND FINISH
+        // =========================
 
-        val score = intent.getIntExtra("SCORE", 0)
-        val fileName = intent.getStringExtra("FILE_NAME") ?: "Materi"
+        finishSound =
+            MediaPlayer.create(
+                this,
+                R.raw.finish
+            )
 
-        tvSkor.text = score.toString()
+        finishSound?.start()
 
-        updateProgress(score)
-        saveToHistory(fileName)
-        markMateri(fileName)
+        initViews()
+        setupData()
+    }
+
+    private fun initViews() {
+
+        btnDashboard =
+            findViewById(R.id.btnDashboard)
+
+        tvSkor =
+            findViewById(R.id.tvSkor)
+
+        tvBenar =
+            findViewById(R.id.tvBenar)
+
+        tvSalah =
+            findViewById(R.id.tvSalah)
+
+        pembahasanContainer =
+            findViewById(R.id.pembahasanContainer)
+    }
+
+    // =========================================
+    // SETUP DATA
+    // =========================================
+
+    private fun setupData() {
+
+        val score =
+            intent.getIntExtra(
+                "SCORE",
+                0
+            )
+
+        val fileName =
+            intent.getStringExtra(
+                "FILE_NAME"
+            ) ?: "Materi"
+
+        // =========================
+        // DATA DARI QUIZ ACTIVITY
+        // =========================
+
+        val questions =
+            intent.getStringArrayListExtra(
+                "QUESTIONS"
+            ) ?: arrayListOf()
+
+        val userAnswers =
+            intent.getStringArrayListExtra(
+                "USER_ANSWERS"
+            ) ?: arrayListOf()
+
+
+        val correctAnswers =
+            intent.getStringArrayListExtra("CORRECT_ANSWERS")
+                ?: arrayListOf()
+
+        showPembahasan(
+            questions,
+            userAnswers,
+            correctAnswers
+        )
+
+        val total =
+            questions.size
+
+        val correct =
+            intent.getIntExtra("CORRECT", 0)
+
+        val wrong =
+            intent.getIntExtra("WRONG", 0)
+
+
+        // =========================
+        // SET TEXT
+        // =========================
+
+        tvSkor.text =
+            "$score"
+
+        tvBenar.text =
+            "$correct"
+
+        tvSalah.text =
+            "$wrong"
+
+        // =========================
+        // TAMPILKAN PEMBAHASAN
+        // =========================
+
+        showPembahasan(
+            questions,
+            userAnswers,
+            correctAnswers
+        )
+
+
+        // =========================
+        // BUTTON DASHBOARD
+        // =========================
 
         btnDashboard.setOnClickListener {
-            startActivity(Intent(this, DashboardActivity::class.java))
+
+            startActivity(
+                Intent(
+                    this,
+                    DashboardActivity::class.java
+                )
+            )
+
             finish()
         }
     }
 
-    private fun updateProgress(score: Int) {
+    // =========================================
+    // PEMBAHASAN
+    // =========================================
 
-        val prefs = getSharedPreferences("progress_data", MODE_PRIVATE)
+    private fun showPembahasan(
+        questions: ArrayList<String>,
+        userAnswers: ArrayList<String>,
+        correctAnswers: ArrayList<String>
+    ) {
 
-        val quiz = prefs.getInt("quiz_count", 0)
-        val avg = prefs.getInt("avg_score", 0)
+        pembahasanContainer.removeAllViews()
 
-        val newAvg = if (quiz == 0) score else (avg + score) / 2
+        for (i in questions.indices) {
 
-        prefs.edit()
-            .putInt("quiz_count", quiz + 1)
-            .putInt("avg_score", newAvg)
-            .apply()
+            val status =
+                if (
+                    userAnswers[i] ==
+                    correctAnswers[i]
+                ) {
+                    "BENAR"
+                } else {
+                    "SALAH"
+                }
+
+            val text =
+                TextView(this).apply {
+
+                    text =
+                        """
+${i + 1}. ${questions[i]}
+
+Jawaban Kamu:
+${userAnswers[i]}
+
+Jawaban Benar:
+${correctAnswers[i]}
+
+Status:
+$status
+                        """.trimIndent()
+
+                    textSize = 15f
+
+                    setPadding(
+                        20,
+                        20,
+                        20,
+                        20
+                    )
+
+                    setTextColor(Color.BLACK)
+
+                    gravity = Gravity.START
+
+                    setBackgroundResource(
+                        R.drawable.kontainer
+                    )
+
+                    layoutParams =
+                        LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+
+                            setMargins(
+                                0,
+                                0,
+                                0,
+                                20
+                            )
+                        }
+                }
+
+            pembahasanContainer.addView(text)
+        }
     }
 
-    private fun saveToHistory(fileName: String) {
+    // =========================================
+    // SAVE FIREBASE
+    // =========================================
 
-        val prefs = getSharedPreferences("history_data", MODE_PRIVATE)
+    private fun saveQuizResultToFirebase(
+        fileName: String,
+        score: Int,
+        totalQuestion: Int
+    ) {
 
-        val set = prefs.getStringSet("files", mutableSetOf())?.toMutableSet() ?: mutableSetOf()
+        val uid =
+            auth.currentUser?.uid ?: return
 
-        val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
+        val quizId =
+            database.child("QuizHistory")
+                .child(uid)
+                .push()
+                .key ?: return
 
-        set.add("$fileName|$date")
+        val currentDate =
+            SimpleDateFormat(
+                "dd MMM yyyy",
+                Locale.getDefault()
+            ).format(Date())
 
-        prefs.edit().putStringSet("files", set).apply()
+        val quizData =
+            HashMap<String, Any>()
+
+        quizData["fileName"] =
+            fileName
+
+        quizData["score"] =
+            score
+
+        quizData["correctAnswer"] =
+            score
+
+        quizData["wrongAnswer"] =
+            totalQuestion - score
+
+        quizData["totalQuestion"] =
+            totalQuestion
+
+        quizData["date"] =
+            currentDate
+
+        database.child("QuizHistory")
+            .child(uid)
+            .child(quizId)
+            .setValue(quizData)
     }
 
-    private fun markMateri(fileName: String) {
+    override fun onDestroy() {
+        super.onDestroy()
 
-        val prefs = getSharedPreferences("progress_data", MODE_PRIVATE)
-
-        prefs.edit()
-            .putString("last_file", fileName)
-            .putInt("materi_count", prefs.getInt("materi_count", 0) + 1)
-            .apply()
+        finishSound?.release()
+        finishSound = null
     }
 }

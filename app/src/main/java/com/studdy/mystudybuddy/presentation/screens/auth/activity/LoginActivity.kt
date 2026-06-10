@@ -2,10 +2,7 @@ package com.studdy.mystudybuddy.presentation.screens.auth.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -20,17 +17,23 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var tvRegister: TextView
 
-    // Firebase
     private lateinit var auth: FirebaseAuth
     private lateinit var database: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        auth = FirebaseAuth.getInstance()
+
+        // 🔥 AUTO LOGIN (kalau sudah login langsung ke dashboard)
+        if (auth.currentUser != null) {
+            startActivity(Intent(this, DashboardActivity::class.java))
+            finish()
+            return
+        }
+
         setContentView(R.layout.activity_login)
 
-        // Inisialisasi Firebase
-        auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
 
         initViews()
@@ -53,42 +56,32 @@ class LoginActivity : AppCompatActivity() {
             val email = etEmail.text.toString().trim()
             val password = etPassword.text.toString().trim()
 
-            // Validasi username
             if (username.isEmpty()) {
                 etUsername.error = "Username wajib diisi"
-                etUsername.requestFocus()
                 return@setOnClickListener
             }
 
-            // Validasi email
             if (email.isEmpty()) {
                 etEmail.error = "Email wajib diisi"
-                etEmail.requestFocus()
                 return@setOnClickListener
             }
 
-            // Validasi password
             if (password.isEmpty()) {
                 etPassword.error = "Password wajib diisi"
-                etPassword.requestFocus()
                 return@setOnClickListener
             }
 
-            // Login Firebase Auth
             auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this) { task ->
+                .addOnCompleteListener { task ->
 
                     if (task.isSuccessful) {
 
-                        val currentUser = auth.currentUser
+                        val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
 
-                        if (currentUser != null) {
-
-                            val uid = currentUser.uid
-
-                            // Ambil username dari Realtime Database
-                            database.child("Users").child(uid)
-                                .addListenerForSingleValueEvent(object : ValueEventListener {
+                        database.child("Users")
+                            .child(uid)
+                            .addListenerForSingleValueEvent(
+                                object : ValueEventListener {
 
                                     override fun onDataChange(snapshot: DataSnapshot) {
 
@@ -96,7 +89,6 @@ class LoginActivity : AppCompatActivity() {
                                             snapshot.child("username")
                                                 .getValue(String::class.java)
 
-                                        // Cek username cocok atau tidak
                                         if (dbUsername == username) {
 
                                             Toast.makeText(
@@ -127,35 +119,27 @@ class LoginActivity : AppCompatActivity() {
                                     }
 
                                     override fun onCancelled(error: DatabaseError) {
-
                                         Toast.makeText(
                                             this@LoginActivity,
                                             error.message,
                                             Toast.LENGTH_SHORT
                                         ).show()
                                     }
-                                })
-                        }
+                                }
+                            )
 
                     } else {
-
                         Toast.makeText(
                             this,
                             "Login gagal: ${task.exception?.message}",
-                            Toast.LENGTH_LONG
+                            Toast.LENGTH_SHORT
                         ).show()
                     }
                 }
         }
 
         tvRegister.setOnClickListener {
-
-            startActivity(
-                Intent(
-                    this,
-                    RegisterActivity::class.java
-                )
-            )
+            startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 }

@@ -1,19 +1,24 @@
 package com.studdy.mystudybuddy.presentation.screens.quiz.activity
 
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizResult
+import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
 
 class QuizActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
+    private lateinit var btnMusic: ImageView
 
+    private lateinit var tvNumber: TextView
     private lateinit var tvQuestion: TextView
 
     private lateinit var optionA: Button
@@ -24,27 +29,44 @@ class QuizActivity : AppCompatActivity() {
     private lateinit var btnPrev: Button
     private lateinit var btnNext: Button
 
+    private lateinit var auth: FirebaseAuth
+
+    private var mediaPlayer: MediaPlayer? = null
+    private var clickSound: MediaPlayer? = null
+
+    private var isMusicOn = true
+
     private var currentQuestionIndex = 0
     private var selectedAnswer = -1
     private var score = 0
 
-    // Menyimpan jawaban user
+    private var fileName: String? = null
+    private var summaryText: String? = null
+    private var jumlahSoal = 5
+
     private val userAnswers = mutableListOf<Int>()
+    private val questions = mutableListOf<QuizQuestion>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kuis)
 
+        auth = FirebaseAuth.getInstance()
+
         initViews()
         setupData()
-        loadQuestion()
+        setupMusic()
         setupListeners()
+
+        generateDummyQuestions()
     }
 
     private fun initViews() {
 
         btnBack = findViewById(R.id.btnBack)
+        btnMusic = findViewById(R.id.btnMusic)
 
+        tvNumber = findViewById(R.id.tvNumber)
         tvQuestion = findViewById(R.id.tvQuestion)
 
         optionA = findViewById(R.id.optionA)
@@ -56,10 +78,59 @@ class QuizActivity : AppCompatActivity() {
         btnNext = findViewById(R.id.btnNext)
     }
 
+    private fun setupData() {
+
+        fileName = intent.getStringExtra("FILE_NAME")
+        summaryText = intent.getStringExtra("RINGKASAN")
+        jumlahSoal = intent.getIntExtra("JUMLAH_SOAL", 5)
+
+        userAnswers.clear()
+    }
+
+    private fun setupMusic() {
+
+        mediaPlayer =
+            MediaPlayer.create(this, R.raw.backsound)
+
+        mediaPlayer?.apply {
+            isLooping = true
+            start()
+        }
+
+        clickSound =
+            MediaPlayer.create(this, R.raw.button)
+
+        btnMusic.setImageResource(
+            R.drawable.ic_music_on
+        )
+    }
+
     private fun setupListeners() {
 
         btnBack.setOnClickListener {
             finish()
+        }
+
+        btnMusic.setOnClickListener {
+
+            if (isMusicOn) {
+
+                mediaPlayer?.pause()
+
+                btnMusic.setImageResource(
+                    R.drawable.ic_music_off
+                )
+
+            } else {
+
+                mediaPlayer?.start()
+
+                btnMusic.setImageResource(
+                    R.drawable.ic_music_on
+                )
+            }
+
+            isMusicOn = !isMusicOn
         }
 
         optionA.setOnClickListener {
@@ -84,6 +155,12 @@ class QuizActivity : AppCompatActivity() {
 
                 currentQuestionIndex--
 
+                selectedAnswer =
+                    if (currentQuestionIndex < userAnswers.size)
+                        userAnswers[currentQuestionIndex]
+                    else
+                        -1
+
                 loadQuestion()
             }
         }
@@ -102,8 +179,11 @@ class QuizActivity : AppCompatActivity() {
             }
 
             if (userAnswers.size <= currentQuestionIndex) {
+
                 userAnswers.add(selectedAnswer)
+
             } else {
+
                 userAnswers[currentQuestionIndex] =
                     selectedAnswer
             }
@@ -111,16 +191,113 @@ class QuizActivity : AppCompatActivity() {
             if (currentQuestionIndex < questions.size - 1) {
 
                 currentQuestionIndex++
-                selectedAnswer = -1
+
+                selectedAnswer =
+                    if (currentQuestionIndex < userAnswers.size)
+                        userAnswers[currentQuestionIndex]
+                    else
+                        -1
 
                 loadQuestion()
 
             } else {
 
+                // simpan jawaban soal terakhir
+                if (userAnswers.size <= currentQuestionIndex) {
+                    userAnswers.add(selectedAnswer)
+                } else {
+                    userAnswers[currentQuestionIndex] = selectedAnswer
+                }
+
                 calculateScore()
+
+                saveQuizResult()
+
                 showResult()
             }
         }
+    }
+
+    private fun generateDummyQuestions() {
+
+        val allQuestions = mutableListOf(
+
+            QuizQuestion(
+                "Apa fungsi utama sistem operasi?",
+                listOf(
+                    "Mengelola hardware dan software",
+                    "Membuat dokumen",
+                    "Menyimpan data",
+                    "Membuka browser"
+                ),
+                0
+            ),
+
+            QuizQuestion(
+                "Bahasa resmi Android saat ini adalah?",
+                listOf(
+                    "Java",
+                    "PHP",
+                    "Kotlin",
+                    "Swift"
+                ),
+                2
+            ),
+
+            QuizQuestion(
+                "Apa kepanjangan CPU?",
+                listOf(
+                    "Central Process Unit",
+                    "Computer Processing Unit",
+                    "Central Processing Unit",
+                    "Central Program Unit"
+                ),
+                2
+            ),
+
+            QuizQuestion(
+                "Git digunakan untuk?",
+                listOf(
+                    "Database",
+                    "Version Control",
+                    "UI Design",
+                    "Hosting"
+                ),
+                1
+            ),
+
+            QuizQuestion(
+                "Perintah SQL mengambil data?",
+                listOf(
+                    "INSERT",
+                    "DELETE",
+                    "UPDATE",
+                    "SELECT"
+                ),
+                3
+            ),
+
+            QuizQuestion(
+                "FIFO digunakan pada?",
+                listOf(
+                    "Stack",
+                    "Queue",
+                    "Tree",
+                    "Graph"
+                ),
+                1
+            )
+        )
+
+        allQuestions.shuffle()
+
+        questions.clear()
+
+        questions.addAll(
+            allQuestions.take(jumlahSoal)
+        )
+
+        loadQuestion()
     }
 
     private fun loadQuestion() {
@@ -130,13 +307,23 @@ class QuizActivity : AppCompatActivity() {
         val question =
             questions[currentQuestionIndex]
 
-        tvQuestion.text =
-            "${currentQuestionIndex + 1}. ${question.question}"
+        tvNumber.text =
+            "Soal ${currentQuestionIndex + 1} dari ${questions.size}"
 
-        optionA.text = question.options[0]
-        optionB.text = question.options[1]
-        optionC.text = question.options[2]
-        optionD.text = question.options[3]
+        tvQuestion.text =
+            question.question
+
+        optionA.text =
+            question.options[0]
+
+        optionB.text =
+            question.options[1]
+
+        optionC.text =
+            question.options[2]
+
+        optionD.text =
+            question.options[3]
 
         if (currentQuestionIndex < userAnswers.size) {
 
@@ -149,15 +336,18 @@ class QuizActivity : AppCompatActivity() {
 
     private fun selectAnswer(index: Int) {
 
+        clickSound?.start()
+
         selectedAnswer = index
 
         resetButtons()
+
         highlightSelectedButton()
     }
 
     private fun highlightSelectedButton() {
 
-        when(selectedAnswer){
+        when (selectedAnswer) {
 
             0 -> optionA.setBackgroundResource(R.drawable.button1)
 
@@ -171,124 +361,164 @@ class QuizActivity : AppCompatActivity() {
 
     private fun resetButtons() {
 
-        optionA.setBackgroundResource(
-            R.drawable.kontainer
-        )
-
-        optionB.setBackgroundResource(
-            R.drawable.kontainer
-        )
-
-        optionC.setBackgroundResource(
-            R.drawable.kontainer
-        )
-
-        optionD.setBackgroundResource(
-            R.drawable.kontainer
-        )
+        optionA.setBackgroundResource(R.drawable.kontainer)
+        optionB.setBackgroundResource(R.drawable.kontainer)
+        optionC.setBackgroundResource(R.drawable.kontainer)
+        optionD.setBackgroundResource(R.drawable.kontainer)
     }
 
     private fun calculateScore() {
 
         score = 0
 
-        for(i in questions.indices){
+        for (i in questions.indices) {
 
-            if(userAnswers[i] ==
-                questions[i].correctAnswer){
-
+            if (
+                i < userAnswers.size &&
+                userAnswers[i] == questions[i].correctAnswer
+            ) {
                 score++
             }
         }
     }
 
+    private fun saveQuizResult() {
+
+        val userId =
+            auth.currentUser?.uid ?: return
+
+        val database =
+            FirebaseDatabase.getInstance()
+                .getReference("QuizHistory")
+                .child(userId)
+
+        val quizId =
+            database.push().key ?: return
+
+        val questionList = ArrayList<String>()
+        val userAnswerList = ArrayList<String>()
+        val correctAnswerList = ArrayList<String>()
+
+        for (i in questions.indices) {
+
+            questionList.add(
+                questions[i].question
+            )
+
+            userAnswerList.add(
+                questions[i].options[userAnswers[i]]
+            )
+
+            correctAnswerList.add(
+                questions[i].options[
+                    questions[i].correctAnswer
+                ]
+            )
+        }
+
+        val finalScore =
+            (score * 100) / questions.size
+
+        val quizData = hashMapOf<String, Any>(
+
+            "fileName" to (fileName ?: "Materi"),
+
+            "score" to finalScore,
+
+            "correctAnswer" to score,
+
+            "wrongAnswer" to (questions.size - score),
+
+            "totalQuestion" to questions.size,
+
+            "questions" to questionList,
+
+            "userAnswers" to userAnswerList,
+
+            "correctAnswers" to correctAnswerList,
+
+            "createdAt" to System.currentTimeMillis()
+        )
+
+        database.child(quizId)
+            .setValue(quizData)
+    }
+
     private fun showResult() {
 
-        val result = QuizResult(
+        val correct = score
+        val wrong = questions.size - score
 
-            totalQuestion = questions.size,
+        val questionList = ArrayList<String>()
+        val userAnswerList = ArrayList<String>()
+        val correctAnswerList = ArrayList<String>()
 
-            correctAnswer = score,
+        for (i in questions.indices) {
 
-            wrongAnswer = questions.size - score,
+            questionList.add(questions[i].question)
 
-            score = (score * 100) / questions.size,
-
-            explanations = listOf(
-
-                "1. Jakarta adalah ibu kota Indonesia",
-
-                "2. 2 + 5 = 7",
-
-                "3. Jupiter merupakan planet terbesar"
+            userAnswerList.add(
+                questions[i].options[userAnswers[i]]
             )
-        )
 
-        val intent = Intent(
-            this,
-            HasilKuisActivity::class.java
-        )
+            correctAnswerList.add(
+                questions[i].options[
+                    questions[i].correctAnswer
+                ]
+            )
+        }
 
-        intent.putExtra(
-            "QUIZ_RESULT",
-            result
-        )
+        startActivity(
+            Intent(this, HasilKuisActivity::class.java).apply {
 
-        startActivity(intent)
+                putExtra("CORRECT", score)
+                putExtra("WRONG", questions.size - score)
+                putExtra("SCORE", (score * 100) / questions.size)
+
+                putExtra("TOTAL_QUESTIONS", questions.size)
+
+                putExtra("FILE_NAME", fileName)
+
+                putStringArrayListExtra(
+                    "QUESTIONS",
+                    questionList
+                )
+
+                putStringArrayListExtra(
+                    "USER_ANSWERS",
+                    userAnswerList
+                )
+
+                putStringArrayListExtra(
+                    "CORRECT_ANSWERS",
+                    correctAnswerList
+                )
+            }
+        )
 
         finish()
     }
 
-    private fun setupData() {
-
-        userAnswers.clear()
+    override fun onPause() {
+        super.onPause()
+        mediaPlayer?.pause()
     }
 
-    companion object {
+    override fun onResume() {
+        super.onResume()
 
-        val questions = listOf(
+        if (isMusicOn) {
+            mediaPlayer?.start()
+        }
+    }
 
-            Question(
-                question = "Apa ibu kota Indonesia?",
-                options = listOf(
-                    "Bandung",
-                    "Jakarta",
-                    "Surabaya",
-                    "Semarang"
-                ),
-                correctAnswer = 1
-            ),
+    override fun onDestroy() {
+        super.onDestroy()
 
-            Question(
-                question = "2 + 5 = ?",
-                options = listOf(
-                    "5",
-                    "6",
-                    "7",
-                    "8"
-                ),
-                correctAnswer = 2
-            ),
+        mediaPlayer?.release()
+        mediaPlayer = null
 
-            Question(
-                question = "Planet terbesar di tata surya?",
-                options = listOf(
-                    "Mars",
-                    "Venus",
-                    "Jupiter",
-                    "Saturnus"
-                ),
-                correctAnswer = 2
-            )
-        )
+        clickSound?.release()
+        clickSound = null
     }
 }
-
-data class Question(
-
-    val question: String,
-
-    val options: List<String>,
-
-    val correctAnswer: Int
-)

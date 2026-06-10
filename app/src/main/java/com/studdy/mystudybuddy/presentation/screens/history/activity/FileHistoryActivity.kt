@@ -3,9 +3,12 @@ package com.studdy.mystudybuddy.presentation.screens.history.activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.history.adapter.FileHistoryAdapter
 import com.studdy.mystudybuddy.presentation.screens.history.model.FileHistoryModel
@@ -15,12 +18,23 @@ class FileHistoryActivity : AppCompatActivity() {
     private lateinit var rvHistory: RecyclerView
     private lateinit var btnBack: ImageView
 
+    private val auth = FirebaseAuth.getInstance()
+    private val database = FirebaseDatabase.getInstance().reference
+
+    private val historyList = mutableListOf<FileHistoryModel>()
+
+    private var isGuest = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_history_file)
 
+        val session = getSharedPreferences("user_session", MODE_PRIVATE)
+        isGuest = session.getBoolean("isGuest", false)
+
         initViews()
         setupListener()
+        setupRecycler()
     }
 
     override fun onResume() {
@@ -37,85 +51,171 @@ class FileHistoryActivity : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
     }
 
+    private fun setupRecycler() {
+        rvHistory.layoutManager = LinearLayoutManager(this)
+    }
+
     private fun loadHistory() {
 
-        val prefs = getSharedPreferences(
-            "history_data",
-            MODE_PRIVATE
-        )
-
-        val rawSet =
-            prefs.getStringSet("files", emptySet()) ?: emptySet()
-
-        val historyList = rawSet.mapNotNull { item ->
-
-            val p = item.split("|")
-
-            if (p.size >= 3) {
-
-                FileHistoryModel(
-                    p[0], // file name
-                    p[1]  // date
-                )
-
-            } else {
-                null
-            }
+        if (isGuest || auth.currentUser == null) {
+            historyList.clear()
+            rvHistory.adapter = FileHistoryAdapter(historyList, {}, {})
+            return
         }
 
-        val adapter = FileHistoryAdapter(
+        val uid = auth.currentUser!!.uid
 
-            historyList.toMutableList(),
+        historyList.clear()
 
-            onItemClick = { file ->
+        database.child("History") // ✔ sudah disamakan dengan UploadActivity
+            .child(uid)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
 
-                startActivity(
-                    Intent(
-                        this,
-                        FileHistoryDetailActivity::class.java
-                    ).apply {
+                override fun onDataChange(snapshot: DataSnapshot) {
 
-                        putExtra(
-                            "FILE_NAME",
-                            file.fileName
-                        )
+                    for (data in snapshot.children) {
+
+                        val fileName = data.child("fileName")
+                            .getValue(String::class.java) ?: "Materi"
+
+                        val date = data.child("date")
+                            .getValue(String::class.java) ?: "-"
+
+                        historyList.add(FileHistoryModel(fileName, date))
                     }
-                )
-            },
 
-            onDelete = { file ->
-
-                val current =
-                    prefs.getStringSet(
-                        "files",
-                        mutableSetOf()
-                    )?.toMutableSet() ?: mutableSetOf()
-
-                // Cari item lengkap yang cocok
-                val target = current.find {
-
-                    val p = it.split("|")
-
-                    p.size >= 2 &&
-                            p[0] == file.fileName &&
-                            p[1] == file.date
+                    rvHistory.adapter = FileHistoryAdapter(
+                        historyList,
+                        onItemClick = { file ->
+                            startActivity(
+                                Intent(
+                                    this@FileHistoryActivity,
+                                    FileHistoryDetailActivity::class.java
+                                ).apply {
+                                    putExtra("FILE_NAME", file.fileName)
+                                }
+                            )
+                        },
+                        onDelete = { file ->
+                            deleteHistory(uid, file)
+                        }
+                    )
                 }
 
-                target?.let {
-                    current.remove(it)
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@FileHistoryActivity, error.message, Toast.LENGTH_SHORT)
+                        .show()
+                }
+            })
+    }
+
+    private fun deleteHistory(uid: String, file: FileHistoryModel) {
+
+        // Hapus dari History
+        database.child("History")
+            .child(uid)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+
+                override fun onDataChange(snapshot: DataSnapshot) {
+
+                    for (data in snapshot.children) {
+
+                        val fileName =
+                            data.child("fileName")
+                                .getValue(String::class.java)
+
+                        val date =
+                            data.child("date")
+                                .getValue(String::class.java)
+
+                        if (
+                            fileName == file.fileName &&
+                            date == file.date
+                        ) {
+
+                            data.ref.removeValue()
+                        }
+                    }
+
+                    // =============================
+                    // HAPUS UploadedMaterials
+                    // =============================
+
+                    database.child("UploadedMaterials")
+                        .child(uid)
+                        .addListenerForSingleValueEvent(
+                            object : ValueEventListener {
+
+                                override fun onDataChange(uploadSnapshot: DataSnapshot) {
+
+                                    for (upload in uploadSnapshot.children) {
+
+                                        val uploadFileName =
+                                            upload.child("fileName")
+                                                .getValue(String::class.java)
+
+                                        if (uploadFileName == file.fileName) {
+
+                                            upload.ref.removeValue()
+                                        }
+                                    }
+
+                                    // =============================
+                                    // HAPUS QuizHistory
+                                    // =============================
+
+                                    database.child("QuizHistory")
+                                        .child(uid)
+                                        .addListenerForSingleValueEvent(
+                                            object : ValueEventListener {
+
+                                                override fun onDataChange(
+                                                    quizSnapshot: DataSnapshot
+                                                ) {
+
+                                                    for (quiz in quizSnapshot.children) {
+
+                                                        val quizFileName =
+                                                            quiz.child("fileName")
+                                                                .getValue(String::class.java)
+
+                                                        if (quizFileName == file.fileName) {
+
+                                                            quiz.ref.removeValue()
+                                                        }
+                                                    }
+
+                                                    Toast.makeText(
+                                                        this@FileHistoryActivity,
+                                                        "File dan progress berhasil dihapus",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+
+                                                    loadHistory()
+                                                }
+
+                                                override fun onCancelled(
+                                                    error: DatabaseError
+                                                ) {
+                                                }
+                                            })
+                                }
+
+                                override fun onCancelled(
+                                    error: DatabaseError
+                                ) {
+                                }
+                            })
                 }
 
-                prefs.edit()
-                    .putStringSet("files", current)
-                    .apply()
+                override fun onCancelled(error: DatabaseError) {
 
-                loadHistory()
-            }
-        )
-
-        rvHistory.layoutManager =
-            LinearLayoutManager(this)
-
-        rvHistory.adapter = adapter
+                    Toast.makeText(
+                        this@FileHistoryActivity,
+                        error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
     }
 }
