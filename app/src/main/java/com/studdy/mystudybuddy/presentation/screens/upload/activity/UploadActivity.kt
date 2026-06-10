@@ -79,23 +79,27 @@ class UploadActivity : AppCompatActivity() {
         uploadContainer.setOnClickListener { pickFile() }
 
         btnRingkasan.setOnClickListener {
-            if (fileUri == null) return@setOnClickListener
+            if (savedDocumentId == null) {
+                Toast.makeText(this, "Upload PDF dulu!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             startActivity(
                 Intent(this, RingkasanActivity::class.java).apply {
-                    putExtra("FILE_URI", fileUri.toString())
+                    putExtra("DOCUMENT_ID", savedDocumentId)
                     putExtra("FILE_NAME", fileName)
-                    putExtra("DOCUMENT_ID", savedDocumentId)  // ← TAMBAH: kirim ID dokumen Firestore
                 }
             )
         }
 
         btnChatbot.setOnClickListener {
-            if (fileUri == null) return@setOnClickListener
+            if (savedDocumentId == null) {
+                Toast.makeText(this, "Upload PDF dulu!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             startActivity(
                 Intent(this, ChatbotActivity::class.java).apply {
-                    putExtra("FILE_URI", fileUri.toString())
+                    putExtra("DOCUMENT_ID", savedDocumentId)
                     putExtra("FILE_NAME", fileName)
-                    putExtra("DOCUMENT_ID", savedDocumentId)  // ← TAMBAH
                 }
             )
         }
@@ -109,44 +113,34 @@ class UploadActivity : AppCompatActivity() {
         launcher.launch(intent)
     }
 
-    private val launcher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val uri = result.data?.data ?: return@registerForActivityResult
+    private val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data ?: return@registerForActivityResult
 
-                fileUri = uri
-                fileName = getFileName(uri)
+            fileUri = uri
+            fileName = getFileName(uri)
 
-                val pdfText = extractTextFromPdf(uri)
-
-                if (pdfText.isNotBlank()) {
-                    savePdfTextToFirestore(fileName ?: "unknown.pdf", pdfText)  // ← GANTI ke Firestore
-                } else {
-                    Toast.makeText(this, "PDF tidak berhasil dibaca", Toast.LENGTH_LONG).show()
+            tvKosong.visibility = View.GONE
+            fileContainer.removeAllViews()
+            fileContainer.addView(
+                TextView(this).apply {
+                    text = fileName
+                    textSize = 15f
+                    setPadding(20, 20, 20, 20)
+                    setBackgroundResource(R.drawable.kontainer)
+                    setOnClickListener { openAlur() }
                 }
+            )
 
-                tvKosong.visibility = View.GONE
-                fileContainer.removeAllViews()
-                fileContainer.addView(
-                    TextView(this).apply {
-                        text = fileName
-                        textSize = 15f
-                        setPadding(20, 20, 20, 20)
-                        setBackgroundResource(R.drawable.kontainer)
-                        setOnClickListener { openAlur() }
-                    }
-                )
+            val extractedText = extractTextFromPdf(uri)
 
-                if (isLoggedIn()) {
-                    saveUploadedMaterial(fileName ?: "")
-                    saveToHistory(fileName ?: "")
-                    updateProgress(fileName ?: "")
-                }
-
-                btnRingkasan.isEnabled = true
-                btnChatbot.isEnabled = true
+            if (extractedText.isNotBlank()) {
+                savePdfTextToFirestore(fileName ?: "unknown.pdf", extractedText)
+            } else {
+                Toast.makeText(this, "PDF tidak berisi teks yang bisa diekstrak", Toast.LENGTH_LONG).show()
             }
         }
+    }
 
     private fun getFileName(uri: Uri): String {
         var name = "file.pdf"
@@ -161,33 +155,18 @@ class UploadActivity : AppCompatActivity() {
     }
 
     private fun extractTextFromPdf(uri: Uri): String {
-
         return try {
-
             contentResolver.openInputStream(uri)?.use { inputStream ->
-
                 val document = PDDocument.load(inputStream)
-
-                val text =
-                    PDFTextStripper().getText(document)
-
+                val text = PDFTextStripper().getText(document)
                 document.close()
-
-                text
-
+                text?.trim() ?: ""
             } ?: ""
-
         } catch (e: Exception) {
-
-            android.util.Log.e(
-                "PDF_ERROR",
-                e.stackTraceToString()
-            )
-
+            android.util.Log.e("PDF_ERROR", e.stackTraceToString())
             ""
         }
     }
-
 
     private fun savePdfTextToFirestore(fileName: String, content: String) {
         val userId = auth.currentUser?.uid ?: "guest"
@@ -196,47 +175,59 @@ class UploadActivity : AppCompatActivity() {
             "fileName" to fileName,
             "content" to content,
             "userId" to userId,
-            "timestamp" to System.currentTimeMillis()
+            "timestamp" to System.currentTimeMillis(),
+            "isProcessed" to false
         )
 
         firestore.collection("PdfContents")
+            .document(userId)
+            .collection("documents")
             .add(data)
             .addOnSuccessListener { documentRef ->
-
                 savedDocumentId = documentRef.id
+                btnRingkasan.isEnabled = true
+                btnChatbot.isEnabled = true
 
-                android.util.Log.d(
-                    "FIRESTORE",
-                    "Document ID = ${documentRef.id}"
-                )
+                android.util.Log.d("FIRESTORE", "Document saved with ID: ${documentRef.id}")
+                android.util.Log.d("FIRESTORE", "Content length: ${content.length}")
 
-                android.util.Log.d(
-                    "FIRESTORE",
-                    "Jumlah karakter = ${content.length}"
-                )
+                Toast.makeText(this, "✅ PDF berhasil disimpan!", Toast.LENGTH_SHORT).show()
 
-                Toast.makeText(
-                    this,
-                    "Isi PDF berhasil disimpan",
-                    Toast.LENGTH_SHORT
-                ).show()
+                if (isLoggedIn()) {
+                    saveToHistory(fileName, savedDocumentId ?: "")
+                    saveUploadedMaterial(fileName, savedDocumentId ?: "")
+                    updateProgress(fileName)
+                    Toast.makeText(this, "📚 File juga tersimpan di History", Toast.LENGTH_SHORT).show()
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Gagal menyimpan: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "❌ Gagal menyimpan: ${e.message}", Toast.LENGTH_LONG).show()
             }
     }
 
-    private fun saveToHistory(file: String) {
+    private fun saveToHistory(file: String, documentId: String) {
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance().getReference("History").child(userId)
         val historyId = database.push().key ?: return
-        val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
-        database.child(historyId).setValue(
-            hashMapOf<String, Any>("fileName" to file, "date" to date)
+        val date = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date())
+
+        val historyData = hashMapOf<String, Any>(
+            "fileName" to file,
+            "date" to date,
+            "timestamp" to System.currentTimeMillis(),
+            "documentId" to documentId
         )
+
+        database.child(historyId).setValue(historyData)
+            .addOnSuccessListener {
+                android.util.Log.d("HISTORY", "Saved to history: $file with ID: $documentId")
+            }
+            .addOnFailureListener { e ->
+                android.util.Log.e("HISTORY", "Failed to save history: ${e.message}")
+            }
     }
 
-    private fun saveUploadedMaterial(materialName: String) {
+    private fun saveUploadedMaterial(materialName: String, documentId: String) {
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance()
             .getReference("UploadedMaterials").child(userId)
@@ -244,7 +235,8 @@ class UploadActivity : AppCompatActivity() {
         database.child(materialId).setValue(
             hashMapOf<String, Any>(
                 "fileName" to materialName,
-                "timestamp" to System.currentTimeMillis()
+                "timestamp" to System.currentTimeMillis(),
+                "documentId" to documentId
             )
         )
     }
@@ -256,6 +248,7 @@ class UploadActivity : AppCompatActivity() {
             .putInt("materi_count", materiLama + 1)
             .putString("last_file", fileName)
             .apply()
+        android.util.Log.d("PROGRESS", "Total materi: ${materiLama + 1}")
     }
 
     private fun openAlur() {
@@ -263,7 +256,7 @@ class UploadActivity : AppCompatActivity() {
             Intent(this, AlurActivity::class.java).apply {
                 putExtra("FILE_NAME", fileName)
                 putExtra("FILE_URI", fileUri.toString())
-                putExtra("DOCUMENT_ID", savedDocumentId)  // ← TAMBAH
+                putExtra("DOCUMENT_ID", savedDocumentId)
             }
         )
     }

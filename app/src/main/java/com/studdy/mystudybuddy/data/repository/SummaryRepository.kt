@@ -1,5 +1,6 @@
 package com.studdy.mystudybuddy.data.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.data.model.DocumentModel
 import com.studdy.mystudybuddy.data.model.SummaryModel
@@ -14,31 +15,41 @@ class SummaryRepository {
 
     private val firestore = FirebaseFirestore.getInstance()
 
+    private val COLLECTION_PDF_CONTENTS = "PdfContents"
     private val COLLECTION_DOCUMENTS = "documents"
     private val COLLECTION_SUMMARIES = "summaries"
 
+    // 🔥 Simpan dokumen ke PdfContents/documents
     suspend fun saveDocument(
         fileName: String,
-        extractedText: String,
+        content: String,
         userId: String
     ): String {
         return withContext(Dispatchers.IO) {
             val document = DocumentModel(
                 fileName = fileName,
-                extractedText = extractedText,
+                content = content,
                 userId = userId,
                 uploadedAt = Date(),
                 isProcessed = false
             )
-            val docRef = firestore.collection(COLLECTION_DOCUMENTS).document()
+            // Simpan ke PdfContents/{userId}/documents/{autoId}
+            val docRef = firestore.collection(COLLECTION_PDF_CONTENTS)
+                .document(userId)
+                .collection(COLLECTION_DOCUMENTS)
+                .document()
             docRef.set(document).await()
+            Log.d("SummaryRepo", "Document saved: ${docRef.id}")
             return@withContext docRef.id
         }
     }
 
-    suspend fun getDocumentById(documentId: String): DocumentModel? {
+    // 🔥 Ambil dokumen dari PdfContents/{userId}/documents/{documentId}
+    suspend fun getDocumentById(userId: String, documentId: String): DocumentModel? {
         return withContext(Dispatchers.IO) {
-            val doc = firestore.collection(COLLECTION_DOCUMENTS)
+            val doc = firestore.collection(COLLECTION_PDF_CONTENTS)
+                .document(userId)
+                .collection(COLLECTION_DOCUMENTS)
                 .document(documentId)
                 .get()
                 .await()
@@ -46,79 +57,26 @@ class SummaryRepository {
         }
     }
 
-    suspend fun processAndSaveSummary(documentId: String): Result<SummaryModel> {
+    // 🔥 Simpan ringkasan ke collection "summaries" (terpisah)
+    suspend fun saveSummary(summaryModel: SummaryModel): String {
         return withContext(Dispatchers.IO) {
-            try {
-                val document = getDocumentById(documentId)
-                if (document == null) {
-                    return@withContext Result.failure(Exception("Dokumen tidak ditemukan"))
-                }
-
-                val extractedText = document.extractedText
-                if (extractedText.isEmpty()) {
-                    return@withContext Result.failure(Exception("Teks kosong"))
-                }
-
-                val apiService = RetrofitClient.api
-                val response = apiService.summarizeText(SummarizeRequest(extractedText))
-
-                if (!response.isSuccessful || response.body() == null) {
-                    return@withContext Result.failure(Exception("Gagal memanggil API: ${response.code()}"))
-                }
-
-                val summaryResponse = response.body()!!
-                val summaryText = summaryResponse.summary
-
-                val summaryModel = SummaryModel(
-                    documentId = documentId,
-                    fileName = document.fileName,
-                    summary = summaryText,
-                    summaryLength = summaryText.length,
-                    originalLength = extractedText.length,
-                    createdAt = Date(),
-                    userId = document.userId
-                )
-
-                val summaryRef = firestore.collection(COLLECTION_SUMMARIES).document()
-                summaryRef.set(summaryModel).await()
-                val savedSummary = summaryModel.copy(id = summaryRef.id)
-
-                val updates: MutableMap<String, Any> = hashMapOf(
-                    "isProcessed" to true,
-                    "summaryId" to summaryRef.id
-                )
-                firestore.collection(COLLECTION_DOCUMENTS)
-                    .document(documentId)
-                    .update(updates)
-                    .await()
-
-                return@withContext Result.success(savedSummary)
-
-            } catch (e: Exception) {
-                return@withContext Result.failure(e)
-            }
+            val docRef = firestore.collection(COLLECTION_SUMMARIES).document()
+            docRef.set(summaryModel).await()
+            Log.d("SummaryRepo", "Summary saved: ${docRef.id}")
+            return@withContext docRef.id
         }
     }
 
-    suspend fun getSummaryById(summaryId: String): SummaryModel? {
-        return withContext(Dispatchers.IO) {
-            val doc = firestore.collection(COLLECTION_SUMMARIES)
-                .document(summaryId)
-                .get()
+    // 🔥 Update dokumen dengan summaryId
+    suspend fun updateDocumentWithSummary(userId: String, documentId: String, summaryId: String) {
+        withContext(Dispatchers.IO) {
+            firestore.collection(COLLECTION_PDF_CONTENTS)
+                .document(userId)
+                .collection(COLLECTION_DOCUMENTS)
+                .document(documentId)
+                .update("isProcessed", true, "summaryId", summaryId)
                 .await()
-            doc.toObject(SummaryModel::class.java)?.copy(id = doc.id)
-        }
-    }
-
-    suspend fun getAllSummaries(userId: String): List<SummaryModel> {
-        return withContext(Dispatchers.IO) {
-            val snapshot = firestore.collection(COLLECTION_SUMMARIES)
-                .whereEqualTo("userId", userId)
-                .orderBy("createdAt", com.google.firebase.firestore.Query.Direction.DESCENDING)
-                .get()
-                .await()
-
-            snapshot.documents.mapNotNull { it.toObject(SummaryModel::class.java)?.copy(id = it.id) }
+            Log.d("SummaryRepo", "Document updated with summaryId: $summaryId")
         }
     }
 }
