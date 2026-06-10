@@ -27,6 +27,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true  // Tambahan dari chatbot
         viewBinding = true
         dataBinding = true
         compose = true
@@ -55,10 +56,6 @@ android {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
-    //aaptOptions {
-        //noCompress += listOf("pdf", "onnx", "txt")
-    //}
-
     packaging {
         resources {
             pickFirsts += setOf(
@@ -74,7 +71,6 @@ kapt {
 }
 
 dependencies {
-
     // CORE & ANDROID UI
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
@@ -121,6 +117,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // DATASTORE & COROUTINES
     implementation("androidx.datastore:datastore-preferences:1.1.1")
@@ -131,14 +128,13 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
 
-    // ML
+    // ML & PDF
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.17.0")
-
-    // 🔥 PDF BOX (INI SUDAH BENAR)
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
     // TESTING
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
 }
