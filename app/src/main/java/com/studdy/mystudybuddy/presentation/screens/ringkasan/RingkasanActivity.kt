@@ -1,6 +1,5 @@
 package com.studdy.mystudybuddy.presentation.screens.ringkasan
 
-import com.studdy.mystudybuddy.R
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -13,15 +12,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.studdy.mystudybuddy.network.RetrofitClient
-import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
-import kotlinx.coroutines.Dispatchers
+import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.data.repository.SummaryRepository
+import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
+import com.studdy.mystudybuddy.utils.PDFUtils
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import java.io.File
 import java.util.Date
 
 class RingkasanActivity : AppCompatActivity() {
@@ -30,21 +25,23 @@ class RingkasanActivity : AppCompatActivity() {
     private lateinit var tvRingkasan: TextView
     private lateinit var btnGenerate: Button
     private lateinit var btnFinishRingkasan: Button
+    private lateinit var progressBar: android.widget.ProgressBar
 
     private lateinit var auth: FirebaseAuth
     private lateinit var firestore: FirebaseFirestore
+    private lateinit var repository: SummaryRepository
 
-    private var fileUri: Uri? = null
     private var currentSummary: String = ""
+    private var currentDocumentId: String = ""
+    private var currentFileName: String = ""
 
-    // 🔥 PICK PDF LANGSUNG DI SINI
-    private val pickPdf =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            if (uri != null) {
-                fileUri = uri
-                uploadPdfToServer(uri)
-            }
+    // PICK PDF
+    private val pickPdf = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) {
+            currentFileName = uri.lastPathSegment ?: "document.pdf"
+            processPdf(uri)
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +49,7 @@ class RingkasanActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
         firestore = FirebaseFirestore.getInstance()
+        repository = SummaryRepository()
 
         initViews()
         setupClickListeners()
@@ -62,15 +60,14 @@ class RingkasanActivity : AppCompatActivity() {
         tvRingkasan = findViewById(R.id.tvRingkasan)
         btnGenerate = findViewById(R.id.btnGenerate)
         btnFinishRingkasan = findViewById(R.id.btnFinishRingkasan)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun setupClickListeners() {
-
         btnBack.setOnClickListener {
             finish()
         }
 
-        // 🔥 PILIH PDF
         btnGenerate.setOnClickListener {
             pickPdf.launch("application/pdf")
         }
@@ -82,94 +79,85 @@ class RingkasanActivity : AppCompatActivity() {
         }
     }
 
-    // 🔥 UPLOAD KE RAILWAY
-    private fun uploadPdfToServer(uri: Uri) {
+    private fun processPdf(uri: Uri) {
+        tvRingkasan.text = "📖 Membaca file PDF: $currentFileName\n\n⏳ Mengekstrak teks..."
+        showLoading(true)
 
-        tvRingkasan.text = "📤 Mengupload PDF ke server..."
-
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             try {
+                // STEP 1: Ekstrak teks dari PDF menggunakan PDFBox
+                val extractedText = PDFUtils.extractTextFromPdf(this@RingkasanActivity, uri)
 
-                val file = uriToFile(uri)
-
-                val requestFile = file.asRequestBody("application/pdf".toMediaType())
-                val body = MultipartBody.Part.createFormData(
-                    "file",
-                    file.name,
-                    requestFile
-                )
-
-                val response = RetrofitClient.api.summarizePdf(body)
-
-                withContext(Dispatchers.Main) {
-
-                    if (response.isSuccessful) {
-
-                        val summary = response.body()?.summary ?: "Tidak ada hasil"
-                        currentSummary = summary
-
-                        tvRingkasan.text = """
-                            🔹 RINGKASAN AI (RAILWAY):
-                            
-                            $summary
-                        """.trimIndent()
-
-                        // simpan ke firestore
-                        saveSummaryToFirestore(summary)
-
-                    } else {
-                        tvRingkasan.text = "❌ Gagal dari server"
-                    }
+                if (extractedText.isEmpty()) {
+                    tvRingkasan.text = "❌ Gagal mengekstrak teks dari PDF."
+                    showLoading(false)
+                    return@launch
                 }
+
+                tvRingkasan.text = "📝 Teks berhasil diekstrak (${extractedText.length} karakter)\n\n🤖 AI sedang meringkas..."
+
+                // STEP 2: Dapatkan userId
+                val userId = auth.currentUser?.uid ?: "user_123"
+
+                // STEP 3: Simpan teks asli ke Firestore
+                val documentId = repository.saveDocument(currentFileName, extractedText, userId)
+                currentDocumentId = documentId
+
+                // STEP 4: Proses ringkasan (kirim ke Railway backend)
+                val result = repository.processAndSaveSummary(documentId)
+
+                result.onSuccess { summaryModel ->
+                    currentSummary = summaryModel.summary
+                    tvRingkasan.text = """
+                        🔹 RINGKASAN AI (MobileBERT):
+                        
+                        ${summaryModel.summary}
+                        
+                        ─────────────────────────
+                        📊 Statistik:
+                        • Teks asli: ${summaryModel.originalLength} karakter
+                        • Ringkasan: ${summaryModel.summaryLength} karakter
+                        • Model: MobileBERT ONNX (Railway)
+                    """.trimIndent()
+
+                    Toast.makeText(this@RingkasanActivity, "Ringkasan berhasil dibuat!", Toast.LENGTH_SHORT).show()
+
+                }.onFailure { error ->
+                    tvRingkasan.text = "❌ Gagal membuat ringkasan: ${error.message}"
+                    Toast.makeText(this@RingkasanActivity, "Error: ${error.message}", Toast.LENGTH_LONG).show()
+                }
+
+                showLoading(false)
 
             } catch (e: Exception) {
                 e.printStackTrace()
-
-                withContext(Dispatchers.Main) {
-                    tvRingkasan.text = "❌ Error: ${e.message}"
-                }
+                tvRingkasan.text = "❌ Error: ${e.message}"
+                showLoading(false)
             }
         }
     }
 
-    // 🔥 Uri → File
-    private fun uriToFile(uri: Uri): File {
-        val inputStream = contentResolver.openInputStream(uri)
-        val file = File(cacheDir, "temp.pdf")
-
-        file.outputStream().use { output ->
-            inputStream?.copyTo(output)
-        }
-
-        inputStream?.close()
-        return file
-    }
-
-    private fun saveSummaryToFirestore(summary: String) {
-
-        val userId = auth.currentUser?.uid ?: return
-
-        val data = hashMapOf(
-            "summary" to summary,
-            "createdAt" to Date(),
-            "userId" to userId
-        )
-
-        firestore.collection("summaries")
-            .add(data)
-    }
-
     private fun saveProgressMateri() {
-
         val userId = auth.currentUser?.uid ?: return
 
         val data = hashMapOf(
+            "fileName" to currentFileName,
             "completed" to true,
-            "updatedAt" to Date()
+            "updatedAt" to Date(),
+            "summaryId" to currentDocumentId
         )
 
         firestore.collection("readingProgress")
             .document(userId)
-            .set(data)
+            .collection("materi")
+            .add(data)
+            .addOnFailureListener {
+                Toast.makeText(this, "Gagal menyimpan progress", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        progressBar.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+        btnGenerate.isEnabled = !isLoading
     }
 }

@@ -9,27 +9,16 @@ import kotlinx.coroutines.withContext
 
 object PDFUtils {
 
-    suspend fun extractTextFromPdf(
-        context: Context,
-        uri: Uri
-    ): String = withContext(Dispatchers.IO) {
-
+    suspend fun extractTextFromPdf(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
         var document: PDDocument? = null
-
         try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: return@withContext ""
-
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext ""
             document = PDDocument.load(inputStream)
-
             val stripper = PDFTextStripper()
             val text = stripper.getText(document)
-
             document.close()
             inputStream.close()
-
             text.replace(Regex("\\s+"), " ").trim()
-
         } catch (e: Exception) {
             e.printStackTrace()
             ""

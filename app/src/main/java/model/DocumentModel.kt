@@ -11,5 +11,6 @@ data class DocumentModel(
     val summaryLength: Int = 0,
     val uploadedAt: Date = Date(),
     val userId: String = "",
-    val isProcessed: Boolean = false
+    val isProcessed: Boolean = false,
+    val summaryId: String = ""
 )

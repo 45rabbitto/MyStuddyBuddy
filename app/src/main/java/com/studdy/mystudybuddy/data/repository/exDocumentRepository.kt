@@ -13,7 +13,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class DocumentRepository @Inject constructor() { // HAPUS parameter firestoreService di sini
+class exDocumentRepository @Inject constructor() { // HAPUS parameter firestoreService di sini
 
     suspend fun uploadAndSummarizeDocument(
         context: Context,
