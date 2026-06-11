@@ -40,12 +40,10 @@ class FileHistoryAdapter(
         holder.binding.tvFileName.text = item.fileName
         holder.binding.tvDate.text = item.date
 
-        // klik item
         holder.binding.root.setOnClickListener {
             onItemClick(item)
         }
 
-        // tombol delete
         holder.binding.btnDelete.setOnClickListener {
             onDelete(item)
         }

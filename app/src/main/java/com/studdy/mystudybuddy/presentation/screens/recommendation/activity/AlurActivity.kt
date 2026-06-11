@@ -22,7 +22,6 @@ class AlurActivity : AppCompatActivity() {
     private lateinit var tvNextStep: TextView
     private lateinit var tvFile: TextView
 
-    // Firebase
     private val auth =
         FirebaseAuth.getInstance()
 
@@ -113,7 +112,6 @@ class AlurActivity : AppCompatActivity() {
         val uid =
             auth.currentUser?.uid ?: return
 
-        // Ambil nilai quiz terakhir dari Firebase
         database.child("QuizHistory")
             .child(uid)
             .limitToLast(1)

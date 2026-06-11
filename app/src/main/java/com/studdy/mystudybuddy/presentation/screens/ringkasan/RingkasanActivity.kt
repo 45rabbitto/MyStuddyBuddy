@@ -85,7 +85,6 @@ class RingkasanActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                // STEP 1: Ekstrak teks dari PDF menggunakan PDFBox
                 val extractedText = PDFUtils.extractTextFromPdf(this@RingkasanActivity, uri)
 
                 if (extractedText.isEmpty()) {
@@ -96,14 +95,11 @@ class RingkasanActivity : AppCompatActivity() {
 
                 tvRingkasan.text = " Teks berhasil diekstrak (${extractedText.length} karakter)\n\n AI sedang meringkas..."
 
-                // STEP 2: Dapatkan userId
                 val userId = auth.currentUser?.uid ?: "user_123"
 
-                // STEP 3: Simpan teks asli ke Firestore
                 val documentId = repository.saveDocument(currentFileName, extractedText, userId)
                 currentDocumentId = documentId
 
-                // STEP 4: Proses ringkasan (kirim ke Railway backend)
                 val result = repository.processAndSaveSummary(documentId)
 
                 result.onSuccess { summaryModel ->

@@ -76,16 +76,7 @@ class ProfileActivity : AppCompatActivity() {
         imgProfile =
             findViewById(R.id.imgProfile)
     }
-
-    // =========================================
-    // LOAD PROFILE
-    // =========================================
-
     private fun loadProfile() {
-
-        // =========================
-        // GUEST MODE
-        // =========================
 
         if (
             isGuest ||
@@ -176,19 +167,13 @@ class ProfileActivity : AppCompatActivity() {
             )
     }
 
-    // =========================================
-    // LISTENER
-    // =========================================
-
     private fun setupListeners() {
 
-        // BACK
         btnBack.setOnClickListener {
 
             finish()
         }
 
-        // EDIT PROFILE
         btnEditProfile.setOnClickListener {
 
             if (isGuest) {
@@ -210,7 +195,6 @@ class ProfileActivity : AppCompatActivity() {
             )
         }
 
-        // LOGOUT
         menuLogout.setOnClickListener {
 
             auth.signOut()

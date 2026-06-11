@@ -103,10 +103,6 @@ class EditProfileActivity : AppCompatActivity() {
             finish()
         }
 
-        // =========================
-        // PILIH AVATAR
-        // =========================
-
         avatarBuku.setOnClickListener {
 
             selectedAvatar = "ava_buku"
@@ -151,10 +147,6 @@ class EditProfileActivity : AppCompatActivity() {
                 R.drawable.ava_robot
             )
         }
-
-        // =========================
-        // SAVE PROFILE
-        // =========================
 
         btnSave.setOnClickListener {
 
@@ -204,10 +196,6 @@ class EditProfileActivity : AppCompatActivity() {
             )
         }
     }
-
-    // =========================
-    // LOAD PROFILE
-    // =========================
 
     private fun loadProfile() {
 
@@ -268,10 +256,6 @@ class EditProfileActivity : AppCompatActivity() {
             )
     }
 
-    // =========================
-    // SAVE DATA PROFILE
-    // =========================
-
     private fun saveProfileData(
         name: String,
         email: String,
@@ -320,10 +304,6 @@ class EditProfileActivity : AppCompatActivity() {
                 ).show()
             }
     }
-
-    // =========================
-    // CHECK INTERNET
-    // =========================
 
     private fun isInternetAvailable(): Boolean {
 

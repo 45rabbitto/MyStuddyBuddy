@@ -28,7 +28,6 @@ class RingkasanViewModel : ViewModel() {
 
     fun loadRingkasan() {
 
-        // sementara data dummy
         val dataRingkasan = listOf(
 
             "Fotosintesis adalah proses tumbuhan menghasilkan makanan.",

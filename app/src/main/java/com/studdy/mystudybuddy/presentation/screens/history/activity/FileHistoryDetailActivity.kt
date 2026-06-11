@@ -130,10 +130,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                             snapshot: DataSnapshot
                         ) {
 
-                            // =========================
-                            // BELUM QUIZ
-                            // =========================
-
                             if (!snapshot.exists()) {
 
                                 startActivity(
@@ -157,10 +153,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
 
                                 return
                             }
-
-                            // =========================
-                            // SUDAH QUIZ
-                            // =========================
 
                             var score = 0
                             var correct = 0

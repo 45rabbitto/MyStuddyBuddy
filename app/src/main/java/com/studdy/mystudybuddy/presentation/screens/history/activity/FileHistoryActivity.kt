@@ -67,7 +67,7 @@ class FileHistoryActivity : AppCompatActivity() {
 
         historyList.clear()
 
-        database.child("History") // ✔ sudah disamakan dengan UploadActivity
+        database.child("History")
             .child(uid)
             .addListenerForSingleValueEvent(object : ValueEventListener {
 
@@ -137,10 +137,6 @@ class FileHistoryActivity : AppCompatActivity() {
                         }
                     }
 
-                    // =============================
-                    // HAPUS UploadedMaterials
-                    // =============================
-
                     database.child("UploadedMaterials")
                         .child(uid)
                         .addListenerForSingleValueEvent(
@@ -160,9 +156,6 @@ class FileHistoryActivity : AppCompatActivity() {
                                         }
                                     }
 
-                                    // =============================
-                                    // HAPUS QuizHistory
-                                    // =============================
 
                                     database.child("QuizHistory")
                                         .child(uid)

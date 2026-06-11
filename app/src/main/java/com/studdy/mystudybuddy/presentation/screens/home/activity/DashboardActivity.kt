@@ -75,10 +75,8 @@ class DashboardActivity : AppCompatActivity() {
         setupMenu()
     }
 
-    // 🔥 STREAK
     private fun setupStreak() {
 
-        // mode tamu tidak menghitung streak
         if (isGuest) {
 
             tvStreak.text = "0"
@@ -96,15 +94,13 @@ class DashboardActivity : AppCompatActivity() {
 
         Toast.makeText(
             this,
-            "Streak kamu: $streak 🔥",
+            "Streak kamu: $streak ",
             Toast.LENGTH_SHORT
         ).show()
     }
 
-    // MENU CLICK
     private fun setupMenu() {
 
-        // HISTORY
         history.setOnClickListener {
 
             if (isGuest) {
@@ -136,7 +132,6 @@ class DashboardActivity : AppCompatActivity() {
             )
         }
 
-        // PROGRESS
         progres.setOnClickListener {
 
             if (isGuest) {
@@ -152,7 +147,6 @@ class DashboardActivity : AppCompatActivity() {
             )
         }
 
-        // UPLOAD
         upload.setOnClickListener {
 
             Toast.makeText(
@@ -169,7 +163,6 @@ class DashboardActivity : AppCompatActivity() {
             )
         }
 
-        // PROFILE
         profile.setOnClickListener {
 
             if (isGuest) {
@@ -196,7 +189,6 @@ class DashboardActivity : AppCompatActivity() {
             }
         }
 
-        // HOME
         home.setOnClickListener {
 
             Toast.makeText(

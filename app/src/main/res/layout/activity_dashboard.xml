@@ -4,14 +4,13 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
-    <!-- ================= CONTENT ================= -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="8dp">
 
-        <!-- ================= HALO ================= -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -46,7 +45,6 @@
             android:fontFamily="@font/poppins"
             android:textColor="@color/dark_text" />
 
-        <!-- ================= CARD DASHBOARD ================= -->
         <RelativeLayout
             android:layout_width="360dp"
             android:layout_height="250dp"
@@ -55,7 +53,6 @@
             android:background="@drawable/kontainer"
             android:padding="20dp">
 
-            <!-- STREAK -->
             <LinearLayout
                 android:layout_width="90dp"
                 android:layout_height="40dp"
@@ -79,7 +76,6 @@
                     android:fontFamily="@font/poppins" />
             </LinearLayout>
 
-            <!-- IMAGE -->
             <ImageView
                 android:layout_width="280dp"
                 android:layout_height="190dp"
@@ -90,7 +86,6 @@
 
         </RelativeLayout>
 
-        <!-- ================= MENU ================= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,7 +96,6 @@
             android:fontFamily="@font/poppins"
             android:textColor="@color/dark_text" />
 
-        <!-- MENU ICON -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -110,7 +104,6 @@
             android:orientation="horizontal"
             android:weightSum="3">
 
-            <!-- HISTORY -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -138,7 +131,6 @@
 
             </LinearLayout>
 
-            <!-- ALUR -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -166,7 +158,6 @@
 
             </LinearLayout>
 
-            <!-- PROGRESS -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -198,7 +189,6 @@
 
     </LinearLayout>
 
-    <!-- navigasi -->
     <FrameLayout
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
@@ -207,7 +197,6 @@
         android:clipChildren="false"
         android:clipToPadding="false">
 
-        <!-- BOTTOM NAVBAR -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -222,7 +211,6 @@
             android:paddingStart="20dp"
             android:paddingEnd="20dp">
 
-            <!-- HOME -->
             <LinearLayout
                 android:id="@+id/layouthome"
                 android:layout_width="0dp"
@@ -241,12 +229,10 @@
 
             </LinearLayout>
 
-            <!-- SPACE -->
             <Space
                 android:layout_width="130dp"
                 android:layout_height="wrap_content" />
 
-            <!-- PROFILE -->
             <LinearLayout
                 android:id="@+id/layoutprofile"
                 android:layout_width="0dp"
@@ -267,7 +253,6 @@
 
         </LinearLayout>
 
-        <!-- BUTTON UPLOAD FLOATING -->
         <FrameLayout
             android:layout_width="150dp"
             android:layout_height="130dp"
@@ -277,7 +262,6 @@
             android:clipChildren="false"
             android:clipToPadding="false">
 
-            <!-- BG PALING BAWAH -->
             <ImageView
                 android:id="@+id/bgUploadBawah"
                 android:layout_width="130dp"
@@ -287,7 +271,6 @@
                 android:scaleType="fitXY"
                 android:src="@drawable/bg_upload_bawah" />
 
-            <!-- ICON UPLOAD -->
             <ImageView
                 android:id="@+id/upload"
                 android:layout_width="200dp"

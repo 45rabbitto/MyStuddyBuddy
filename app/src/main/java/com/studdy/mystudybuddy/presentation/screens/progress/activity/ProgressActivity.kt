@@ -123,7 +123,6 @@ class ProgresActivity : AppCompatActivity() {
                                     .getValue(String::class.java)
                                     ?: "Materi"
 
-                            // cek status baca
                             database.child("ReadingProgress")
                                 .child(uid)
                                 .orderByChild("fileName")
@@ -137,9 +136,6 @@ class ProgresActivity : AppCompatActivity() {
 
                                             var progress = 0
 
-                                            // ====================
-                                            // BACA = 70%
-                                            // ====================
 
                                             var readCompleted = false
 
@@ -154,11 +150,6 @@ class ProgresActivity : AppCompatActivity() {
                                             if (readCompleted) {
                                                 progress += 70
                                             }
-
-                                            // ====================
-                                            // QUIZ = +30%
-                                            // jika nilai >=70
-                                            // ====================
 
                                             database.child("QuizHistory")
                                                 .child(uid)

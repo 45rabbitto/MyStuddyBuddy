@@ -40,10 +40,6 @@ class HasilKuisActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_hasil_kuis)
 
-        // =========================
-        // SOUND FINISH
-        // =========================
-
         finishSound =
             MediaPlayer.create(
                 this,
@@ -73,11 +69,6 @@ class HasilKuisActivity : AppCompatActivity() {
         pembahasanContainer =
             findViewById(R.id.pembahasanContainer)
     }
-
-    // =========================================
-    // SETUP DATA
-    // =========================================
-
     private fun setupData() {
 
         val score =
@@ -90,10 +81,6 @@ class HasilKuisActivity : AppCompatActivity() {
             intent.getStringExtra(
                 "FILE_NAME"
             ) ?: "Materi"
-
-        // =========================
-        // DATA DARI QUIZ ACTIVITY
-        // =========================
 
         val questions =
             intent.getStringArrayListExtra(
@@ -125,11 +112,6 @@ class HasilKuisActivity : AppCompatActivity() {
         val wrong =
             intent.getIntExtra("WRONG", 0)
 
-
-        // =========================
-        // SET TEXT
-        // =========================
-
         tvSkor.text =
             "$score"
 
@@ -139,20 +121,11 @@ class HasilKuisActivity : AppCompatActivity() {
         tvSalah.text =
             "$wrong"
 
-        // =========================
-        // TAMPILKAN PEMBAHASAN
-        // =========================
-
         showPembahasan(
             questions,
             userAnswers,
             correctAnswers
         )
-
-
-        // =========================
-        // BUTTON DASHBOARD
-        // =========================
 
         btnDashboard.setOnClickListener {
 
@@ -166,11 +139,6 @@ class HasilKuisActivity : AppCompatActivity() {
             finish()
         }
     }
-
-    // =========================================
-    // PEMBAHASAN
-    // =========================================
-
     private fun showPembahasan(
         questions: ArrayList<String>,
         userAnswers: ArrayList<String>,
@@ -243,10 +211,6 @@ $status
             pembahasanContainer.addView(text)
         }
     }
-
-    // =========================================
-    // SAVE FIREBASE
-    // =========================================
 
     private fun saveQuizResultToFirebase(
         fileName: String,

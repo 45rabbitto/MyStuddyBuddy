@@ -28,7 +28,6 @@ class AlurFileActivity : AppCompatActivity() {
             R.layout.activity_alur_file
         )
 
-        // Firebase init
         auth = FirebaseAuth.getInstance()
         database = FirebaseDatabase.getInstance().reference
 
