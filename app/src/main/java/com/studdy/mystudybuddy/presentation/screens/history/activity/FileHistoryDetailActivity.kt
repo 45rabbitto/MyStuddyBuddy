@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -93,21 +94,20 @@ class FileHistoryDetailActivity : AppCompatActivity() {
 
         btnBukaRingkasan.setOnClickListener {
 
+            Toast.makeText(
+                this,
+                "FILE_NAME = $fileName\nFILE_URI = $fileUri",
+                Toast.LENGTH_LONG
+            ).show()
+
             startActivity(
                 Intent(
                     this,
                     RingkasanActivity::class.java
                 ).apply {
 
-                    putExtra(
-                        "FILE_NAME",
-                        fileName
-                    )
-
-                    putExtra(
-                        "FILE_URI",
-                        fileUri
-                    )
+                    putExtra("FILE_NAME", fileName)
+                    putExtra("FILE_URI", fileUri)
                 }
             )
         }
@@ -159,12 +159,16 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                             var wrong = 0
                             var total = 0
 
-                            var questions = arrayListOf<String>()
-                            var userAnswers = arrayListOf<String>()
-                            var correctAnswers = arrayListOf<String>()
+                            var questions =
+                                arrayListOf<String>()
+
+                            var userAnswers =
+                                arrayListOf<String>()
+
+                            var correctAnswers =
+                                arrayListOf<String>()
 
                             for (data in snapshot.children) {
-
 
                                 score =
                                     data.child("score")
@@ -218,12 +222,30 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                     HasilKuisActivity::class.java
                                 ).apply {
 
-                                    putExtra("SCORE", score)
-                                    putExtra("CORRECT", correct)
-                                    putExtra("WRONG", wrong)
-                                    putExtra("TOTAL", total)
+                                    putExtra(
+                                        "SCORE",
+                                        score
+                                    )
 
-                                    putExtra("FILE_NAME", fileName)
+                                    putExtra(
+                                        "CORRECT",
+                                        correct
+                                    )
+
+                                    putExtra(
+                                        "WRONG",
+                                        wrong
+                                    )
+
+                                    putExtra(
+                                        "TOTAL",
+                                        total
+                                    )
+
+                                    putExtra(
+                                        "FILE_NAME",
+                                        fileName
+                                    )
 
                                     putStringArrayListExtra(
                                         "QUESTIONS",
@@ -247,6 +269,11 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                             error: DatabaseError
                         ) {
 
+                            Toast.makeText(
+                                this@FileHistoryDetailActivity,
+                                error.message,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 )

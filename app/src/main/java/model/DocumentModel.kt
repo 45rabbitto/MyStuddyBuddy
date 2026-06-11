@@ -6,6 +6,7 @@ data class DocumentModel(
     val id: String = "",
     val fileName: String = "",
     val fileUri: String = "",
+    val content: String = "",
     val extractedText: String = "",
     val summary: String = "",
     val summaryLength: Int = 0,

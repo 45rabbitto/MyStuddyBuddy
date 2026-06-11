@@ -12,8 +12,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/kontainer" >
-
+        android:background="@drawable/kontainer">
 
         <ImageView
             android:id="@+id/btnBack"
@@ -38,20 +37,80 @@
 
     </RelativeLayout>
 
+    <!-- 🔥 TEKS ASLI (ditambahkan) -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Teks Asli"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins"
+        android:textStyle="bold"
+        android:textColor="@color/dark_text"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/card_bg"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvTeksAsli"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Memilih file PDF..."
+            android:textColor="@color/gray_text"
+            android:fontFamily="@font/poppins"
+            android:textSize="12sp"
+            android:lineSpacingExtra="4dp"/>
+
+    </ScrollView>
+
+    <!-- 🔥 TOMBOL RINGKASAN (ditambahkan) -->
+    <Button
+        android:id="@+id/btnRingkasan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/button1"
+        android:text="Ringkasan"
+        android:textColor="@color/white"
+        android:fontFamily="@font/poppins"
+        android:enabled="false"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ringkasan AI"
+        android:textSize="14sp"
+        android:fontFamily="@font/poppins"
+        android:textStyle="bold"
+        android:textColor="@color/dark_text"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"/>
+
     <ScrollView
         android:id="@+id/ringkasanScroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/card_bg"
+        android:padding="12dp">
 
         <LinearLayout
             android:id="@+id/ringkasanContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/card_bg"
-            android:padding="20dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvRingkasan"
@@ -60,34 +119,45 @@
                 android:text="Ringkasan akan muncul di sini setelah file diproses..."
                 android:textColor="@color/gray_text"
                 android:fontFamily="@font/poppins"
-                android:textSize="16sp" />
-
-            <Button
-                android:id="@+id/btnFinishRingkasan"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/button1"
-                android:text="selesai"
-                android:textColor="@color/white"
-                android:fontFamily="@font/poppins"
-                android:layout_marginBottom="20dp"
-                android:layout_gravity="center" />
+                android:textSize="14sp"
+                android:lineSpacingExtra="6dp" />
 
         </LinearLayout>
 
     </ScrollView>
 
+    <!-- 🔥 PROGRESS BAR -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"/>
+
     <Button
-        android:id="@+id/btnGenerate"
+        android:id="@+id/btnGenerateQuiz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button1"
+        android:text=" Generate Kuis"
+        android:textColor="@color/white"
+        android:fontFamily="@font/poppins"
+        android:enabled="false"/>
+
+    <Button
+        android:id="@+id/btnFinishRingkasan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:background="@drawable/button1"
-        android:text="Generate kuis"
-        android:textColor="@color/white"
-        android:fontFamily="@font/poppins"
-        android:layout_gravity="center" />
+        android:background="@drawable/button_line"
+        android:text="Selesai"
+        android:textColor="@color/primary_button"
+        android:fontFamily="@font/poppins"/>
 
 </LinearLayout>

@@ -2,9 +2,13 @@ package com.studdy.mystudybuddy.network
 
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiService {
+
+    @GET("health")
+    suspend fun healthCheck(): Response<HealthResponse>
 
     @POST("summarize")
     suspend fun summarizeText(
@@ -21,4 +25,10 @@ data class SummaryResponse(
     val summary: String = "",
     val original_length: Int = 0,
     val summary_length: Int = 0
+)
+
+data class HealthResponse(
+    val status: String,
+    val model_loaded: Boolean,
+    val model_type: String
 )
