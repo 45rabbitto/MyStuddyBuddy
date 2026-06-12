@@ -66,7 +66,7 @@ class RingkasanActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressBar)
 
         btnRingkasan.isEnabled = false
-        btnGenerateQuiz.isEnabled = false
+        btnGenerateQuiz.isEnabled = true
     }
 
     private fun setupClickListeners() {
@@ -83,29 +83,29 @@ class RingkasanActivity : AppCompatActivity() {
 
         btnGenerateQuiz.setOnClickListener {
 
-            val bottomSheet =
-                BottomGenerateKuis()
+            if (currentSummary.isEmpty()) {
 
-            bottomSheet.arguments =
-                Bundle().apply {
+                Toast.makeText(
+                    this,
+                    "Silakan buat ringkasan terlebih dahulu",
+                    Toast.LENGTH_SHORT
+                ).show()
 
-                    putString(
-                        "FILE_NAME",
-                        currentFileName
-                    )
+                return@setOnClickListener
+            }
 
-                    putString(
-                        "RINGKASAN",
-                        currentSummary
-                    )
-                }
+            val bottomSheet = BottomGenerateKuis()
+
+            bottomSheet.arguments = Bundle().apply {
+                putString("FILE_NAME", currentFileName)
+                putString("RINGKASAN", currentSummary)
+            }
 
             bottomSheet.show(
                 supportFragmentManager,
                 "bottom_generate_kuis"
             )
         }
-
         btnFinishRingkasan.setOnClickListener {
             saveProgressMateri()
             showFeedbackDialog()
@@ -325,6 +325,6 @@ class RingkasanActivity : AppCompatActivity() {
     private fun showLoading(isLoading: Boolean) {
         progressBar.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
         btnRingkasan.isEnabled = !isLoading
-        btnGenerateQuiz.isEnabled = !isLoading && currentSummary.isNotEmpty()
+        btnGenerateQuiz.isEnabled = !isLoading
     }
 }
