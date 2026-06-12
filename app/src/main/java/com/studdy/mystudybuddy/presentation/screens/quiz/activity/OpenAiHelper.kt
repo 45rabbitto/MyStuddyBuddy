@@ -10,7 +10,7 @@ import java.net.URL
 object OpenAiHelper {
 
     // Ganti dengan API Key OpenAI Anda
-    private const val API_KEY = "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"
+    private const val API_KEY = "sk----"
 
     fun generateSoal(
         ringkasan: String,

@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object OpenAiHelper {
 
-    private const val API_KEY = "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" // ← ganti dengan API key kamu
+    private const val API_KEY = "sk----" // ← ganti dengan API key kamu
     private const val BASE_URL = "https://api.openai.com/v1/chat/completions"
     private const val MODEL = "gpt-3.5-turbo" // bisa ganti ke gpt-4 jika mau
 
