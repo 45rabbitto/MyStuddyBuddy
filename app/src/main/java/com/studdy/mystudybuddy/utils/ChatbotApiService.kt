@@ -20,8 +20,9 @@ class ChatbotApiService(private val context: Context) {
 
     private val gson = Gson()
 
-    // 🔥 GEMINI API - PASTIKAN KEY VALID
-    private val BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent"
+    // 🔥 OPENROUTER API - FREE TIER
+    private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+    private val MODEL_NAME = "openrouter/free"  // 🔥 ROUTER OTOMATIS KE MODEL FREE TERBAIK
 
     private val apiKey: String by lazy {
         loadTokenFromAssets()
@@ -34,10 +35,8 @@ class ChatbotApiService(private val context: Context) {
             inputStream.read(buffer)
             inputStream.close()
             val token = String(buffer, Charsets.UTF_8).trim()
-
             android.util.Log.d("CHATBOT_API", "Token loaded, length: ${token.length}")
-
-            if (token.isEmpty() || token == "your_api_key_here") {
+            if (token.isEmpty() || token == "your_openrouter_api_key_here") {
                 "MISSING_TOKEN"
             } else {
                 token
@@ -52,56 +51,53 @@ class ChatbotApiService(private val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 if (apiKey == "MISSING_TOKEN") {
-                    return@withContext "❌ API Key tidak ditemukan. Cek file chatbot_token.txt"
+                    return@withContext "❌ API Key tidak ditemukan. Cek file chatbot_token.txt\n\nDapatkan key di: https://openrouter.ai/keys"
                 }
 
                 if (summaryContext.isEmpty()) {
-                    return@withContext "⚠️ Teks dokumen kosong"
+                    return@withContext "⚠️ Teks dokumen kosong. Silakan upload PDF terlebih dahulu."
                 }
 
-                // 🔥 BATASI TEKS AGAR TIDAK TERLALU PANJANG
-                val maxContextLength = 2000
+                val maxContextLength = 3000
                 val trimmedContext = if (summaryContext.length > maxContextLength) {
                     summaryContext.take(maxContextLength) + "..."
                 } else {
                     summaryContext
                 }
 
-                val prompt = """
+                android.util.Log.d("CHATBOT_API", "Model: $MODEL_NAME")
+                android.util.Log.d("CHATBOT_API", "Context length: ${trimmedContext.length}")
+
+                val systemPrompt = """
                     Anda adalah asisten belajar AI yang ramah dan membantu bernama "My Study Buddy".
                     
-                    Jawablah pertanyaan berdasarkan MATERI berikut:
+                    Jawablah berdasarkan MATERI berikut:
                     
                     MATERI:
                     $trimmedContext
                     
-                    PERTANYAAN: $question
-                    
                     ATURAN:
                     1. Jawab berdasarkan materi di atas
                     2. Gunakan bahasa Indonesia yang baik
-                    3. Jawab singkat dan jelas (maksimal 100 kata)
-                    4. Jika pertanyaan tidak relevan, bilang "Maaf, itu di luar materi"
+                    3. Jawab singkat dan jelas (maksimal 2 paragraf)
+                    4. Jika pertanyaan tidak relevan, bilang "Maaf, itu di luar materi yang dipelajari"
                 """.trimIndent()
 
                 val requestBody = mapOf(
-                    "contents" to listOf(
-                        mapOf(
-                            "parts" to listOf(
-                                mapOf("text" to prompt)
-                            )
-                        )
+                    "model" to MODEL_NAME,
+                    "messages" to listOf(
+                        mapOf("role" to "system", "content" to systemPrompt),
+                        mapOf("role" to "user", "content" to question)
                     ),
-                    "generationConfig" to mapOf(
-                        "maxOutputTokens" to 300,
-                        "temperature" to 0.7
-                    )
+                    "max_tokens" to 500,
+                    "temperature" to 0.7
                 )
 
                 val jsonBody = gson.toJson(requestBody)
 
                 val request = Request.Builder()
-                    .url("$BASE_URL?key=$apiKey")
+                    .url(BASE_URL)
+                    .addHeader("Authorization", "Bearer $apiKey")
                     .addHeader("Content-Type", "application/json")
                     .post(jsonBody.toRequestBody("application/json".toMediaType()))
                     .build()
@@ -110,30 +106,23 @@ class ChatbotApiService(private val context: Context) {
                 val responseBody = response.body?.string() ?: ""
 
                 android.util.Log.d("CHATBOT_API", "Response code: ${response.code}")
-                android.util.Log.d("CHATBOT_API", "Response: ${responseBody.take(300)}")
 
                 if (response.isSuccessful) {
-                    val jsonResponse = gson.fromJson(responseBody, GeminiResponse::class.java)
-                    val answer = jsonResponse.candidates
-                        ?.firstOrNull()
-                        ?.content
-                        ?.parts
-                        ?.firstOrNull()
-                        ?.text ?: "Maaf, tidak ada jawaban."
+                    val jsonResponse = gson.fromJson(responseBody, OpenRouterResponse::class.java)
+                    val answer = jsonResponse.choices?.firstOrNull()?.message?.content ?: "Maaf, tidak ada jawaban."
                     return@withContext answer.trim()
                 } else {
                     return@withContext when (response.code) {
-                        400 -> "❌ Request error. Coba pertanyaan yang lebih singkat."
                         401 -> "❌ API Key tidak valid. Cek token di chatbot_token.txt"
-                        429 -> "❌ Rate limit. Coba lagi dalam 10-30 detik (Gemini free: 60 request/menit)"
-                        503 -> "❌ Server sibuk. Coba lagi nanti."
-                        else -> "❌ Error ${response.code}"
+                        402 -> "❌ Credit limit habis. Bisa top up minimal 10 credits (sekali saja)"
+                        429 -> "❌ Rate limit. Coba lagi nanti (free tier: ~20 request/menit)"
+                        else -> "❌ Error ${response.code}: ${responseBody.take(200)}"
                     }
                 }
 
             } catch (e: IOException) {
                 android.util.Log.e("CHATBOT_API", "IO Error: ${e.message}")
-                return@withContext "❌ Gagal terhubung ke server. Periksa internet."
+                return@withContext "❌ Gagal terhubung ke server. Periksa koneksi internet."
             } catch (e: Exception) {
                 android.util.Log.e("CHATBOT_API", "Error: ${e.message}", e)
                 return@withContext "❌ Error: ${e.message}"
@@ -142,19 +131,14 @@ class ChatbotApiService(private val context: Context) {
     }
 }
 
-// Response model untuk Gemini
-data class GeminiResponse(
-    val candidates: List<GeminiCandidate>? = null
+data class OpenRouterResponse(
+    val choices: List<OpenRouterChoice>? = null
 )
 
-data class GeminiCandidate(
-    val content: GeminiContent? = null
+data class OpenRouterChoice(
+    val message: OpenRouterMessage? = null
 )
 
-data class GeminiContent(
-    val parts: List<GeminiPart>? = null
-)
-
-data class GeminiPart(
-    val text: String? = null
+data class OpenRouterMessage(
+    val content: String? = null
 )
