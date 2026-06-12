@@ -42,9 +42,9 @@ class RingkasanActivity : AppCompatActivity() {
     private fun initViews() {
         btnBack = findViewById(R.id.btnBack)
         tvRingkasan = findViewById(R.id.tvRingkasan)
-        btnGenerate = findViewById(R.id.btnGenerate)
+        btnGenerate = findViewById(R.id.btnGenerateQuiz)
         btnFinishRingkasan = findViewById(R.id.btnFinishRingkasan)
-        progressBar = findViewById(R.id.progressBarRingkasan)
+        progressBar = findViewById(R.id.progressBar)
     }
 
     private fun setupClickListeners() {
