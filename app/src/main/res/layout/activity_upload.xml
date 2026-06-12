@@ -145,7 +145,7 @@
                 android:id="@+id/btnChatbot"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
-                android:layout_weight="1"
+                android:layout_weight="1"F
                 android:layout_marginStart="8dp"
                 android:text="Chat Bot"
                 android:textColor="@color/white"
