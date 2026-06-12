@@ -20,9 +20,9 @@ class ChatbotApiService(private val context: Context) {
 
     private val gson = Gson()
 
-    // 🔥 OPENROUTER API - FREE TIER
+    // OPENROUTER API
     private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-    private val MODEL_NAME = "openrouter/free"  // 🔥 ROUTER OTOMATIS KE MODEL FREE TERBAIK
+    private val MODEL_NAME = "openrouter/free"
 
     private val apiKey: String by lazy {
         loadTokenFromAssets()
@@ -67,30 +67,35 @@ class ChatbotApiService(private val context: Context) {
 
                 android.util.Log.d("CHATBOT_API", "Model: $MODEL_NAME")
                 android.util.Log.d("CHATBOT_API", "Context length: ${trimmedContext.length}")
+                android.util.Log.d("CHATBOT_API", "Question: $question")
 
-                val systemPrompt = """
-                    Anda adalah asisten belajar AI yang ramah dan membantu bernama "My Study Buddy".
-                    
-                    Jawablah berdasarkan MATERI berikut:
-                    
-                    MATERI:
-                    $trimmedContext
-                    
-                    ATURAN:
-                    1. Jawab berdasarkan materi di atas
-                    2. Gunakan bahasa Indonesia yang baik
-                    3. Jawab singkat dan jelas (maksimal 2 paragraf)
-                    4. Jika pertanyaan tidak relevan, bilang "Maaf, itu di luar materi yang dipelajari"
-                """.trimIndent()
+
+                val prompt = """Anda adalah asisten belajar AI bernama "My Study Buddy".
+
+Berikut adalah MATERI yang harus Anda gunakan untuk menjawab:
+
+--- MATERI MULAI ---
+$trimmedContext
+--- MATERI SELESAI ---
+
+PERTANYAAN USER: $question
+
+PERINTAH WAJIB:
+1. LANGSUNG JAWAB pertanyaan di atas. JANGAN bertanya balik ke user.
+2. Jawab berdasarkan MATERI yang diberikan.
+3. Gunakan bahasa Indonesia.
+4. Jika jawaban tidak ditemukan dalam materi, katakan: "Maaf, jawaban tidak tersedia dalam materi."
+5. Jawab singkat, maksimal 3 kalimat.
+
+JAWABAN LANGSUNG:"""
 
                 val requestBody = mapOf(
                     "model" to MODEL_NAME,
                     "messages" to listOf(
-                        mapOf("role" to "system", "content" to systemPrompt),
-                        mapOf("role" to "user", "content" to question)
+                        mapOf("role" to "user", "content" to prompt)
                     ),
-                    "max_tokens" to 500,
-                    "temperature" to 0.7
+                    "max_tokens" to 300,
+                    "temperature" to 0.3
                 )
 
                 val jsonBody = gson.toJson(requestBody)
@@ -110,12 +115,17 @@ class ChatbotApiService(private val context: Context) {
                 if (response.isSuccessful) {
                     val jsonResponse = gson.fromJson(responseBody, OpenRouterResponse::class.java)
                     val answer = jsonResponse.choices?.firstOrNull()?.message?.content ?: "Maaf, tidak ada jawaban."
-                    return@withContext answer.trim()
+
+                    val cleanedAnswer = answer
+                        .replace(Regex("(?i)(apakah|bisa tolong|tolong|silakan|mohon).*?(\\?|\\n)", RegexOption.DOT_MATCHES_ALL), "")
+                        .trim()
+
+                    return@withContext if (cleanedAnswer.isEmpty()) "Maaf, saya tidak dapat menjawab pertanyaan tersebut." else cleanedAnswer
                 } else {
                     return@withContext when (response.code) {
                         401 -> "❌ API Key tidak valid. Cek token di chatbot_token.txt"
-                        402 -> "❌ Credit limit habis. Bisa top up minimal 10 credits (sekali saja)"
-                        429 -> "❌ Rate limit. Coba lagi nanti (free tier: ~20 request/menit)"
+                        402 -> "❌ Credit limit habis."
+                        429 -> "❌ Rate limit. Coba lagi nanti (20 request/menit)"
                         else -> "❌ Error ${response.code}: ${responseBody.take(200)}"
                     }
                 }
