@@ -93,13 +93,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
 
         btnBukaRingkasan.setOnClickListener {
-
-            Toast.makeText(
-                this,
-                "FILE_NAME = $fileName\nFILE_URI = $fileUri",
-                Toast.LENGTH_LONG
-            ).show()
-
             startActivity(
                 Intent(
                     this,

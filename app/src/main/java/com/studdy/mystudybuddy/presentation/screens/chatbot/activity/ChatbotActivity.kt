@@ -1,6 +1,7 @@
 package com.studdy.mystudybuddy.presentation.screens.chatbot.activity
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -15,7 +16,6 @@ import com.studdy.mystudybuddy.utils.ChatbotApiService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-
 class ChatbotActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
@@ -26,8 +26,9 @@ class ChatbotActivity : AppCompatActivity() {
     private lateinit var chatAdapter: ChatAdapter
     private val messages = mutableListOf<ChatMessage>()
     private lateinit var apiService: ChatbotApiService
-    private var currentSummaryText: String = ""
+    private var currentDocumentText: String = ""
     private var currentFileName: String = ""
+    private var currentDocumentId: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +37,7 @@ class ChatbotActivity : AppCompatActivity() {
         apiService = ChatbotApiService(this)
         initViews()
         setupRecyclerView()
-        loadSummary()
+        loadDocument()
         setupListeners()
     }
 
@@ -54,12 +55,16 @@ class ChatbotActivity : AppCompatActivity() {
         rvChat.adapter = chatAdapter
     }
 
-    private fun loadSummary() {
-        val summaryId = intent.getStringExtra("SUMMARY_ID")
+    // 🔥 AMBIL DOKUMEN ASLI DARI FIRESTORE (collection "documents")
+    private fun loadDocument() {
+        currentDocumentId = intent.getStringExtra("DOCUMENT_ID") ?: ""
         currentFileName = intent.getStringExtra("FILE_NAME") ?: "Materi"
 
-        if (summaryId == null) {
-            Toast.makeText(this, "Tidak ada ringkasan", Toast.LENGTH_SHORT).show()
+        Log.d("CHATBOT", "DOCUMENT_ID: $currentDocumentId")
+        Log.d("CHATBOT", "FILE_NAME: $currentFileName")
+
+        if (currentDocumentId.isEmpty()) {
+            Toast.makeText(this, "Tidak ada dokumen", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
@@ -68,15 +73,32 @@ class ChatbotActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val doc = FirebaseFirestore.getInstance().collection("summaries").document(summaryId).get().await()
-                currentSummaryText = doc.getString("summary") ?: ""
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
 
-                if (currentSummaryText.isNotEmpty()) {
-                    messages.add(ChatMessage("👋 Halo! Saya AI Tutor. Ada yang ingin kamu tanyakan tentang \"$currentFileName\"?", false))
+                // 🔥 AMBIL DARI COLLECTION "documents" (BUKAN summaries)
+                val doc = FirebaseFirestore.getInstance()
+                    .collection("PdfContents")
+                    .document(userId)
+                    .collection("documents")
+                    .document(currentDocumentId)
+                    .get()
+                    .await()
+
+                currentDocumentText = doc.getString("content") ?: ""
+                Log.d("CHATBOT", "Document loaded, length: ${currentDocumentText.length}")
+
+                if (currentDocumentText.isNotEmpty()) {
+                    messages.add(ChatMessage(
+                        "👋 Halo! Saya AI Tutor. Saya sudah membaca dokumen \"$currentFileName\". Ada yang ingin kamu tanyakan tentang materinya?",
+                        false
+                    ))
                     chatAdapter.notifyItemInserted(0)
+                } else {
+                    Toast.makeText(this@ChatbotActivity, "Dokumen kosong", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@ChatbotActivity, "Gagal memuat: ${e.message}", Toast.LENGTH_SHORT).show()
+                Log.e("CHATBOT", "Error: ${e.message}", e)
+                Toast.makeText(this@ChatbotActivity, "Gagal memuat dokumen: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -101,12 +123,12 @@ class ChatbotActivity : AppCompatActivity() {
         etMessage.setText("")
         btnSend.isEnabled = false
 
-        messages.add(ChatMessage("✍️ Mengetik...", false))
+        messages.add(ChatMessage("✍️ AI sedang mengetik...", false))
         chatAdapter.notifyItemInserted(messages.size - 1)
         rvChat.scrollToPosition(messages.size - 1)
 
         lifecycleScope.launch {
-            val answer = apiService.chatWithSummary(question, currentSummaryText)
+            val answer = apiService.chatWithSummary(question, currentDocumentText)
             messages.removeAt(messages.size - 1)
             chatAdapter.notifyItemRemoved(messages.size)
             messages.add(ChatMessage(answer, false))

@@ -27,7 +27,7 @@ android {
     }
 
     buildFeatures {
-        buildConfig = true  // Tambahan dari chatbot
+        buildConfig = true
         viewBinding = true
         dataBinding = true
         compose = true
@@ -65,6 +65,12 @@ android {
         }
     }
 }
+
+android.defaultConfig.buildConfigField(
+    "String",
+    "GITHUB_TOKEN",
+    "\"${project.properties["GITHUB_TOKEN"] ?: ""}\""
+)
 
 kapt {
     correctErrorTypes = true

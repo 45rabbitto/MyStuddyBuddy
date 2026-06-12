@@ -97,6 +97,7 @@ proguard-seeds.txt
 # Document uploads temporary
 app/src/main/assets/temp/
 app/src/main/assets/uploads/
+app/src/main/assets/chatbot_token.txt
 *.pdf.tmp
 *.docx.tmp
 
