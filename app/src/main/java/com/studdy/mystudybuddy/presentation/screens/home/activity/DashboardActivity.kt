@@ -149,11 +149,6 @@ class DashboardActivity : AppCompatActivity() {
 
         upload.setOnClickListener {
 
-            Toast.makeText(
-                this,
-                "Membuka Upload",
-                Toast.LENGTH_SHORT
-            ).show()
 
             startActivity(
                 Intent(

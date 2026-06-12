@@ -63,6 +63,11 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         savedDocumentId = intent.getStringExtra("DOCUMENT_ID")
 
         tvFileName.text = fileName
+
+        // Debug log untuk cek nilai
+        android.util.Log.d("HistoryDetail", "fileName: $fileName")
+        android.util.Log.d("HistoryDetail", "fileUri: $fileUri")
+        android.util.Log.d("HistoryDetail", "savedDocumentId: $savedDocumentId")
     }
 
     private fun setupListeners() {
@@ -191,19 +196,26 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                 })
         }
 
+        // 🔥 PERBAIKAN: Tombol Chatbot dengan Langkah 4
         btnChatbot.setOnClickListener {
+            // Cek apakah savedDocumentId ada
+            if (savedDocumentId == null || savedDocumentId?.isEmpty() == true) {
+                Toast.makeText(this, "Dokumen tidak ditemukan", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            startActivity(
-                Intent(
-                    this,
-                    ChatbotActivity::class.java
-                ).apply {
-
+            // Jalankan intent ke ChatbotActivity
+            val intent = Intent(this, ChatbotActivity::class.java).apply {
+                putExtra("FILE_NAME", fileName)
+                putExtra("DOCUMENT_ID", savedDocumentId)
+                // FILE_URI dikirim jika ada (opsional)
+                if (fileUri.isNotEmpty()) {
                     putExtra("FILE_URI", fileUri)
-                    putExtra("FILE_NAME", fileName)
-                    putExtra("DOCUMENT_ID", savedDocumentId)
                 }
-            )
+            }
+
+            android.util.Log.d("HistoryDetail", "Opening Chatbot with DOCUMENT_ID: $savedDocumentId")
+            startActivity(intent)
         }
     }
 

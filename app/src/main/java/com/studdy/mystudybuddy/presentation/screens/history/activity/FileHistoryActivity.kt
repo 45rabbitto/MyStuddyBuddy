@@ -81,7 +81,11 @@ class FileHistoryActivity : AppCompatActivity() {
                         val date = data.child("date")
                             .getValue(String::class.java) ?: "-"
 
-                        historyList.add(FileHistoryModel(fileName, date))
+                        // 🔥 AMBIL DOCUMENT_ID dari database
+                        val documentId = data.child("documentId")
+                            .getValue(String::class.java) ?: ""
+
+                        historyList.add(FileHistoryModel(fileName, date, documentId))
                     }
 
                     rvHistory.adapter = FileHistoryAdapter(
@@ -93,6 +97,8 @@ class FileHistoryActivity : AppCompatActivity() {
                                     FileHistoryDetailActivity::class.java
                                 ).apply {
                                     putExtra("FILE_NAME", file.fileName)
+                                    putExtra("DOCUMENT_ID", file.documentId)  // 🔥 KIRIM DOCUMENT_ID
+                                    // FILE_URI akan dicari di detail activity atau tidak dikirim
                                 }
                             )
                         },
