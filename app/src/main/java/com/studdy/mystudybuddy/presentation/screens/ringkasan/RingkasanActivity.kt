@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.data.model.SummaryModel
 import com.studdy.mystudybuddy.network.RetrofitClient
@@ -107,7 +108,7 @@ class RingkasanActivity : AppCompatActivity() {
         }
 
         btnFinishRingkasan.setOnClickListener {
-            saveProgressMateri()
+
             showFeedbackDialog()
         }
     }
@@ -125,14 +126,32 @@ class RingkasanActivity : AppCompatActivity() {
             .create()
 
         ivLike.setOnClickListener {
+
             saveFeedbackToFirestore("like")
-            Toast.makeText(this, "✅ Terima kasih atas masukan baiknya!", Toast.LENGTH_LONG).show()
+
+            updateProgress(70)
+
+            Toast.makeText(
+                this,
+                "Terimaksih Atas Feedback Anda",
+                Toast.LENGTH_SHORT
+            ).show()
+
             dialog.dismiss()
         }
 
         ivDislike.setOnClickListener {
+
             saveFeedbackToFirestore("dislike")
-            Toast.makeText(this, "🙏 Maaf atas pengalaman Anda. Kami akan perbaiki!", Toast.LENGTH_LONG).show()
+
+            updateProgress(70)
+
+            Toast.makeText(
+                this,
+                "Terima kasih atas feedback Anda",
+                Toast.LENGTH_SHORT
+            ).show()
+
             dialog.dismiss()
         }
 
@@ -300,26 +319,49 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun saveProgressMateri() {
-        val userId = auth.currentUser?.uid ?: return
 
-        val data = hashMapOf(
-            "fileName" to currentFileName,
-            "completed" to true,
-            "updatedAt" to Date(),
-            "summaryId" to currentDocumentId
-        )
+        val uid =
+            FirebaseAuth.getInstance()
+                .currentUser?.uid ?: return
 
-        firestore.collection("PdfContents")
-            .document(userId)
-            .collection("readingProgress")
-            .add(data)
-            .addOnSuccessListener {
-                Log.d("Ringkasan", "Progress saved successfully")
-            }
-            .addOnFailureListener { e ->
-                Log.e("Ringkasan", "Failed to save progress: ${e.message}")
-                Toast.makeText(this, "Gagal menyimpan progress", Toast.LENGTH_SHORT).show()
-            }
+        val safeFileName =
+            currentFileName.replace(".", "_")
+
+        FirebaseDatabase.getInstance()
+            .reference
+            .child("ReadingProgress")
+            .child(uid)
+            .child(safeFileName)
+            .setValue(
+                mapOf(
+                    "fileName" to currentFileName,
+                    "progress" to 70,
+                    "completed" to true
+                )
+            )
+    }
+
+    private fun updateProgress(progress: Int) {
+
+        val uid =
+            FirebaseAuth.getInstance()
+                .currentUser?.uid ?: return
+
+        val safeFileName =
+            currentFileName.replace(".", "_")
+
+        FirebaseDatabase.getInstance()
+            .reference
+            .child("ReadingProgress")
+            .child(uid)
+            .child(safeFileName)
+            .setValue(
+                mapOf(
+                    "fileName" to currentFileName,
+                    "progress" to progress,
+                    "completed" to true
+                )
+            )
     }
 
     private fun showLoading(isLoading: Boolean) {

@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.home.activity.DashboardActivity
 import java.text.SimpleDateFormat
@@ -39,6 +40,8 @@ class HasilKuisActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_hasil_kuis)
+
+        updateProgressQuiz()
 
         finishSound =
             MediaPlayer.create(
@@ -265,5 +268,31 @@ $status
 
         finishSound?.release()
         finishSound = null
+    }
+
+    private fun updateProgressQuiz() {
+
+        val uid =
+            FirebaseAuth.getInstance()
+                .currentUser?.uid ?: return
+
+        val fileName =
+            intent.getStringExtra("FILE_NAME")
+                ?: return
+
+        val safeFileName =
+            fileName.replace(".", "_")
+
+        FirebaseDatabase.getInstance()
+            .reference
+            .child("ReadingProgress")
+            .child(uid)
+            .child(safeFileName)
+            .updateChildren(
+                mapOf(
+                    "fileName" to fileName,
+                    "progress" to 100
+                )
+            )
     }
 }

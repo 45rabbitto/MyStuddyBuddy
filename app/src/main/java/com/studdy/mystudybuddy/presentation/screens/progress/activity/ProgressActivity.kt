@@ -29,10 +29,11 @@ class ProgresActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_progres)
 
-        val session = getSharedPreferences(
-            "user_session",
-            MODE_PRIVATE
-        )
+        val session =
+            getSharedPreferences(
+                "user_session",
+                MODE_PRIVATE
+            )
 
         isGuest =
             session.getBoolean(
@@ -96,6 +97,7 @@ class ProgresActivity : AppCompatActivity() {
         database.child("UploadedMaterials")
             .child(uid)
             .addListenerForSingleValueEvent(
+
                 object : ValueEventListener {
 
                     override fun onDataChange(
@@ -113,8 +115,8 @@ class ProgresActivity : AppCompatActivity() {
                         val totalFile =
                             snapshot.childrenCount.toInt()
 
-                        var totalProgress = 0
                         var processed = 0
+                        var totalProgress = 0
 
                         for (data in snapshot.children) {
 
@@ -123,39 +125,31 @@ class ProgresActivity : AppCompatActivity() {
                                     .getValue(String::class.java)
                                     ?: "Materi"
 
+                            val safeFileName =
+                                fileName.replace(".", "_")
+
                             database.child("ReadingProgress")
                                 .child(uid)
-                                .orderByChild("fileName")
-                                .equalTo(fileName)
+                                .child(safeFileName)
                                 .addListenerForSingleValueEvent(
+
                                     object : ValueEventListener {
 
                                         override fun onDataChange(
                                             readSnapshot: DataSnapshot
                                         ) {
 
-                                            var progress = 0
-
-
-                                            var readCompleted = false
-
-                                            for (read in readSnapshot.children) {
-
-                                                readCompleted =
-                                                    read.child("completed")
-                                                        .getValue(Boolean::class.java)
-                                                        ?: false
-                                            }
-
-                                            if (readCompleted) {
-                                                progress += 70
-                                            }
+                                            var progress =
+                                                readSnapshot.child("progress")
+                                                    .getValue(Int::class.java)
+                                                    ?: 0
 
                                             database.child("QuizHistory")
                                                 .child(uid)
                                                 .orderByChild("fileName")
                                                 .equalTo(fileName)
                                                 .addListenerForSingleValueEvent(
+
                                                     object : ValueEventListener {
 
                                                         override fun onDataChange(
@@ -176,8 +170,9 @@ class ProgresActivity : AppCompatActivity() {
                                                                 }
                                                             }
 
+                                                            // Jika kuis lulus
                                                             if (bestScore >= 70) {
-                                                                progress += 30
+                                                                progress = 100
                                                             }
 
                                                             progressList.add(
@@ -195,7 +190,10 @@ class ProgresActivity : AppCompatActivity() {
                                                                 recycler.adapter?.notifyDataSetChanged()
 
                                                                 val average =
-                                                                    totalProgress / totalFile
+                                                                    if (totalFile > 0)
+                                                                        totalProgress / totalFile
+                                                                    else
+                                                                        0
 
                                                                 tvTotalProgress.text =
                                                                     "Total Progress : $average%"
