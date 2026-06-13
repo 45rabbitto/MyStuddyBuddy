@@ -26,7 +26,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvSkor: TextView
     private lateinit var btnBukaRingkasan: Button
     private lateinit var btnBukaQuiz: Button
-    private lateinit var btnChatbot: Button
+    private lateinit var btnChatbot: Button  // 🔥 TAMBAHKAN
 
     private var fileName = ""
     private var fileUri = ""
@@ -54,7 +54,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         tvSkor = findViewById(R.id.tvSkor)
         btnBukaRingkasan = findViewById(R.id.btnBukaRingkasan)
         btnBukaQuiz = findViewById(R.id.btnBukaQuiz)
-        btnChatbot = findViewById(R.id.btnChatbot)
+        btnChatbot = findViewById(R.id.btnChatbot)  // 🔥 INIT CHATBOT
     }
 
     private fun getData() {
@@ -64,14 +64,12 @@ class FileHistoryDetailActivity : AppCompatActivity() {
 
         tvFileName.text = fileName
 
-        // Debug log untuk cek nilai
         android.util.Log.d("HistoryDetail", "fileName: $fileName")
         android.util.Log.d("HistoryDetail", "fileUri: $fileUri")
         android.util.Log.d("HistoryDetail", "savedDocumentId: $savedDocumentId")
     }
 
     private fun setupListeners() {
-
         btnBack.setOnClickListener {
             finish()
         }
@@ -87,7 +85,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
 
         btnBukaQuiz.setOnClickListener {
-
             val uid = auth.currentUser?.uid ?: return@setOnClickListener
 
             database.child("QuizHistory")
@@ -97,9 +94,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                 .addListenerForSingleValueEvent(object : ValueEventListener {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
-
                         if (!snapshot.exists()) {
-
                             startActivity(
                                 Intent(
                                     this@FileHistoryDetailActivity,
@@ -109,7 +104,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                     putExtra("FILE_URI", fileUri)
                                 }
                             )
-
                             return
                         }
 
@@ -117,42 +111,27 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                         var correct = 0
                         var wrong = 0
                         var total = 0
-
                         var questions = arrayListOf<String>()
                         var userAnswers = arrayListOf<String>()
                         var correctAnswers = arrayListOf<String>()
 
                         for (data in snapshot.children) {
-
-                            score =
-                                data.child("score").getValue(Int::class.java) ?: 0
-
-                            correct =
-                                data.child("correctAnswer").getValue(Int::class.java) ?: 0
-
-                            wrong =
-                                data.child("wrongAnswer").getValue(Int::class.java) ?: 0
-
-                            total =
-                                data.child("totalQuestion").getValue(Int::class.java) ?: 0
-
-                            questions =
-                                data.child("questions")
-                                    .children
-                                    .mapNotNull { it.getValue(String::class.java) }
-                                    .toCollection(ArrayList())
-
-                            userAnswers =
-                                data.child("userAnswers")
-                                    .children
-                                    .mapNotNull { it.getValue(String::class.java) }
-                                    .toCollection(ArrayList())
-
-                            correctAnswers =
-                                data.child("correctAnswers")
-                                    .children
-                                    .mapNotNull { it.getValue(String::class.java) }
-                                    .toCollection(ArrayList())
+                            score = data.child("score").getValue(Int::class.java) ?: 0
+                            correct = data.child("correctAnswer").getValue(Int::class.java) ?: 0
+                            wrong = data.child("wrongAnswer").getValue(Int::class.java) ?: 0
+                            total = data.child("totalQuestion").getValue(Int::class.java) ?: 0
+                            questions = data.child("questions")
+                                .children
+                                .mapNotNull { it.getValue(String::class.java) }
+                                .toCollection(ArrayList())
+                            userAnswers = data.child("userAnswers")
+                                .children
+                                .mapNotNull { it.getValue(String::class.java) }
+                                .toCollection(ArrayList())
+                            correctAnswers = data.child("correctAnswers")
+                                .children
+                                .mapNotNull { it.getValue(String::class.java) }
+                                .toCollection(ArrayList())
                         }
 
                         startActivity(
@@ -160,33 +139,19 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                 this@FileHistoryDetailActivity,
                                 HasilKuisActivity::class.java
                             ).apply {
-
                                 putExtra("SCORE", score)
                                 putExtra("CORRECT", correct)
                                 putExtra("WRONG", wrong)
                                 putExtra("TOTAL", total)
                                 putExtra("FILE_NAME", fileName)
-
-                                putStringArrayListExtra(
-                                    "QUESTIONS",
-                                    questions
-                                )
-
-                                putStringArrayListExtra(
-                                    "USER_ANSWERS",
-                                    userAnswers
-                                )
-
-                                putStringArrayListExtra(
-                                    "CORRECT_ANSWERS",
-                                    correctAnswers
-                                )
+                                putStringArrayListExtra("QUESTIONS", questions)
+                                putStringArrayListExtra("USER_ANSWERS", userAnswers)
+                                putStringArrayListExtra("CORRECT_ANSWERS", correctAnswers)
                             }
                         )
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-
                         Toast.makeText(
                             this@FileHistoryDetailActivity,
                             error.message,
@@ -196,19 +161,16 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                 })
         }
 
-        // 🔥 PERBAIKAN: Tombol Chatbot dengan Langkah 4
+        // 🔥 TOMBOL CHATBOT
         btnChatbot.setOnClickListener {
-            // Cek apakah savedDocumentId ada
             if (savedDocumentId == null || savedDocumentId?.isEmpty() == true) {
                 Toast.makeText(this, "Dokumen tidak ditemukan", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Jalankan intent ke ChatbotActivity
             val intent = Intent(this, ChatbotActivity::class.java).apply {
                 putExtra("FILE_NAME", fileName)
                 putExtra("DOCUMENT_ID", savedDocumentId)
-                // FILE_URI dikirim jika ada (opsional)
                 if (fileUri.isNotEmpty()) {
                     putExtra("FILE_URI", fileUri)
                 }
@@ -220,7 +182,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
     }
 
     private fun loadDetailHistory() {
-
         val uid = auth.currentUser?.uid ?: return
 
         database.child("QuizHistory")
@@ -230,24 +191,18 @@ class FileHistoryDetailActivity : AppCompatActivity() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
-
                     if (!snapshot.exists()) {
-
                         tvSkor.text = "Skor : Belum ada"
                         tvRingkasan.text = "Belum ada ringkasan"
-
                         return
                     }
 
                     for (data in snapshot.children) {
-                        latestScore =
-                            data.child("score")
-                                .getValue(Int::class.java) ?: 0
+                        latestScore = data.child("score").getValue(Int::class.java) ?: 0
                     }
 
                     tvSkor.text = "Skor : $latestScore"
-                    tvRingkasan.text =
-                        "Klik tombol untuk melihat ringkasan materi"
+                    tvRingkasan.text = "Klik tombol untuk melihat ringkasan materi"
                 }
 
                 override fun onCancelled(error: DatabaseError) {
