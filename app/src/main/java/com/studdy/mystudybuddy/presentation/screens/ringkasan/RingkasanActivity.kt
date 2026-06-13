@@ -99,6 +99,11 @@ class RingkasanActivity : AppCompatActivity() {
                         "RINGKASAN",
                         currentSummary
                     )
+
+                    putString(
+                        "MATERI_ASLI",
+                        currentOriginalText
+                    )
                 }
 
             bottomSheet.show(

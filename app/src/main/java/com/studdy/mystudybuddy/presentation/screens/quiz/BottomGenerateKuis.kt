@@ -87,6 +87,13 @@ class BottomGenerateKuis : BottomSheetDialogFragment() {
             )
 
             intent.putExtra(
+                "MATERI_ASLI",
+                arguments?.getString(
+                    "MATERI_ASLI"
+                )
+            )
+
+            intent.putExtra(
                 "JUMLAH_SOAL",
                 jumlahSoal
             )

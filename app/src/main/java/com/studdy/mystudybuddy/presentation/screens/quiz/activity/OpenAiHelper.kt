@@ -6,20 +6,25 @@ import org.json.JSONObject
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import android.util.Log
 
 object OpenAiHelper {
 
-    // Ganti dengan API Key OpenAI Anda
-    private const val API_KEY = ""
+    private const val API_KEY = "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"
+
     fun generateSoal(
-        ringkasan: String,
+        materi: String,
         jumlahSoal: Int,
         onSuccess: (String) -> Unit,
         onError: (String) -> Unit
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val soalJson = callOpenAiForQuestions(ringkasan, jumlahSoal)
+                val soalJson =
+                    callOpenAiForQuestions(
+                        materi,
+                        jumlahSoal
+                    )
                 onSuccess(soalJson)
             } catch (e: Exception) {
                 onError(e.message ?: "Unknown error")
@@ -27,29 +32,51 @@ object OpenAiHelper {
         }
     }
 
-    private suspend fun callOpenAiForQuestions(ringkasan: String, jumlahSoal: Int): String {
+    private suspend fun callOpenAiForQuestions(materi: String, jumlahSoal: Int): String {
+        val materiPendek =
+            if (materi.length > 12000)
+                materi.take(12000)
+            else
+                materi
         val prompt = """
-            Buatkan $jumlahSoal soal pilihan ganda dari materi berikut:
+            Anda adalah dosen pembuat soal.
+
+            Berdasarkan materi berikut:
             
-            $ringkasan
+            $materiPendek
             
-            Format output harus dalam JSON Array seperti contoh:
+            Buatkan $jumlahSoal soal pilihan ganda.
+            
+            ATURAN:
+            
+            1. Soal HARUS berasal dari isi materi.
+            2. Jangan membuat soal di luar materi.
+            3. Setiap soal memiliki 4 opsi.
+            4. Hanya ada 1 jawaban benar.
+            5. Tingkat kesulitan menengah.
+            6. Gunakan bahasa Indonesia.
+            7. Jangan mengulang soal yang sama.
+            
+            Format JSON:
+            
             [
-                {
-                    "question": "Pertanyaan 1?",
-                    "options": ["Jawaban A", "Jawaban B", "Jawaban C", "Jawaban D"],
-                    "correctAnswer": 0
-                }
+             {
+               "question":"...",
+               "options":[
+                  "...",
+                  "...",
+                  "...",
+                  "..."
+               ],
+               "correctAnswer":0
+             }
             ]
             
-            Pastikan:
-            1. correctAnswer adalah index 0-3 (0 untuk A, 1 untuk B, dst)
-            2. Soal harus relevan dengan materi di atas
-            3. Gunakan bahasa Indonesia
-        """.trimIndent()
+            Keluarkan JSON saja tanpa penjelasan tambahan.
+            """.trimIndent()
 
         val jsonBody = JSONObject().apply {
-            put("model", "gpt-3.5-turbo")
+            put("model", "gpt-4o")
             put("messages", JSONArray().apply {
                 put(JSONObject().apply {
                     put("role", "system")
@@ -78,24 +105,34 @@ object OpenAiHelper {
         }
 
         val responseCode = connection.responseCode
-        val response = if (responseCode == HttpURLConnection.HTTP_OK) {
-            connection.inputStream.bufferedReader().readText()
-        } else {
-            connection.errorStream?.bufferedReader()?.readText() ?: ""
-        }
+
+        val responseText =
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                connection.inputStream.bufferedReader().readText()
+            } else {
+                connection.errorStream?.bufferedReader()?.readText() ?: ""
+            }
+
+        Log.d("OPENAI_CODE", responseCode.toString())
+        Log.d("OPENAI_RESPONSE", responseText)
+
         connection.disconnect()
 
         if (responseCode != HttpURLConnection.HTTP_OK) {
-            throw Exception("API Error: $responseCode - $response")
+            throw Exception("API Error: $responseCode - $responseText")
         }
 
-        val jsonResponse = JSONObject(response)
-        val content = jsonResponse
-            .getJSONArray("choices")
-            .getJSONObject(0)
-            .getJSONObject("message")
-            .getString("content")
-            .trim()
+        val jsonResponse = JSONObject(responseText)
+
+        val content =
+            jsonResponse
+                .getJSONArray("choices")
+                .getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content")
+                .trim()
+
+        Log.d("QUIZ_JSON", content)
 
         return content
     }

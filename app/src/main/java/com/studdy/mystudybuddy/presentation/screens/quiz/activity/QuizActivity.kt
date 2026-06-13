@@ -12,6 +12,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
+import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizGenerator
+
 
 class QuizActivity : AppCompatActivity() {
 
@@ -41,7 +43,8 @@ class QuizActivity : AppCompatActivity() {
     private var score = 0
 
     private var fileName: String? = null
-    private var summaryText: String? = null
+    private var materiAsli: String? = null
+    private var ringkasan: String? = null
     private var jumlahSoal = 5
 
     private val userAnswers = mutableListOf<Int>()
@@ -58,9 +61,58 @@ class QuizActivity : AppCompatActivity() {
         setupMusic()
         setupListeners()
 
-        generateDummyQuestions()
+        generateQuestionsFromText()
     }
 
+    private fun generateQuestionsFromText() {
+
+        val materiGabungan = buildString {
+
+            append(
+                ringkasan ?: ""
+            )
+
+            append("\n\n")
+
+            append(
+                materiAsli ?: ""
+            )
+        }
+
+        if (materiGabungan.isEmpty()) {
+
+            Toast.makeText(
+                this,
+                "Materi kosong",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        questions.clear()
+
+        questions.addAll(
+
+            QuizGenerator.generateFromText(
+                materiGabungan,
+                jumlahSoal
+            )
+        )
+
+        if (questions.isNotEmpty()) {
+
+            loadQuestion()
+
+        } else {
+
+            Toast.makeText(
+                this,
+                "Soal tidak berhasil dibuat",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
     private fun initViews() {
 
         btnBack = findViewById(R.id.btnBack)
@@ -80,9 +132,20 @@ class QuizActivity : AppCompatActivity() {
 
     private fun setupData() {
 
-        fileName = intent.getStringExtra("FILE_NAME")
-        summaryText = intent.getStringExtra("RINGKASAN")
-        jumlahSoal = intent.getIntExtra("JUMLAH_SOAL", 5)
+        fileName =
+            intent.getStringExtra("FILE_NAME")
+
+        ringkasan =
+            intent.getStringExtra("RINGKASAN")
+
+        materiAsli =
+            intent.getStringExtra("MATERI_ASLI")
+
+        jumlahSoal =
+            intent.getIntExtra(
+                "JUMLAH_SOAL",
+                5
+            )
 
         userAnswers.clear()
     }
@@ -216,88 +279,6 @@ class QuizActivity : AppCompatActivity() {
                 showResult()
             }
         }
-    }
-
-    private fun generateDummyQuestions() {
-
-        val allQuestions = mutableListOf(
-
-            QuizQuestion(
-                "Apa fungsi utama sistem operasi?",
-                listOf(
-                    "Mengelola hardware dan software",
-                    "Membuat dokumen",
-                    "Menyimpan data",
-                    "Membuka browser"
-                ),
-                0
-            ),
-
-            QuizQuestion(
-                "Bahasa resmi Android saat ini adalah?",
-                listOf(
-                    "Java",
-                    "PHP",
-                    "Kotlin",
-                    "Swift"
-                ),
-                2
-            ),
-
-            QuizQuestion(
-                "Apa kepanjangan CPU?",
-                listOf(
-                    "Central Process Unit",
-                    "Computer Processing Unit",
-                    "Central Processing Unit",
-                    "Central Program Unit"
-                ),
-                2
-            ),
-
-            QuizQuestion(
-                "Git digunakan untuk?",
-                listOf(
-                    "Database",
-                    "Version Control",
-                    "UI Design",
-                    "Hosting"
-                ),
-                1
-            ),
-
-            QuizQuestion(
-                "Perintah SQL mengambil data?",
-                listOf(
-                    "INSERT",
-                    "DELETE",
-                    "UPDATE",
-                    "SELECT"
-                ),
-                3
-            ),
-
-            QuizQuestion(
-                "FIFO digunakan pada?",
-                listOf(
-                    "Stack",
-                    "Queue",
-                    "Tree",
-                    "Graph"
-                ),
-                1
-            )
-        )
-
-        allQuestions.shuffle()
-
-        questions.clear()
-
-        questions.addAll(
-            allQuestions.take(jumlahSoal)
-        )
-
-        loadQuestion()
     }
 
     private fun loadQuestion() {
