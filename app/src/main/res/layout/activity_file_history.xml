@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
@@ -11,10 +11,10 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- HEADER -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/kontainer"
             android:padding="10dp">
 
@@ -22,123 +22,138 @@
                 android:id="@+id/btnBack"
                 android:layout_width="35dp"
                 android:layout_height="35dp"
-                android:src="@drawable/back"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:src="@drawable/back" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="Detail File"
-                android:textSize="20sp"
-                android:textStyle="bold"
                 android:textColor="@color/dark_text"
-                android:layout_centerInParent="true"/>
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
         </RelativeLayout>
 
-        <!-- FILE -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginTop="20dp">
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nama File"
-                android:textStyle="bold"
-                android:textColor="#888888"/>
+                android:textColor="#888888"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvFileName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Biologi Sel.pdf"
+                android:layout_marginTop="8dp"
+                android:text="Dokumen.pdf"
+                android:textColor="@color/dark_text"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginTop="6dp"/>
+                android:textStyle="bold" />
+
         </LinearLayout>
 
-        <!-- RINGKASAN -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginTop="16dp">
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ringkasan"
+                android:text="✨ Ringkasan"
+                android:textColor="@color/primary_button"
                 android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvRingkasan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Materi membahas struktur sel..."
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:text="Klik tombol untuk melihat ringkasan materi"
+                android:textColor="#666666"
+                android:textSize="15sp" />
 
             <Button
                 android:id="@+id/btnBukaRingkasan"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Lihat Ringkasan"
-                android:textColor="@android:color/white"
+                android:layout_height="55dp"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/button1"/>
+                android:background="@drawable/button1"
+                android:text="LIHAT RINGKASAN"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
-        <!-- QUIZ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             android:background="@drawable/card_bg"
             android:orientation="vertical"
-            android:padding="16dp"
-            android:layout_marginTop="16dp">
+            android:padding="16dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hasil Quiz"
-                android:textStyle="bold"
-                android:textSize="18sp"/>
+                android:text="📊 Hasil Quiz"
+                android:textColor="@color/primary_button"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvSkor"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Skor : 85"
-                android:layout_marginTop="10dp"/>
+                android:layout_marginTop="10dp"
+                android:text="Skor : 100"
+                android:textColor="#666666"
+                android:textSize="15sp" />
 
             <Button
                 android:id="@+id/btnBukaQuiz"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Lihat Hasil Quiz"
-                android:textColor="@android:color/white"
+                android:layout_height="55dp"
                 android:layout_marginTop="15dp"
-                android:background="@drawable/button1"/>
-
-            <!-- 🔥 TOMBOL CHATBOT (BARU) -->
-            <Button
-                android:id="@+id/btnChatbot"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Chat Bot"
+                android:background="@drawable/button1"
+                android:text="LIHAT HASIL QUIZ"
+                android:textAllCaps="true"
                 android:textColor="@android:color/white"
-                android:layout_marginTop="15dp"
-                android:background="@drawable/button_line"
-                android:textColor="@color/primary_button"/>
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnChatbot"
+            android:layout_width="300dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp"
+            android:background="@drawable/button1"
+            android:text="💬 CHAT BOT"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

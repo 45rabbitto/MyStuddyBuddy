@@ -1,8 +1,8 @@
 package com.studdy.mystudybuddy.presentation.screens.ringkasan
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -14,10 +14,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
-import com.studdy.mystudybuddy.data.model.SummaryModel
 import com.studdy.mystudybuddy.network.RetrofitClient
 import com.studdy.mystudybuddy.network.SummarizeRequest
-import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Date
@@ -30,7 +28,6 @@ class RingkasanActivity : AppCompatActivity() {
     private lateinit var tvRingkasan: TextView
     private lateinit var btnRingkasan: Button
     private lateinit var btnGenerateQuiz: Button
-
     private lateinit var btnFinishRingkasan: Button
     private lateinit var progressBar: android.widget.ProgressBar
 
@@ -50,11 +47,26 @@ class RingkasanActivity : AppCompatActivity() {
         firestore = FirebaseFirestore.getInstance()
 
         currentFileName = intent.getStringExtra("FILE_NAME") ?: "Dokumen"
+        currentDocumentId = intent.getStringExtra("DOCUMENT_ID") ?: ""
+
+        Log.d("DEBUG_FLOW", "fileName = $currentFileName")
+        Log.d("DEBUG_FLOW", "documentId = $currentDocumentId")
 
         initViews()
         setupClickListeners()
 
-        loadOriginalText()
+        val fromHistory = intent.getBooleanExtra("FROM_HISTORY", false)
+
+        if (currentDocumentId.isBlank()) {
+            tvRingkasan.text = "Document ID tidak valid"
+            return
+        }
+
+        if (fromHistory) {
+            loadSavedSummary()
+        } else {
+            loadOriginalText()
+        }
     }
 
     private fun initViews() {
@@ -71,51 +83,170 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
+
         btnBack.setOnClickListener { finish() }
 
         btnRingkasan.setOnClickListener {
-            if (currentOriginalText.isNotEmpty()) {
+            if (currentSummary.isEmpty()) {
                 generateSummary()
             } else {
-                Toast.makeText(this, "Teks belum dimuat. Tunggu sebentar...", Toast.LENGTH_SHORT).show()
+                showSummary()
             }
         }
 
-
         btnGenerateQuiz.setOnClickListener {
+            val bottomSheet = BottomGenerateKuis()
 
-            val bottomSheet =
-                BottomGenerateKuis()
+            bottomSheet.arguments = Bundle().apply {
+                putString("FILE_NAME", currentFileName)
+                putString("RINGKASAN", currentSummary)
+                putString("MATERI_ASLI", currentOriginalText)
+            }
 
-            bottomSheet.arguments =
-                Bundle().apply {
-
-                    putString(
-                        "FILE_NAME",
-                        currentFileName
-                    )
-
-                    putString(
-                        "RINGKASAN",
-                        currentSummary
-                    )
-
-                    putString(
-                        "MATERI_ASLI",
-                        currentOriginalText
-                    )
-                }
-
-            bottomSheet.show(
-                supportFragmentManager,
-                "bottom_generate_kuis"
-            )
+            bottomSheet.show(supportFragmentManager, "bottom_generate_kuis")
         }
 
         btnFinishRingkasan.setOnClickListener {
-
             showFeedbackDialog()
         }
+    }
+
+    private fun showSummary() {
+        tvRingkasan.text = """
+            RINGKASAN AI:
+
+            $currentSummary
+        """.trimIndent()
+    }
+
+    private fun loadOriginalText() {
+        tvTeksAsli.text = "Memuat dokumen..."
+        showLoading(true)
+
+        lifecycleScope.launch {
+            try {
+                val uid = auth.currentUser?.uid ?: return@launch
+
+                val snapshot = firestore.collection("PdfContents")
+                    .document(uid)
+                    .collection("documents")
+                    .document(currentDocumentId)
+                    .get()
+                    .await()
+
+                if (!snapshot.exists()) {
+                    tvTeksAsli.text = "Dokumen tidak ditemukan"
+                    showLoading(false)
+                    return@launch
+                }
+
+                currentOriginalText = snapshot.getString("content") ?: ""
+                currentSummary = snapshot.getString("summary") ?: ""
+
+                tvTeksAsli.text = currentOriginalText
+
+                if (currentSummary.isNotEmpty()) {
+                    tvRingkasan.text = buildSummaryUI(currentSummary)
+                }
+
+                btnRingkasan.isEnabled = true
+
+            } catch (e: Exception) {
+                tvTeksAsli.text = "Error: ${e.message}"
+            } finally {
+                showLoading(false)
+            }
+        }
+    }
+
+    private fun loadSavedSummary() {
+        val uid = auth.currentUser?.uid ?: return
+
+        Log.d("SUMMARY_DEBUG", "uid = $uid")
+        Log.d("SUMMARY_DEBUG", "documentId = $currentDocumentId")
+
+        firestore.collection("PdfContents")
+            .document(uid)
+            .collection("documents")
+            .document(currentDocumentId)
+            .get()
+            .addOnSuccessListener { doc ->
+
+                if (!doc.exists()) {
+                    tvRingkasan.text = "Data tidak ditemukan"
+                    return@addOnSuccessListener
+                }
+
+                currentOriginalText = doc.getString("content") ?: ""
+                currentSummary = doc.getString("summary") ?: ""
+
+                tvTeksAsli.text = currentOriginalText
+
+                if (currentSummary.isNotEmpty()) {
+                    tvRingkasan.text = buildSummaryUI(currentSummary)
+                }
+
+                btnRingkasan.isEnabled = true
+                btnGenerateQuiz.isEnabled = currentSummary.isNotEmpty()
+            }
+            .addOnFailureListener {
+                tvRingkasan.text = "Gagal load data"
+            }
+    }
+
+    private fun generateSummary() {
+        tvRingkasan.text = "📡 AI sedang meringkas..."
+        showLoading(true)
+
+        lifecycleScope.launch {
+            try {
+                val uid = auth.currentUser?.uid ?: return@launch
+
+                val response = RetrofitClient.api.summarizeText(
+                    SummarizeRequest(currentOriginalText)
+                )
+
+                if (response.isSuccessful && response.body() != null) {
+
+                    val summaryText = response.body()!!.summary
+                    currentSummary = summaryText
+
+                    firestore.collection("PdfContents")
+                        .document(uid)
+                        .collection("documents")
+                        .document(currentDocumentId)
+                        .update(
+                            mapOf(
+                                "summary" to summaryText,
+                                "isProcessed" to true
+                            )
+                        )
+                        .await()
+
+                    tvRingkasan.text = buildSummaryUI(summaryText)
+                    btnGenerateQuiz.isEnabled = true
+                }
+
+            } catch (e: Exception) {
+                tvRingkasan.text = "Error: ${e.message}"
+            } finally {
+                showLoading(false)
+                btnRingkasan.isEnabled = true
+            }
+        }
+    }
+
+    private fun buildSummaryUI(summary: String): String {
+        return """
+            RINGKASAN AI:
+
+            $summary
+
+            ───────────────
+            📊 Statistik:
+            • Panjang teks: ${currentOriginalText.length}
+            • Ringkasan: ${summary.length}
+        """.trimIndent()
     }
 
     private fun showFeedbackDialog() {
@@ -123,7 +254,6 @@ class RingkasanActivity : AppCompatActivity() {
 
         val ivLike = dialogView.findViewById<ImageView>(R.id.ivLike)
         val ivDislike = dialogView.findViewById<ImageView>(R.id.ivDislike)
-        val tvQuestion = dialogView.findViewById<TextView>(R.id.tvQuestion)
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -131,32 +261,16 @@ class RingkasanActivity : AppCompatActivity() {
             .create()
 
         ivLike.setOnClickListener {
-
             saveFeedbackToFirestore("like")
-
             updateProgress(70)
-
-            Toast.makeText(
-                this,
-                "Terimaksih Atas Feedback Anda",
-                Toast.LENGTH_SHORT
-            ).show()
-
+            Toast.makeText(this, "Terima kasih!", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
         ivDislike.setOnClickListener {
-
             saveFeedbackToFirestore("dislike")
-
             updateProgress(70)
-
-            Toast.makeText(
-                this,
-                "Terima kasih atas feedback Anda",
-                Toast.LENGTH_SHORT
-            ).show()
-
+            Toast.makeText(this, "Terima kasih!", Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
 
@@ -164,7 +278,7 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun saveFeedbackToFirestore(feedback: String) {
-        val userId = auth.currentUser?.uid ?: "guest"
+        val uid = auth.currentUser?.uid ?: "guest"
 
         val data = hashMapOf(
             "feedback" to feedback,
@@ -172,194 +286,20 @@ class RingkasanActivity : AppCompatActivity() {
             "fileName" to currentFileName,
             "summary" to currentSummary,
             "timestamp" to Date(),
-            "userId" to userId
+            "userId" to uid
         )
 
-        firestore.collection("feedbacks")
-            .add(data)
-            .addOnSuccessListener {
-                Log.d("FEEDBACK", "Feedback saved: $feedback")
-            }
-            .addOnFailureListener { e ->
-                Log.e("FEEDBACK", "Failed to save feedback: ${e.message}")
-            }
-    }
-
-    private fun loadOriginalText() {
-
-        tvTeksAsli.text =
-            "Memuat dokumen..."
-
-        showLoading(true)
-
-        lifecycleScope.launch {
-
-            try {
-
-                val userId =
-                    auth.currentUser?.uid ?: return@launch
-
-                val snapshot =
-                    firestore.collection("PdfContents")
-                        .document(userId)
-                        .collection("documents")
-                        .whereEqualTo(
-                            "fileName",
-                            currentFileName
-                        )
-                        .get()
-                        .await()
-
-                if (snapshot.isEmpty) {
-
-                    tvTeksAsli.text =
-                        "❌ Dokumen tidak ditemukan"
-
-                    showLoading(false)
-                    return@launch
-                }
-
-                val doc =
-                    snapshot.documents.first()
-
-                currentDocumentId =
-                    doc.id
-
-                currentOriginalText =
-                    doc.getString("content")
-                        ?: ""
-
-                if (currentOriginalText.isEmpty()) {
-
-                    tvTeksAsli.text =
-                        "❌ Isi dokumen kosong"
-
-                    showLoading(false)
-                    return@launch
-                }
-
-                tvTeksAsli.text =
-                    currentOriginalText.take(1000)
-
-                btnRingkasan.isEnabled =
-                    true
-
-                showLoading(false)
-
-            } catch (e: Exception) {
-
-                tvTeksAsli.text =
-                    "❌ ${e.message}"
-
-                showLoading(false)
-            }
-        }
-    }
-
-    private fun generateSummary() {
-        tvRingkasan.text = "📡 Mengirim ke AI...\n\n AI sedang meringkas (mohon tunggu 5-10 detik)..."
-        showLoading(true)
-        btnRingkasan.isEnabled = false
-
-        lifecycleScope.launch {
-            try {
-                val userId = auth.currentUser?.uid ?: "guest"
-
-                val response = RetrofitClient.api.summarizeText(
-                    SummarizeRequest(currentOriginalText)
-                )
-
-                if (response.isSuccessful && response.body() != null) {
-                    val summaryText = response.body()!!.summary
-                    currentSummary = summaryText
-
-                    val summaryModel = SummaryModel(
-                        documentId = currentDocumentId,
-                        fileName = currentFileName,
-                        summary = summaryText,
-                        summaryLength = summaryText.length,
-                        originalLength = currentOriginalText.length,
-                        createdAt = Date(),
-                        userId = userId
-                    )
-
-                    val summaryRef = firestore.collection("summaries").document()
-                    summaryRef.set(summaryModel).await()
-
-                    firestore.collection("PdfContents")
-                        .document(userId)
-                        .collection("documents")
-                        .document(currentDocumentId)
-                        .update("summaryId", summaryRef.id, "isProcessed", true)
-                        .await()
-
-                    tvRingkasan.text = """
-                        RINGKASAN AI:
-                        
-                        $summaryText
-                        
-                        ─────────────────────────
-                        Statistik:
-                        • Teks asli: ${currentOriginalText.length} karakter
-                        • Ringkasan: ${summaryText.length} karakter
-                    """.trimIndent()
-
-                    Toast.makeText(this@RingkasanActivity, "✅ Ringkasan berhasil dibuat!", Toast.LENGTH_SHORT).show()
-                    btnGenerateQuiz.isEnabled = true
-
-                } else {
-                    tvRingkasan.text = "❌ Gagal membuat ringkasan: API error ${response.code()}"
-                }
-
-                showLoading(false)
-                btnRingkasan.isEnabled = true
-
-            } catch (e: Exception) {
-                Log.e("Ringkasan", "Error: ${e.message}", e)
-                tvRingkasan.text = "❌ Error: ${e.message}"
-                showLoading(false)
-                btnRingkasan.isEnabled = true
-            }
-        }
-    }
-
-    private fun saveProgressMateri() {
-
-        val uid =
-            FirebaseAuth.getInstance()
-                .currentUser?.uid ?: return
-
-        val safeFileName =
-            currentFileName.replace(".", "_")
-
-        FirebaseDatabase.getInstance()
-            .reference
-            .child("ReadingProgress")
-            .child(uid)
-            .child(safeFileName)
-            .setValue(
-                mapOf(
-                    "fileName" to currentFileName,
-                    "progress" to 70,
-                    "completed" to true
-                )
-            )
+        firestore.collection("feedbacks").add(data)
     }
 
     private fun updateProgress(progress: Int) {
-
-        val uid =
-            FirebaseAuth.getInstance()
-                .currentUser?.uid ?: return
-
-        val safeFileName =
-            currentFileName.replace(".", "_")
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         FirebaseDatabase.getInstance()
             .reference
             .child("ReadingProgress")
             .child(uid)
-            .child(safeFileName)
+            .child(currentFileName.replace(".", "_"))
             .setValue(
                 mapOf(
                     "fileName" to currentFileName,
@@ -370,7 +310,9 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        progressBar.visibility = if (isLoading) android.view.View.VISIBLE else android.view.View.GONE
+        progressBar.visibility =
+            if (isLoading) View.VISIBLE else View.GONE
+
         btnRingkasan.isEnabled = !isLoading
         btnGenerateQuiz.isEnabled = !isLoading && currentSummary.isNotEmpty()
     }

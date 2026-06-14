@@ -2,16 +2,15 @@ package com.studdy.mystudybuddy.presentation.screens.history.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
+import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.HasilKuisActivity
@@ -26,16 +25,15 @@ class FileHistoryDetailActivity : AppCompatActivity() {
     private lateinit var tvSkor: TextView
     private lateinit var btnBukaRingkasan: Button
     private lateinit var btnBukaQuiz: Button
-    private lateinit var btnChatbot: Button  // 🔥 TAMBAHKAN
+    private lateinit var btnChatbot: Button
+
+    private val firestore = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+    private val database = FirebaseDatabase.getInstance().reference
 
     private var fileName = ""
     private var fileUri = ""
     private var savedDocumentId: String? = null
-
-    private var latestScore = 0
-
-    private val auth = FirebaseAuth.getInstance()
-    private val database = FirebaseDatabase.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,25 +52,24 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         tvSkor = findViewById(R.id.tvSkor)
         btnBukaRingkasan = findViewById(R.id.btnBukaRingkasan)
         btnBukaQuiz = findViewById(R.id.btnBukaQuiz)
-        btnChatbot = findViewById(R.id.btnChatbot)  // 🔥 INIT CHATBOT
+        btnChatbot = findViewById(R.id.btnChatbot)
     }
 
     private fun getData() {
-        fileName = intent.getStringExtra("FILE_NAME") ?: "Dokumen"
+        fileName = intent.getStringExtra("FILE_NAME") ?: ""
         fileUri = intent.getStringExtra("FILE_URI") ?: ""
         savedDocumentId = intent.getStringExtra("DOCUMENT_ID")
 
         tvFileName.text = fileName
 
-        android.util.Log.d("HistoryDetail", "fileName: $fileName")
-        android.util.Log.d("HistoryDetail", "fileUri: $fileUri")
-        android.util.Log.d("HistoryDetail", "savedDocumentId: $savedDocumentId")
+        Log.d("HistoryDetail", "fileName=$fileName")
+        Log.d("HistoryDetail",  "Document ID = $savedDocumentId")
+
     }
 
     private fun setupListeners() {
-        btnBack.setOnClickListener {
-            finish()
-        }
+
+        btnBack.setOnClickListener { finish() }
 
         btnBukaRingkasan.setOnClickListener {
             startActivity(
@@ -85,6 +82,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
 
         btnBukaQuiz.setOnClickListener {
+
             val uid = auth.currentUser?.uid ?: return@setOnClickListener
 
             database.child("QuizHistory")
@@ -94,6 +92,7 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                 .addListenerForSingleValueEvent(object : ValueEventListener {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
+
                         if (!snapshot.exists()) {
                             startActivity(
                                 Intent(
@@ -111,27 +110,27 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                         var correct = 0
                         var wrong = 0
                         var total = 0
-                        var questions = arrayListOf<String>()
-                        var userAnswers = arrayListOf<String>()
-                        var correctAnswers = arrayListOf<String>()
+                        val questions = arrayListOf<String>()
+                        val userAnswers = arrayListOf<String>()
+                        val correctAnswers = arrayListOf<String>()
 
                         for (data in snapshot.children) {
                             score = data.child("score").getValue(Int::class.java) ?: 0
                             correct = data.child("correctAnswer").getValue(Int::class.java) ?: 0
                             wrong = data.child("wrongAnswer").getValue(Int::class.java) ?: 0
                             total = data.child("totalQuestion").getValue(Int::class.java) ?: 0
-                            questions = data.child("questions")
-                                .children
-                                .mapNotNull { it.getValue(String::class.java) }
-                                .toCollection(ArrayList())
-                            userAnswers = data.child("userAnswers")
-                                .children
-                                .mapNotNull { it.getValue(String::class.java) }
-                                .toCollection(ArrayList())
-                            correctAnswers = data.child("correctAnswers")
-                                .children
-                                .mapNotNull { it.getValue(String::class.java) }
-                                .toCollection(ArrayList())
+
+                            data.child("questions").children.forEach {
+                                it.getValue(String::class.java)?.let { q -> questions.add(q) }
+                            }
+
+                            data.child("userAnswers").children.forEach {
+                                it.getValue(String::class.java)?.let { a -> userAnswers.add(a) }
+                            }
+
+                            data.child("correctAnswers").children.forEach {
+                                it.getValue(String::class.java)?.let { a -> correctAnswers.add(a) }
+                            }
                         }
 
                         startActivity(
@@ -152,37 +151,35 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(
-                            this@FileHistoryDetailActivity,
-                            error.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@FileHistoryDetailActivity, error.message, Toast.LENGTH_SHORT).show()
                     }
                 })
         }
 
-        // 🔥 TOMBOL CHATBOT
         btnChatbot.setOnClickListener {
-            if (savedDocumentId == null || savedDocumentId?.isEmpty() == true) {
-                Toast.makeText(this, "Dokumen tidak ditemukan", Toast.LENGTH_SHORT).show()
+
+            if (savedDocumentId.isNullOrEmpty()) {
+                Toast.makeText(this, "Document ID kosong", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val intent = Intent(this, ChatbotActivity::class.java).apply {
-                putExtra("FILE_NAME", fileName)
-                putExtra("DOCUMENT_ID", savedDocumentId)
-                if (fileUri.isNotEmpty()) {
+            startActivity(
+                Intent(this, ChatbotActivity::class.java).apply {
+                    putExtra("FILE_NAME", fileName)
+                    putExtra("DOCUMENT_ID", savedDocumentId)
                     putExtra("FILE_URI", fileUri)
                 }
-            }
-
-            android.util.Log.d("HistoryDetail", "Opening Chatbot with DOCUMENT_ID: $savedDocumentId")
-            startActivity(intent)
+            )
         }
     }
 
     private fun loadDetailHistory() {
+
         val uid = auth.currentUser?.uid ?: return
+
+
+        android.util.Log.d("CHECK_HISTORY", "uid = $uid")
+        android.util.Log.d("CHECK_HISTORY", "documentId = $savedDocumentId")
 
         database.child("QuizHistory")
             .child(uid)
@@ -191,23 +188,53 @@ class FileHistoryDetailActivity : AppCompatActivity() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
+
                     if (!snapshot.exists()) {
-                        tvSkor.text = "Skor : Belum ada"
-                        tvRingkasan.text = "Belum ada ringkasan"
+                        tvSkor.text = "Skor : 0"
                         return
                     }
 
-                    for (data in snapshot.children) {
-                        latestScore = data.child("score").getValue(Int::class.java) ?: 0
+                    var score = 0
+
+                    snapshot.children.forEach { data ->
+                        score = data.child("score").getValue(Int::class.java) ?: 0
                     }
 
-                    tvSkor.text = "Skor : $latestScore"
-                    tvRingkasan.text = "Klik tombol untuk melihat ringkasan materi"
+                    tvSkor.text = "Skor : $score"
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    tvSkor.text = "Gagal memuat skor"
+                    tvSkor.text = "Gagal load skor"
                 }
             })
+
+        if (savedDocumentId.isNullOrEmpty()) {
+            tvRingkasan.text = "Ringkasan belum tersedia"
+            return
+        }
+
+        firestore.collection("PdfContents")
+            .document(uid)
+            .collection("documents")
+            .document(savedDocumentId!!)
+            .get()
+            .addOnSuccessListener { doc ->
+
+                Log.d("FIRESTORE_CHECK", "exists = ${doc.exists()}")
+                Log.d("FIRESTORE_CHECK", "data = ${doc.data}")
+
+                if (doc.exists()) {
+                    val summary = doc.getString("summary")
+
+                    Log.d("CHECK_HISTORY", "SUMMARY = $summary")
+
+                    tvRingkasan.text = summary ?: "Ringkasan belum tersedia"
+                } else {
+                    tvRingkasan.text = "Dokumen tidak ditemukan"
+                }
+            }
+            .addOnFailureListener {
+                tvRingkasan.text = "Gagal load ringkasan"
+            }
     }
 }

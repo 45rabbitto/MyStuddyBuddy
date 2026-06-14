@@ -26,6 +26,7 @@ import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import java.text.SimpleDateFormat
 import java.util.*
+import android.util.Log
 
 class UploadActivity : AppCompatActivity() {
 
@@ -144,13 +145,6 @@ class UploadActivity : AppCompatActivity() {
                     setOnClickListener { openAlur() }
                 }
             )
-
-            if (isLoggedIn()) {
-                saveUploadedMaterial(fileName ?: "", savedDocumentId ?: "")
-                saveToHistory(fileName ?: "", savedDocumentId ?: "")
-                updateProgress(fileName ?: "")
-                Toast.makeText(this, "File tersimpan", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 
@@ -180,7 +174,11 @@ class UploadActivity : AppCompatActivity() {
         }
     }
 
-    private fun savePdfTextToFirestore(fileName: String, content: String) {
+    private fun savePdfTextToFirestore(
+        fileName: String,
+        content: String
+    ) {
+
         val userId = auth.currentUser?.uid ?: "guest"
 
         val data = hashMapOf(
@@ -188,40 +186,85 @@ class UploadActivity : AppCompatActivity() {
             "content" to content,
             "userId" to userId,
             "timestamp" to System.currentTimeMillis(),
-            "isProcessed" to false  // Dari File 1
+            "isProcessed" to false
         )
 
-        // Menggunakan struktur dari File 1 (dengan sub-collection per user)
         firestore.collection("PdfContents")
             .document(userId)
             .collection("documents")
             .add(data)
             .addOnSuccessListener { documentRef ->
+
                 savedDocumentId = documentRef.id
+
                 btnRingkasan.isEnabled = true
                 btnChatbot.isEnabled = true
 
-                android.util.Log.d("FIRESTORE", "Document saved with ID: ${documentRef.id}")
-                android.util.Log.d("FIRESTORE", "Content length: ${content.length}")
+                Log.d(
+                    "FIRESTORE",
+                    "Document saved with ID: ${documentRef.id}"
+                )
 
-                // LoggingHelper dari File 2
+                Log.d(
+                    "FIRESTORE",
+                    "Content length: ${content.length}"
+                )
+
                 LoggingHelper.logTextLength(
-                    documentId = savedDocumentId!!,
+                    documentId = documentRef.id,
                     type = "pdfContents",
                     text = content,
                     userId = userId,
                     fileName = fileName,
-                    originalLength = content.length,
+                    originalLength = content.length
                 )
 
-                Toast.makeText(this, " PDF berhasil disimpan! secara online", Toast.LENGTH_SHORT).show()
+                if (isLoggedIn()) {
+
+                    saveUploadedMaterial(
+                        fileName,
+                        documentRef.id
+                    )
+
+                    saveToHistory(
+                        fileName,
+                        documentRef.id
+                    )
+
+                    updateProgress(
+                        fileName
+                    )
+                }
+
+                Toast.makeText(
+                    this,
+                    "PDF berhasil disimpan secara online!",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "❌ Gagal menyimpan: ${e.message}", Toast.LENGTH_LONG).show()
+
+                Toast.makeText(
+                    this,
+                    "Gagal menyimpan: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                Log.e(
+                    "FIRESTORE",
+                    "Save failed",
+                    e
+                )
             }
     }
 
-    private fun saveToHistory(file: String, documentId: String) {  // Dari File 1 dengan documentId
+    private fun saveToHistory(file: String, documentId: String) {
+
+        Log.d(
+            "SAVE_HISTORY",
+            "file=$file documentId=$documentId"
+        )
+
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance().getReference("History").child(userId)
         val historyId = database.push().key ?: return

@@ -12,6 +12,7 @@ import com.google.firebase.database.*
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.history.adapter.FileHistoryAdapter
 import com.studdy.mystudybuddy.presentation.screens.history.model.FileHistoryModel
+import android.util.Log
 
 class FileHistoryActivity : AppCompatActivity() {
 
@@ -81,11 +82,20 @@ class FileHistoryActivity : AppCompatActivity() {
                         val date = data.child("date")
                             .getValue(String::class.java) ?: "-"
 
-                        // 🔥 AMBIL DOCUMENT_ID dari database
                         val documentId = data.child("documentId")
                             .getValue(String::class.java) ?: ""
 
-                        historyList.add(FileHistoryModel(fileName, date, documentId))
+                        if (documentId.isEmpty()) {
+                            Log.e("HISTORY", "documentId kosong untuk file: $fileName")
+                        }
+
+                        historyList.add(
+                            FileHistoryModel(
+                                fileName = fileName,
+                                date = date,
+                                documentId = documentId
+                            )
+                        )
                     }
 
                     rvHistory.adapter = FileHistoryAdapter(
@@ -97,8 +107,7 @@ class FileHistoryActivity : AppCompatActivity() {
                                     FileHistoryDetailActivity::class.java
                                 ).apply {
                                     putExtra("FILE_NAME", file.fileName)
-                                    putExtra("DOCUMENT_ID", file.documentId)  // 🔥 KIRIM DOCUMENT_ID
-                                    // FILE_URI akan dicari di detail activity atau tidak dikirim
+                                    putExtra("DOCUMENT_ID", file.documentId)
                                 }
                             )
                         },
