@@ -160,6 +160,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Mulai Quiz"
+                android:visibility="gone"
                 android:layout_marginTop="16dp"
                 android:backgroundTint="@color/sky_blue"
                 android:textColor="@android:color/white"/>
