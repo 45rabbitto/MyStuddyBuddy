@@ -98,7 +98,6 @@ proguard-seeds.txt
 app/src/main/assets/temp/
 app/src/main/assets/uploads/
 app/src/main/assets/chatbot_token.txt
-app/src/main/java/com/studdy/mystudybuddy/presentation/screens/quiz/activity/
 app/src/main/java/com/studdy/mystudybuddy/presentation/screens/ringkasan/
 *.pdf.tmp
 *.docx.tmp
