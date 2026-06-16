@@ -6,26 +6,28 @@ Aplikasi AI Study Assistant Terintegrasi untuk Membantu Pelajar Meningkatkan Efe
 
 ## 📖 Deskripsi Singkat Proyek
 
-My Study Buddy adalah aplikasi pembelajaran berbasis AI yang dirancang untuk membantu pelajar dalam memahami materi secara lebih efektif dan efisien. Aplikasi ini menyediakan 5 fitur utama dalam satu platform terpadu.
+My Study Buddy adalah aplikasi pembelajaran berbasis AI yang dirancang untuk membantu pelajar dalam memahami materi secara lebih efektif dan efisien. Aplikasi ini menyediakan 5 fitur dalam satu platform terpadu.
 
 **Fitur Utama:**
 
-1. **Ringkasan Otomatis** - Upload dokumen (PDF/TXT/DOCX) dan dapatkan ringkasan materi plus poin penting secara instan menggunakan AI DeepSeek
+1. **Ringkasan Otomatis** - Upload dokumen (PDF) dan dapatkan ringkasan materi plus poin penting secara instan menggunakan AI
 
-2. **Kuis Interaktif** - Soal kuis dihasilkan otomatis dari materi dengan tingkat kesulitan yang menyesuaikan kemampuan pengguna
+2. **Kuis Interaktif** - Soal kuis dihasilkan otomatis dari materi dengan jumlah customizable oleh pengguna
 
-3. **AI Chatbot** - Tanya jawab tentang materi dengan chatbot berbasis DeepSeek yang memahami konteks dokumen yang sudah diupload
+3. **AI Chatbot** - Tanya jawab tentang materi dengan chatbot yang memahami konteks dokumen yang sudah diupload
 
 4. **Monitoring Progres** - Lacak perkembangan belajar melalui grafik dan statistik performa
 
-5. **Rekomendasi Personal** - Dapatkan saran topik belajar selanjutnya berdasarkan kemampuan dan riwayat belajar
+5. **Rekomendasi Personal** - Dapatkan saran topik belajar selanjutnya berdasarkan riwayat belajar
 
 **Target Pengguna:** Pelajar, mahasiswa, dan siapa pun yang ingin belajar mandiri dengan bantuan AI.
 
 **Teknologi yang Digunakan:**
-- Frontend (Android): Kotlin, Jetpack Compose, Material 3, MVVM, Room Database, Hilt
-- Backend (AI): Python, FastAPI, DeepSeek API, Transformers
-- Model Ringkasan: Lokal (disimpan di folder `models/`)
+- Frontend (Android): Kotlin, Jetpack Compose, XML Views
+- Backend (AI): Python, FastAPI railways, Openroute API, onnx
+- Database: Firebase Firestore, Firebase Realtime Database 
+- Model Ringkasan: onnx- bertlite
+- Deployment model ringkasan: Railway 
 - Minimum SDK: API 24 (Android 7.0)
 - Target SDK: API 34 (Android 14)
 
@@ -41,71 +43,136 @@ Sebelum memulai, pastikan komputer Anda memenuhi persyaratan berikut:
 - JDK 17 atau lebih tinggi
 - Python 3.10 atau lebih tinggi
 - RAM minimal 8 GB (16 GB direkomendasikan)
-- Storage kosong minimal 4 GB (ditambah model AI ~2GB)
 - Sistem Operasi: Windows 10 / macOS 11 / Ubuntu 20.04 atau lebih baru
 
 ### Langkah 1: Clone Repository
-git clone https://github.com/kelompok5/MyStudyBuddy-Android.git
-cd MyStudyBuddy-Android
-
+git clone https://github.com/45rabbitto/MyStudyBuddy.git
+cd MyStudyBuddy
 
 ### Langkah 2: Setup Backend Python 
 # Clone repository backend
-git clone https://github.com/kelompok5/MyStudyBuddy-Backend.git
+git clone https://github.com/indhana11/MyStudyBuddy-Backend.git
 cd MyStudyBuddy-Backend
 
-# Buat virtual environment (opsional tapi direkomendasikan)
+# Buat virtual environment
 python -m venv venv
 
 # Aktifkan virtual environment
-# Untuk Windows:
+# Windows:
 venv\Scripts\activate
-# Untuk Mac/Linux:
+# Mac/Linux:
 source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-Langkah 3: Download Model Ringkasan (Lokal)
-# Buat folder models di dalam folder backend
+Langkah 3: Download Model Ringkasan 
+# Buat folder models
 mkdir models
 
-# Download model dari HuggingFace (sekitar 1.5GB)
-# Model yang digunakan: DeepSeek-R1-Distill-Qwen-1.5B
+# Download model 
+git clone https://huggingface.co/team-llm/mobilebert-onnx-summarizer models/mobilebert-summarizer
 
-# Menggunakan git lfs (recommended)
-git lfs install
-git clone https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B models/deepseek-summarizer
+###Langkah 4: OpenRouter API Key (Chatbot Gratis)
+- Dapatkan API Key:
+- Buka https://openrouter.ai/
+- Buka https://openrouter.ai/keys
+- Klik "Create Key"
+- Buat file key di direktori "app/src/main/assets/chatbot_token.txt"
+- Pastekan key kedalam direktori tersebut
 
-# Atau download manual dari:
-# https://huggingface.co/deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B/tree/main
-
-###Langkah 4: Setup API Key DeepSeek
-#isi file env
-DEEPSEEK_API_KEY=your_deepseek_api_key_here
-DEEPSEEK_BASE_URL=https://api.deepseek.com/v1
-MODEL_PATH=./models/deepseek-summarizer
-PORT=8000
-
-###Langkah 5: Menjalankan Backend Server
-# Pastikan virtual environment aktif
-# Untuk Windows:
-venv\Scripts\activate
-# Untuk Mac/Linux:
-source venv/bin/activate
-
-# Jalankan server FastAPI
-python app.py
-
-# Atau menggunakan uvicorn langsung:
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
-
+###Langkah 5: Deploy Backend ke Railway
+Buka https://railway.app/
+- Klik New Project → Deploy from GitHub
+- Pilih repository MyStudyBuddy-Backend
+- Set Environment Variables: PORT	8000
+- Klik Deploy
+- Pastikan deploy berhasil 
 
 ###Langkah 6: Buka Proyek di Android Studio
+- Buka Android Studio
+- Pilih File → Open
+- Arahkan ke folder MyStudyBuddy
+- Tunggu proses Gradle Sync selesai
 
 ###Langkah 7: Konfigurasi URL Backend di Android
+- pada file " network/RetrofitClient.kt" isi: private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
+- pada file "utils/ChatbotApiService.kt" isi:
+private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+private val MODEL_NAME = "openrouter/free"
 
+###Langkah 8: Setup Firebase
+- Buat project di Firebase Console
+- Download google-services.json
+- Letakkan di folder app/
+- Aktifkan Firestore Database dan Realtime Database
 
-###download model yang telah disediakan, masukkan di folder python 
+###Langkah 9: Sync Gradle & Run
+Menjalankan Aplikasi Android:
+- Buka Android Studio
+- Pilih emulator atau HP fisik
+- Klik tombol Run (▶)
+- Atau build APK
 
-### sync kan gradle 
+---
+
+###TAUTAN MODEL:
+- VVV My Studdy Buddy 
+- Chatbot	OpenRouter (DeepSeek/Llama/Phi)	https://openrouter.ai/models
+
+---
+
+## Troubleshooting
+**Backend 502 Bad Gateway**
+Redeploy backend di Railway, cek log apakah model berhasil dimuat. Buka Railway Dashboard → Deployment → Redeploy.
+
+**Missing Token**
+Pastikan file `chatbot_token.txt` ada di folder `app/src/main/assets/` dan berisi OpenRouter API Key yang valid. File ini tidak boleh kosong.
+
+**PDF tidak terbaca**
+Pastikan file PDF berisi teks (bukan hasil scan/gambar). Anda bisa coba buka PDF di komputer dan coba copy teksnya. Jika tidak bisa di-copy, PDF tersebut hanya berisi gambar.
+
+**Firestore tidak terhubung**
+Cek file `google-services.json` sudah benar dan diletakkan di folder `app/`. Pastikan aturan security Firestore di set ke `allow read, write: if true` untuk development.
+
+**Rate limit OpenRouter**
+Gunakan model `openrouter/free` yang otomatis memilih model gratis terbaik. Jika masih kena limit, tunggu 30-60 detik sebelum mencoba lagi.
+
+**Aplikasi force close saat upload PDF**
+Pastikan file PDF tidak terlalu besar (maksimal 10MB). PDFBox Android mungkin kehabisan memori jika file terlalu besar.
+
+**Ringkasan tidak muncul**
+Cek koneksi internet. Backend Railway harus bisa diakses. Buka `https://mystudybuddy-backend-production.up.railway.app/health` di browser. Jika tidak bisa diakses, backend sedang mati.
+
+**Chatbot tidak merespon**
+Cek file `chatbot_token.txt` berisi API Key yang valid. Buka Logcat dan filter dengan `CHATBOT_API` untuk melihat error detail.
+
+**Gradle sync gagal**
+Pastikan koneksi internet stabil. Coba `File → Invalidate Caches → Invalidate and Restart`. Jika masih gagal, cek `build.gradle.kts` tidak ada syntax error.
+
+**Emulator tidak bisa akses internet**
+Restart emulator. Pastikan komputer terhubung ke internet. Coba buka browser di emulator dan akses google.com.
+
+---
+
+## 👥 Tim Pengembang PJK-GM012
+
+- **Project Manager & AI Engineer** - APC466D6X0165 - Desi Triana
+- **Android Developer 1** - APC466D6X0112 - Kharisma Nur Aulia
+- **Android Developer 1** - APC466D6X0174 - Khariska Melly Salsabila 
+- **Data Scientist** - APC349D6X0209 - Keysya Aulia
+- **AI Engineer**** - APC466D6X0416 - Indhana Zulfa Mu'Azzizah
+
+---
+
+## 📞 Kontak & Informasi Lebih Lanjut
+
+**Repository Android:** https://github.com/45rabbitto/MyStudyBuddy
+**Repository Backend:** https://github.com/indhana11/MyStudyBuddy-Backend
+**OpenRouter (API Chatbot Gratis):** https://openrouter.ai/
+**Railway (Hosting Backend):** https://railway.app/
+**Firebase Console:** https://console.firebase.google.com/
+
+---
+
+**⭐ Jika proyek ini bermanfaat, berikan star di GitHub!**
