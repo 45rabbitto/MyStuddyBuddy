@@ -6,7 +6,6 @@ pluginManagement {
         maven {
             url = uri("https://jitpack.io")
         }
-        // Repository untuk plugin Chaquopy
         maven {
             url = uri("https://chaquo.com/maven")
         }
@@ -28,7 +27,6 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://jitpack.io")
         }
-        // Repository untuk dependencies Python (numpy, onnxruntime, dll.)
         maven {
             url = uri("https://chaquo.com/maven")
         }

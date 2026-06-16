@@ -19,7 +19,6 @@ class SummaryRepository {
     private val COLLECTION_DOCUMENTS = "documents"
     private val COLLECTION_SUMMARIES = "summaries"
 
-    // 🔥 Simpan dokumen ke PdfContents/documents
     suspend fun saveDocument(
         fileName: String,
         content: String,
@@ -33,7 +32,7 @@ class SummaryRepository {
                 uploadedAt = Date(),
                 isProcessed = false
             )
-            // Simpan ke PdfContents/{userId}/documents/{autoId}
+
             val docRef = firestore.collection(COLLECTION_PDF_CONTENTS)
                 .document(userId)
                 .collection(COLLECTION_DOCUMENTS)
@@ -44,7 +43,7 @@ class SummaryRepository {
         }
     }
 
-    // 🔥 Ambil dokumen dari PdfContents/{userId}/documents/{documentId}
+
     suspend fun getDocumentById(userId: String, documentId: String): DocumentModel? {
         return withContext(Dispatchers.IO) {
             val doc = firestore.collection(COLLECTION_PDF_CONTENTS)
@@ -57,7 +56,7 @@ class SummaryRepository {
         }
     }
 
-    // 🔥 Simpan ringkasan ke collection "summaries" (terpisah)
+
     suspend fun saveSummary(summaryModel: SummaryModel): String {
         return withContext(Dispatchers.IO) {
             val docRef = firestore.collection(COLLECTION_SUMMARIES).document()
@@ -67,7 +66,7 @@ class SummaryRepository {
         }
     }
 
-    // 🔥 Update dokumen dengan summaryId
+
     suspend fun updateDocumentWithSummary(userId: String, documentId: String, summaryId: String) {
         withContext(Dispatchers.IO) {
             firestore.collection(COLLECTION_PDF_CONTENTS)

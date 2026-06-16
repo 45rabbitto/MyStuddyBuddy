@@ -30,7 +30,6 @@ class WelcomeActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         btnLogin.setOnClickListener {
 
-            // user bukan guest
             val prefs = getSharedPreferences(
                 "user_session",
                 MODE_PRIVATE

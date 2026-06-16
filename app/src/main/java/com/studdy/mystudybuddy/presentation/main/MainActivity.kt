@@ -33,15 +33,12 @@ class MainActivity : AppCompatActivity() {
     private fun setupClickListeners() {
 
         history.setOnClickListener {
-            // buka HistoryActivity
         }
 
         alur.setOnClickListener {
-            // buka AlurBelajarActivity
         }
 
         progres.setOnClickListener {
-            // buka ProgressActivity
         }
     }
 }

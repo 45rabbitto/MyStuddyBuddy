@@ -127,10 +127,7 @@ class ProfileActivity : AppCompatActivity() {
 
                         tvEmail.text =
                             email
-
-                        // =========================
                         // LOAD AVATAR DRAWABLE
-                        // =========================
 
                         val imageRes =
                             resources.getIdentifier(

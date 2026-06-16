@@ -57,13 +57,13 @@ object LoggingHelper {
                     "originalLength" to originalLength,
                     "summaryLength" to summaryLength,
 
-                    // perbandingan ringkasan terhadap teks asli
+
                     "compressionRatio" to compressionRatio,
 
-                    // dalam persen
+
                     "compressionPercentage" to compressionRatio * 100,
 
-                    // format string misalnya "2500/10000"
+
                     "lengthComparison" to "$summaryLength/$originalLength",
 
                     "userId" to userId,

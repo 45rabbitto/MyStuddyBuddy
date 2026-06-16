@@ -29,7 +29,6 @@ class RegisterActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_register)
 
-        // Inisialisasi Firebase
         auth = FirebaseAuth.getInstance()
 
         initViews()
