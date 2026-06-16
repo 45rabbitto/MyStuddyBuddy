@@ -129,7 +129,7 @@ Menjalankan Aplikasi Android:
 
 ## 👥 Tim Pengembang PJK-GM012
 
-- **Project Manager & AI Engineer** - APC466D6X0165 - Desi Triana
+- **Project Manager** - APC466D6X0165 - Desi Triana
 - **Android Developer 1** - APC466D6X0112 - Kharisma Nur Aulia
 - **Android Developer 1** - APC466D6X0174 - Khariska Melly Salsabila 
 - **Data Scientist** - APC349D6X0209 - Keysya Aulia
