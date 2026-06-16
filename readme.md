@@ -56,7 +56,7 @@ cd MyStudyBuddy-Backend
 
 ### Langkah 3: Download Model Ringkasan 
 - Buat folder models mkdir models
-- Download model git clone https://github.com/45rabbitto/ai-MyStudyBuddy atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
+- Download model git clone https://github.com/indhana11/MyStudyBuddy-Backend atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
 
 ### Langkah 4: OpenRouter API Key (Chatbot Gratis)
 - Dapatkan API Key:
@@ -103,7 +103,7 @@ Menjalankan Aplikasi Android:
 ---
 
 ### TAUTAN MODEL:
-- Model AI Ringkasan: https://github.com/45rabbitto/ai-MyStudyBuddy atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
+- Model AI Ringkasan: https://github.com/indhana11/MyStudyBuddy-Backend atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
 - Chatbot	OpenRouter (DeepSeek/Llama/Phi)	https://openrouter.ai/models
 
 ---
