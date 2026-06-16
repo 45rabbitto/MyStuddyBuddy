@@ -11,13 +11,9 @@ My Study Buddy adalah aplikasi pembelajaran berbasis AI yang dirancang untuk mem
 **Fitur Utama:**
 
 1. **Ringkasan Otomatis** - Upload dokumen (PDF) dan dapatkan ringkasan materi plus poin penting secara instan menggunakan AI
-
 2. **Kuis Interaktif** - Soal kuis dihasilkan otomatis dari materi dengan jumlah customizable oleh pengguna
-
 3. **AI Chatbot** - Tanya jawab tentang materi dengan chatbot yang memahami konteks dokumen yang sudah diupload
-
 4. **Monitoring Progres** - Lacak perkembangan belajar melalui grafik dan statistik performa
-
 5. **Rekomendasi Personal** - Dapatkan saran topik belajar selanjutnya berdasarkan riwayat belajar
 
 **Target Pengguna:** Pelajar, mahasiswa, dan siapa pun yang ingin belajar mandiri dengan bantuan AI.
@@ -60,7 +56,7 @@ cd MyStudyBuddy-Backend
 
 ### Langkah 3: Download Model Ringkasan 
 - Buat folder models mkdir models
-- Download model git clone https://github.com/45rabbitto/ai-MyStudyBuddy
+- Download model git clone https://github.com/45rabbitto/ai-MyStudyBuddy atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
 
 ### Langkah 4: OpenRouter API Key (Chatbot Gratis)
 - Dapatkan API Key:
@@ -107,7 +103,7 @@ Menjalankan Aplikasi Android:
 ---
 
 ### TAUTAN MODEL:
-- Model AI Ringkasan: https://github.com/45rabbitto/ai-MyStudyBuddy
+- Model AI Ringkasan: https://github.com/45rabbitto/ai-MyStudyBuddy atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
 - Chatbot	OpenRouter (DeepSeek/Llama/Phi)	https://openrouter.ai/models
 
 ---
@@ -140,11 +136,10 @@ Menjalankan Aplikasi Android:
 
 - **Repository Android:** https://github.com/45rabbitto/MyStudyBuddy
 - **Repository Backend:** https://github.com/indhana11/MyStudyBuddy-Backend
-- **Repository Model:** https://github.com/45rabbitto/ai-MyStudyBuddy
+- **Repository Model:** https://github.com/45rabbitto/ai-MyStudyBuddy atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
 - **OpenRouter (API Chatbot Gratis):** https://openrouter.ai/
 - **Railway (Hosting Backend):** https://railway.app/
 - **Firebase Console:** https://console.firebase.google.com/
 
 ---
-
-**⭐ Jika proyek ini bermanfaat, berikan star di GitHub!**
+**⭐ Tautan download APK** : https://drive.google.com/drive/folders/1eR9D7ea_NhQ0MDDiP1DAcRHCRRkdfi17?usp=sharing
