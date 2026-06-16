@@ -28,6 +28,11 @@ My Study Buddy adalah aplikasi pembelajaran berbasis AI yang dirancang untuk mem
 - Target SDK: API 34 (Android 14)
 
 ---
+## ⭐ Tautan download dan cara instalasi: 
+- download apk melalui https://drive.google.com/drive/folders/1eR9D7ea_NhQ0MDDiP1DAcRHCRRkdfi17?usp=sharing
+- install pada smartphone android
+- berikan akses aplikasi dan pastikan aplikasi tersambung pada internet
+---
 
 ## 🛠️ Petunjuk Setup Environment
 
@@ -141,5 +146,3 @@ Menjalankan Aplikasi Android:
 - **Railway (Hosting Backend):** https://railway.app/
 - **Firebase Console:** https://console.firebase.google.com/
 
----
-**⭐ Tautan download APK** : https://drive.google.com/drive/folders/1eR9D7ea_NhQ0MDDiP1DAcRHCRRkdfi17?usp=sharing
