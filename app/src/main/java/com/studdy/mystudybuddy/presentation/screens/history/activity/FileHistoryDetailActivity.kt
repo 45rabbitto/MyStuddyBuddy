@@ -14,7 +14,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.HasilKuisActivity
-import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizActivity
+import com.studdy.mystudybuddy.presentation.screens.quiz.bottomsheet.BottomGenerateKuis
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
 
 class FileHistoryDetailActivity : AppCompatActivity() {
@@ -93,43 +93,122 @@ class FileHistoryDetailActivity : AppCompatActivity() {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
 
+                        // Belum pernah mengerjakan kuis
                         if (!snapshot.exists()) {
-                            startActivity(
-                                Intent(
+
+                            if (savedDocumentId.isNullOrEmpty()) {
+                                Toast.makeText(
                                     this@FileHistoryDetailActivity,
-                                    QuizActivity::class.java
-                                ).apply {
-                                    putExtra("FILE_NAME", fileName)
-                                    putExtra("FILE_URI", fileUri)
+                                    "Document ID kosong",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                return
+                            }
+
+                            firestore.collection("PdfContents")
+                                .document(uid)
+                                .collection("documents")
+                                .document(savedDocumentId!!)
+                                .get()
+                                .addOnSuccessListener { doc ->
+
+                                    if (!doc.exists()) {
+                                        Toast.makeText(
+                                            this@FileHistoryDetailActivity,
+                                            "Data dokumen tidak ditemukan",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        return@addOnSuccessListener
+                                    }
+
+                                    val summary =
+                                        doc.getString("summary") ?: ""
+
+                                    val originalText =
+                                        doc.getString("content") ?: ""
+
+                                    val bottomSheet =
+                                        BottomGenerateKuis()
+
+                                    bottomSheet.arguments =
+                                        Bundle().apply {
+
+                                            putString(
+                                                "FILE_NAME",
+                                                fileName
+                                            )
+
+                                            putString(
+                                                "RINGKASAN",
+                                                summary
+                                            )
+
+                                            putString(
+                                                "MATERI_ASLI",
+                                                originalText
+                                            )
+                                        }
+
+                                    bottomSheet.show(
+                                        supportFragmentManager,
+                                        "bottom_generate_kuis"
+                                    )
                                 }
-                            )
+                                .addOnFailureListener {
+                                    Toast.makeText(
+                                        this@FileHistoryDetailActivity,
+                                        "Gagal mengambil data dokumen",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
                             return
                         }
 
+                        // Sudah pernah mengerjakan kuis
                         var score = 0
                         var correct = 0
                         var wrong = 0
                         var total = 0
+
                         val questions = arrayListOf<String>()
                         val userAnswers = arrayListOf<String>()
                         val correctAnswers = arrayListOf<String>()
 
                         for (data in snapshot.children) {
-                            score = data.child("score").getValue(Int::class.java) ?: 0
-                            correct = data.child("correctAnswer").getValue(Int::class.java) ?: 0
-                            wrong = data.child("wrongAnswer").getValue(Int::class.java) ?: 0
-                            total = data.child("totalQuestion").getValue(Int::class.java) ?: 0
+
+                            score =
+                                data.child("score")
+                                    .getValue(Int::class.java) ?: 0
+
+                            correct =
+                                data.child("correctAnswer")
+                                    .getValue(Int::class.java) ?: 0
+
+                            wrong =
+                                data.child("wrongAnswer")
+                                    .getValue(Int::class.java) ?: 0
+
+                            total =
+                                data.child("totalQuestion")
+                                    .getValue(Int::class.java) ?: 0
 
                             data.child("questions").children.forEach {
-                                it.getValue(String::class.java)?.let { q -> questions.add(q) }
+                                it.getValue(String::class.java)?.let { q ->
+                                    questions.add(q)
+                                }
                             }
 
                             data.child("userAnswers").children.forEach {
-                                it.getValue(String::class.java)?.let { a -> userAnswers.add(a) }
+                                it.getValue(String::class.java)?.let { a ->
+                                    userAnswers.add(a)
+                                }
                             }
 
                             data.child("correctAnswers").children.forEach {
-                                it.getValue(String::class.java)?.let { a -> correctAnswers.add(a) }
+                                it.getValue(String::class.java)?.let { a ->
+                                    correctAnswers.add(a)
+                                }
                             }
                         }
 
@@ -138,20 +217,38 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                 this@FileHistoryDetailActivity,
                                 HasilKuisActivity::class.java
                             ).apply {
+
                                 putExtra("SCORE", score)
                                 putExtra("CORRECT", correct)
                                 putExtra("WRONG", wrong)
                                 putExtra("TOTAL", total)
                                 putExtra("FILE_NAME", fileName)
-                                putStringArrayListExtra("QUESTIONS", questions)
-                                putStringArrayListExtra("USER_ANSWERS", userAnswers)
-                                putStringArrayListExtra("CORRECT_ANSWERS", correctAnswers)
+
+                                putStringArrayListExtra(
+                                    "QUESTIONS",
+                                    questions
+                                )
+
+                                putStringArrayListExtra(
+                                    "USER_ANSWERS",
+                                    userAnswers
+                                )
+
+                                putStringArrayListExtra(
+                                    "CORRECT_ANSWERS",
+                                    correctAnswers
+                                )
                             }
                         )
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(this@FileHistoryDetailActivity, error.message, Toast.LENGTH_SHORT).show()
+
+                        Toast.makeText(
+                            this@FileHistoryDetailActivity,
+                            error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 })
         }
