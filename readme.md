@@ -50,30 +50,19 @@ git clone https://github.com/45rabbitto/MyStudyBuddy.git
 cd MyStudyBuddy
 
 ### Langkah 2: Setup Backend Python 
-# Clone repository backend
+- Clone repository backend
 git clone https://github.com/indhana11/MyStudyBuddy-Backend.git
 cd MyStudyBuddy-Backend
+- Buat virtual environment python -m venv venv
+- Aktifkan virtual environment
+- Install dependencies
+- pip install -r requirements.txt
 
-# Buat virtual environment
-python -m venv venv
+### Langkah 3: Download Model Ringkasan 
+- Buat folder models mkdir models
+- Download model git clone https://huggingface.co/team-llm/mobilebert-onnx-summarizer models/mobilebert-summarizer
 
-# Aktifkan virtual environment
-# Windows:
-venv\Scripts\activate
-# Mac/Linux:
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-Langkah 3: Download Model Ringkasan 
-# Buat folder models
-mkdir models
-
-# Download model 
-git clone https://huggingface.co/team-llm/mobilebert-onnx-summarizer models/mobilebert-summarizer
-
-###Langkah 4: OpenRouter API Key (Chatbot Gratis)
+### Langkah 4: OpenRouter API Key (Chatbot Gratis)
 - Dapatkan API Key:
 - Buka https://openrouter.ai/
 - Buka https://openrouter.ai/keys
@@ -81,7 +70,7 @@ git clone https://huggingface.co/team-llm/mobilebert-onnx-summarizer models/mobi
 - Buat file key di direktori "app/src/main/assets/chatbot_token.txt"
 - Pastekan key kedalam direktori tersebut
 
-###Langkah 5: Deploy Backend ke Railway
+### Langkah 5: Deploy Backend ke Railway
 Buka https://railway.app/
 - Klik New Project → Deploy from GitHub
 - Pilih repository MyStudyBuddy-Backend
@@ -89,25 +78,25 @@ Buka https://railway.app/
 - Klik Deploy
 - Pastikan deploy berhasil 
 
-###Langkah 6: Buka Proyek di Android Studio
+### Langkah 6: Buka Proyek di Android Studio
 - Buka Android Studio
 - Pilih File → Open
 - Arahkan ke folder MyStudyBuddy
 - Tunggu proses Gradle Sync selesai
 
-###Langkah 7: Konfigurasi URL Backend di Android
+### Langkah 7: Konfigurasi URL Backend di Android
 - pada file " network/RetrofitClient.kt" isi: private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
 - pada file "utils/ChatbotApiService.kt" isi:
 private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 private val MODEL_NAME = "openrouter/free"
 
-###Langkah 8: Setup Firebase
+### Langkah 8: Setup Firebase
 - Buat project di Firebase Console
 - Download google-services.json
 - Letakkan di folder app/
 - Aktifkan Firestore Database dan Realtime Database
 
-###Langkah 9: Sync Gradle & Run
+### Langkah 9: Sync Gradle & Run
 Menjalankan Aplikasi Android:
 - Buka Android Studio
 - Pilih emulator atau HP fisik
@@ -116,41 +105,32 @@ Menjalankan Aplikasi Android:
 
 ---
 
-###TAUTAN MODEL:
+### TAUTAN MODEL:
 - VVV My Studdy Buddy 
 - Chatbot	OpenRouter (DeepSeek/Llama/Phi)	https://openrouter.ai/models
 
 ---
 
 ## Troubleshooting
-**Backend 502 Bad Gateway**
+- **Backend 502 Bad Gateway**
 Redeploy backend di Railway, cek log apakah model berhasil dimuat. Buka Railway Dashboard → Deployment → Redeploy.
-
-**Missing Token**
+- **Missing Token**
 Pastikan file `chatbot_token.txt` ada di folder `app/src/main/assets/` dan berisi OpenRouter API Key yang valid. File ini tidak boleh kosong.
-
-**PDF tidak terbaca**
+- **PDF tidak terbaca**
 Pastikan file PDF berisi teks (bukan hasil scan/gambar). Anda bisa coba buka PDF di komputer dan coba copy teksnya. Jika tidak bisa di-copy, PDF tersebut hanya berisi gambar.
-
-**Firestore tidak terhubung**
+- **Firestore tidak terhubung**
 Cek file `google-services.json` sudah benar dan diletakkan di folder `app/`. Pastikan aturan security Firestore di set ke `allow read, write: if true` untuk development.
-
-**Rate limit OpenRouter**
+- **Rate limit OpenRouter**
 Gunakan model `openrouter/free` yang otomatis memilih model gratis terbaik. Jika masih kena limit, tunggu 30-60 detik sebelum mencoba lagi.
-
-**Aplikasi force close saat upload PDF**
+- **Aplikasi force close saat upload PDF**
 Pastikan file PDF tidak terlalu besar (maksimal 10MB). PDFBox Android mungkin kehabisan memori jika file terlalu besar.
-
-**Ringkasan tidak muncul**
+- **Ringkasan tidak muncul**
 Cek koneksi internet. Backend Railway harus bisa diakses. Buka `https://mystudybuddy-backend-production.up.railway.app/health` di browser. Jika tidak bisa diakses, backend sedang mati.
-
-**Chatbot tidak merespon**
+- **Chatbot tidak merespon**
 Cek file `chatbot_token.txt` berisi API Key yang valid. Buka Logcat dan filter dengan `CHATBOT_API` untuk melihat error detail.
-
-**Gradle sync gagal**
+- **Gradle sync gagal**
 Pastikan koneksi internet stabil. Coba `File → Invalidate Caches → Invalidate and Restart`. Jika masih gagal, cek `build.gradle.kts` tidak ada syntax error.
-
-**Emulator tidak bisa akses internet**
+- **Emulator tidak bisa akses internet**
 Restart emulator. Pastikan komputer terhubung ke internet. Coba buka browser di emulator dan akses google.com.
 
 ---
