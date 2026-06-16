@@ -85,10 +85,11 @@ Buka https://railway.app/
 - Tunggu proses Gradle Sync selesai
 
 ### Langkah 7: Konfigurasi URL Backend di Android
-- pada file " network/RetrofitClient.kt" isi: private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
+- pada file " network/RetrofitClient.kt" isi:
+> private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/" 
 - pada file "utils/ChatbotApiService.kt" isi:
-private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
-private val MODEL_NAME = "openrouter/free"
+> private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
+> private val MODEL_NAME = "openrouter/free"
 
 ### Langkah 8: Setup Firebase
 - Buat project di Firebase Console
