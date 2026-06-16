@@ -113,26 +113,16 @@ Menjalankan Aplikasi Android:
 ---
 
 ## Troubleshooting
-- **Backend 502 Bad Gateway**
-` Redeploy backend di Railway, cek log apakah model berhasil dimuat. Buka Railway Dashboard → Deployment → Redeploy. `
-- **Missing Token**
-Pastikan file `chatbot_token.txt` ada di folder `app/src/main/assets/` dan berisi OpenRouter API Key yang valid. File ini tidak boleh kosong.
-- **PDF tidak terbaca**
-Pastikan file PDF berisi teks (bukan hasil scan/gambar). Anda bisa coba buka PDF di komputer dan coba copy teksnya. Jika tidak bisa di-copy, PDF tersebut hanya berisi gambar.
-- **Firestore tidak terhubung**
-Cek file `google-services.json` sudah benar dan diletakkan di folder `app/`. Pastikan aturan security Firestore di set ke `allow read, write: if true` untuk development.
-- **Rate limit OpenRouter**
-Gunakan model `openrouter/free` yang otomatis memilih model gratis terbaik. Jika masih kena limit, tunggu 30-60 detik sebelum mencoba lagi.
-- **Aplikasi force close saat upload PDF**
-Pastikan file PDF tidak terlalu besar (maksimal 10MB). PDFBox Android mungkin kehabisan memori jika file terlalu besar.
-- **Ringkasan tidak muncul**
-Cek koneksi internet. Backend Railway harus bisa diakses. Buka `https://mystudybuddy-backend-production.up.railway.app/health` di browser. Jika tidak bisa diakses, backend sedang mati.
-- **Chatbot tidak merespon**
-Cek file `chatbot_token.txt` berisi API Key yang valid. Buka Logcat dan filter dengan `CHATBOT_API` untuk melihat error detail.
-- **Gradle sync gagal**
-Pastikan koneksi internet stabil. Coba `File → Invalidate Caches → Invalidate and Restart`. Jika masih gagal, cek `build.gradle.kts` tidak ada syntax error.
-- **Emulator tidak bisa akses internet**
-Restart emulator. Pastikan komputer terhubung ke internet. Coba buka browser di emulator dan akses google.com.
+- **Backend 502 Bad Gateway**: Redeploy backend di Railway, cek log apakah model berhasil dimuat. Buka Railway Dashboard → Deployment → Redeploy.
+- **Missing Token**: Pastikan file `chatbot_token.txt` ada di folder `app/src/main/assets/` dan berisi OpenRouter API Key yang valid. File ini tidak boleh kosong.
+- **PDF tidak terbaca**: Pastikan file PDF berisi teks (bukan hasil scan/gambar). Anda bisa coba buka PDF di komputer dan coba copy teksnya. Jika tidak bisa di-copy, PDF tersebut hanya berisi gambar.
+- **Firestore tidak terhubung**: Cek file `google-services.json` sudah benar dan diletakkan di folder `app/`. Pastikan aturan security Firestore di set ke `allow read, write: if true` untuk development.
+- **Rate limit OpenRouter**: Gunakan model `openrouter/free` yang otomatis memilih model gratis terbaik. Jika masih kena limit, tunggu 30-60 detik sebelum mencoba lagi.
+- **Aplikasi force close saat upload PDF**: Pastikan file PDF tidak terlalu besar (maksimal 10MB). PDFBox Android mungkin kehabisan memori jika file terlalu besar.
+- **Ringkasan tidak muncul**: Cek koneksi internet. Backend Railway harus bisa diakses. Buka `https://mystudybuddy-backend-production.up.railway.app/health` di browser. Jika tidak bisa diakses, backend sedang mati.
+- **Chatbot tidak merespon**: Cek file `chatbot_token.txt` berisi API Key yang valid. Buka Logcat dan filter dengan `CHATBOT_API` untuk melihat error detail.
+- **Gradle sync gagal**: Pastikan koneksi internet stabil. Coba `File → Invalidate Caches → Invalidate and Restart`. Jika masih gagal, cek `build.gradle.kts` tidak ada syntax error.
+- **Emulator tidak bisa akses internet**: Restart emulator. Pastikan komputer terhubung ke internet. Coba buka browser di emulator dan akses google.com.
 
 ---
 
