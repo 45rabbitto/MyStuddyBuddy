@@ -107,14 +107,14 @@ Menjalankan Aplikasi Android:
 ---
 
 ### TAUTAN MODEL:
-- VVV My Studdy Buddy 
+- Model AI Ringkasan: https://github.com/45rabbitto/ai-MyStudyBuddy
 - Chatbot	OpenRouter (DeepSeek/Llama/Phi)	https://openrouter.ai/models
 
 ---
 
 ## Troubleshooting
 - **Backend 502 Bad Gateway**
-Redeploy backend di Railway, cek log apakah model berhasil dimuat. Buka Railway Dashboard → Deployment → Redeploy.
+` Redeploy backend di Railway, cek log apakah model berhasil dimuat. Buka Railway Dashboard → Deployment → Redeploy. `
 - **Missing Token**
 Pastikan file `chatbot_token.txt` ada di folder `app/src/main/assets/` dan berisi OpenRouter API Key yang valid. File ini tidak boleh kosong.
 - **PDF tidak terbaca**
