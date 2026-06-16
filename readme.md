@@ -60,7 +60,7 @@ cd MyStudyBuddy-Backend
 
 ### Langkah 3: Download Model Ringkasan 
 - Buat folder models mkdir models
-- Download model git clone https://huggingface.co/team-llm/mobilebert-onnx-summarizer models/mobilebert-summarizer
+- Download model git clone https://github.com/45rabbitto/ai-MyStudyBuddy
 
 ### Langkah 4: OpenRouter API Key (Chatbot Gratis)
 - Dapatkan API Key:
@@ -147,11 +147,12 @@ Restart emulator. Pastikan komputer terhubung ke internet. Coba buka browser di 
 
 ## 📞 Kontak & Informasi Lebih Lanjut
 
-**Repository Android:** https://github.com/45rabbitto/MyStudyBuddy
-**Repository Backend:** https://github.com/indhana11/MyStudyBuddy-Backend
-**OpenRouter (API Chatbot Gratis):** https://openrouter.ai/
-**Railway (Hosting Backend):** https://railway.app/
-**Firebase Console:** https://console.firebase.google.com/
+- **Repository Android:** https://github.com/45rabbitto/MyStudyBuddy
+- **Repository Backend:** https://github.com/indhana11/MyStudyBuddy-Backend
+- **Repository Model:** https://github.com/45rabbitto/ai-MyStudyBuddy
+- **OpenRouter (API Chatbot Gratis):** https://openrouter.ai/
+- **Railway (Hosting Backend):** https://railway.app/
+- **Firebase Console:** https://console.firebase.google.com/
 
 ---
 
