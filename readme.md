@@ -133,11 +133,11 @@ Menjalankan Aplikasi Android:
 - **Android Developer 1** - APC466D6X0112 - Kharisma Nur Aulia
 - **Android Developer 1** - APC466D6X0174 - Khariska Melly Salsabila 
 - **Data Scientist** - APC349D6X0209 - Keysya Aulia
-- **AI Engineer**** - APC466D6X0416 - Indhana Zulfa Mu'Azzizah
+- **AI Engineer** - APC466D6X0416 - Indhana Zulfa Mu'Azzizah
 
 ---
 
-## 📞 Kontak & Informasi Lebih Lanjut
+## Informasi Lebih Lanjut
 
 - **Repository Android:** https://github.com/45rabbitto/MyStudyBuddy
 - **Repository Backend:** https://github.com/indhana11/MyStudyBuddy-Backend
@@ -145,4 +145,5 @@ Menjalankan Aplikasi Android:
 - **OpenRouter (API Chatbot Gratis):** https://openrouter.ai/
 - **Railway (Hosting Backend):** https://railway.app/
 - **Firebase Console:** https://console.firebase.google.com/
+- **Download apk melalui** https://drive.google.com/drive/folders/1eR9D7ea_NhQ0MDDiP1DAcRHCRRkdfi17?usp=sharing
 
