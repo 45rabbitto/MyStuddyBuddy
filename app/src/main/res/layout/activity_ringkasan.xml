@@ -37,7 +37,7 @@
 
     </RelativeLayout>
 
-    <!-- 🔥 TEKS ASLI (ditambahkan) -->
+    <!-- TEKS ASLI -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
 
     </ScrollView>
 
-    <!-- 🔥 TOMBOL RINGKASAN (ditambahkan) -->
+    <!-- TOMBOL RINGKASAN -->
     <Button
         android:id="@+id/btnRingkasan"
         android:layout_width="match_parent"
@@ -126,7 +126,7 @@
 
     </ScrollView>
 
-    <!-- 🔥 PROGRESS BAR -->
+    <!-- PROGRESS BAR -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
@@ -135,6 +135,7 @@
         android:layout_marginBottom="8dp"
         android:visibility="gone"/>
 
+    <!-- BUTTON GENERATE KUIS -->
     <Button
         android:id="@+id/btnGenerateQuiz"
         android:layout_width="match_parent"
@@ -148,6 +149,21 @@
         android:fontFamily="@font/poppins"
         android:enabled="false"/>
 
+    <!-- 🔥 TOMBOL VIDEO REKOMENDASI (BARU) -->
+    <Button
+        android:id="@+id/btnVideoRecommendation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/button_line"
+        android:text=" Video Rekomendasi"
+        android:textColor="@color/primary_button"
+        android:fontFamily="@font/poppins"
+        android:visibility="gone"/>
+
+    <!-- BUTTON SELESAI -->
     <Button
         android:id="@+id/btnFinishRingkasan"
         android:layout_width="match_parent"
@@ -156,7 +172,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/button_line"
-        android:text="Selesai"
+        android:text=" Selesai"
         android:textColor="@color/primary_button"
         android:fontFamily="@font/poppins"/>
 

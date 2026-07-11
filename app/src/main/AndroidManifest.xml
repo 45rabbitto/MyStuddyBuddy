@@ -117,6 +117,14 @@
             android:name=".presentation.screens.history.activity.SummaryHistoryActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".presentation.screens.video.VideoRecommendationActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.video.VideoPlayerActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

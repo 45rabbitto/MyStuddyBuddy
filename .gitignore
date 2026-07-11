@@ -26,6 +26,9 @@ firebase-debug.log
 *.keystore
 *.key
 
+# YouTube API Key
+app/src/main/assets/youtube_api_key.txt
+
 # Android Studio files
 /.idea/deploymentTargetSelector.xml
 /.idea/deploymentTargetDropDown.xml

@@ -14,7 +14,6 @@ import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.quiz.model.QuizQuestion
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.QuizGenerator
 
-
 class QuizActivity : AppCompatActivity() {
 
     private lateinit var btnBack: ImageView
@@ -65,206 +64,102 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun generateQuestionsFromText() {
-
         val materiGabungan = buildString {
-
-            append(
-                ringkasan ?: ""
-            )
-
+            append(ringkasan ?: "")
             append("\n\n")
-
-            append(
-                materiAsli ?: ""
-            )
+            append(materiAsli ?: "")
         }
 
         if (materiGabungan.isEmpty()) {
-
-            Toast.makeText(
-                this,
-                "Materi kosong",
-                Toast.LENGTH_SHORT
-            ).show()
-
+            Toast.makeText(this, "Materi kosong", Toast.LENGTH_SHORT).show()
             return
         }
 
         questions.clear()
-
-        questions.addAll(
-
-            QuizGenerator.generateFromText(
-                materiGabungan,
-                jumlahSoal
-            )
-        )
+        questions.addAll(QuizGenerator.generateFromText(materiGabungan, jumlahSoal))
 
         if (questions.isNotEmpty()) {
-
             loadQuestion()
-
         } else {
-
-            Toast.makeText(
-                this,
-                "Soal tidak berhasil dibuat",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Soal tidak berhasil dibuat", Toast.LENGTH_SHORT).show()
         }
     }
-    private fun initViews() {
 
+    private fun initViews() {
         btnBack = findViewById(R.id.btnBack)
         btnMusic = findViewById(R.id.btnMusic)
-
         tvNumber = findViewById(R.id.tvNumber)
         tvQuestion = findViewById(R.id.tvQuestion)
-
         optionA = findViewById(R.id.optionA)
         optionB = findViewById(R.id.optionB)
         optionC = findViewById(R.id.optionC)
         optionD = findViewById(R.id.optionD)
-
         btnPrev = findViewById(R.id.btnPrev)
         btnNext = findViewById(R.id.btnNext)
     }
 
     private fun setupData() {
-
-        fileName =
-            intent.getStringExtra("FILE_NAME")
-
-        ringkasan =
-            intent.getStringExtra("RINGKASAN")
-
-        materiAsli =
-            intent.getStringExtra("MATERI_ASLI")
-
-        jumlahSoal =
-            intent.getIntExtra(
-                "JUMLAH_SOAL",
-                5
-            )
-
+        fileName = intent.getStringExtra("FILE_NAME")
+        ringkasan = intent.getStringExtra("RINGKASAN")
+        materiAsli = intent.getStringExtra("MATERI_ASLI")
+        jumlahSoal = intent.getIntExtra("JUMLAH_SOAL", 5)
         userAnswers.clear()
     }
 
     private fun setupMusic() {
-
-        mediaPlayer =
-            MediaPlayer.create(this, R.raw.backsound)
-
+        mediaPlayer = MediaPlayer.create(this, R.raw.backsound)
         mediaPlayer?.apply {
             isLooping = true
             start()
         }
-
-        clickSound =
-            MediaPlayer.create(this, R.raw.button)
-
-        btnMusic.setImageResource(
-            R.drawable.ic_music_on
-        )
+        clickSound = MediaPlayer.create(this, R.raw.button)
+        btnMusic.setImageResource(R.drawable.ic_music_on)
     }
 
     private fun setupListeners() {
-
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
         btnMusic.setOnClickListener {
-
             if (isMusicOn) {
-
                 mediaPlayer?.pause()
-
-                btnMusic.setImageResource(
-                    R.drawable.ic_music_off
-                )
-
+                btnMusic.setImageResource(R.drawable.ic_music_off)
             } else {
-
                 mediaPlayer?.start()
-
-                btnMusic.setImageResource(
-                    R.drawable.ic_music_on
-                )
+                btnMusic.setImageResource(R.drawable.ic_music_on)
             }
-
             isMusicOn = !isMusicOn
         }
 
-        optionA.setOnClickListener {
-            selectAnswer(0)
-        }
-
-        optionB.setOnClickListener {
-            selectAnswer(1)
-        }
-
-        optionC.setOnClickListener {
-            selectAnswer(2)
-        }
-
-        optionD.setOnClickListener {
-            selectAnswer(3)
-        }
+        optionA.setOnClickListener { selectAnswer(0) }
+        optionB.setOnClickListener { selectAnswer(1) }
+        optionC.setOnClickListener { selectAnswer(2) }
+        optionD.setOnClickListener { selectAnswer(3) }
 
         btnPrev.setOnClickListener {
-
             if (currentQuestionIndex > 0) {
-
                 currentQuestionIndex--
-
-                selectedAnswer =
-                    if (currentQuestionIndex < userAnswers.size)
-                        userAnswers[currentQuestionIndex]
-                    else
-                        -1
-
+                selectedAnswer = if (currentQuestionIndex < userAnswers.size) userAnswers[currentQuestionIndex] else -1
                 loadQuestion()
             }
         }
 
         btnNext.setOnClickListener {
-
             if (selectedAnswer == -1) {
-
-                Toast.makeText(
-                    this,
-                    "Pilih jawaban terlebih dahulu",
-                    Toast.LENGTH_SHORT
-                ).show()
-
+                Toast.makeText(this, "Pilih jawaban terlebih dahulu", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (userAnswers.size <= currentQuestionIndex) {
-
                 userAnswers.add(selectedAnswer)
-
             } else {
-
-                userAnswers[currentQuestionIndex] =
-                    selectedAnswer
+                userAnswers[currentQuestionIndex] = selectedAnswer
             }
 
             if (currentQuestionIndex < questions.size - 1) {
-
                 currentQuestionIndex++
-
-                selectedAnswer =
-                    if (currentQuestionIndex < userAnswers.size)
-                        userAnswers[currentQuestionIndex]
-                    else
-                        -1
-
+                selectedAnswer = if (currentQuestionIndex < userAnswers.size) userAnswers[currentQuestionIndex] else -1
                 loadQuestion()
-
             } else {
-
                 // simpan jawaban soal terakhir
                 if (userAnswers.size <= currentQuestionIndex) {
                     userAnswers.add(selectedAnswer)
@@ -273,75 +168,45 @@ class QuizActivity : AppCompatActivity() {
                 }
 
                 calculateScore()
-
                 saveQuizResult()
-
                 showResult()
             }
         }
     }
 
     private fun loadQuestion() {
-
         resetButtons()
-
-        val question =
-            questions[currentQuestionIndex]
-
-        tvNumber.text =
-            "Soal ${currentQuestionIndex + 1} dari ${questions.size}"
-
-        tvQuestion.text =
-            question.question
-
-        optionA.text =
-            question.options[0]
-
-        optionB.text =
-            question.options[1]
-
-        optionC.text =
-            question.options[2]
-
-        optionD.text =
-            question.options[3]
+        val question = questions[currentQuestionIndex]
+        tvNumber.text = "Soal ${currentQuestionIndex + 1} dari ${questions.size}"
+        tvQuestion.text = question.question
+        optionA.text = question.options[0]
+        optionB.text = question.options[1]
+        optionC.text = question.options[2]
+        optionD.text = question.options[3]
 
         if (currentQuestionIndex < userAnswers.size) {
-
-            selectedAnswer =
-                userAnswers[currentQuestionIndex]
-
+            selectedAnswer = userAnswers[currentQuestionIndex]
             highlightSelectedButton()
         }
     }
 
     private fun selectAnswer(index: Int) {
-
         clickSound?.start()
-
         selectedAnswer = index
-
         resetButtons()
-
         highlightSelectedButton()
     }
 
     private fun highlightSelectedButton() {
-
         when (selectedAnswer) {
-
             0 -> optionA.setBackgroundResource(R.drawable.button1)
-
             1 -> optionB.setBackgroundResource(R.drawable.button1)
-
             2 -> optionC.setBackgroundResource(R.drawable.button1)
-
             3 -> optionD.setBackgroundResource(R.drawable.button1)
         }
     }
 
     private fun resetButtons() {
-
         optionA.setBackgroundResource(R.drawable.kontainer)
         optionB.setBackgroundResource(R.drawable.kontainer)
         optionC.setBackgroundResource(R.drawable.kontainer)
@@ -349,131 +214,91 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun calculateScore() {
-
         score = 0
-
         for (i in questions.indices) {
-
-            if (
-                i < userAnswers.size &&
-                userAnswers[i] == questions[i].correctAnswer
-            ) {
+            if (i < userAnswers.size && userAnswers[i] == questions[i].correctAnswer) {
                 score++
             }
         }
     }
 
+    // 🔥 PERBAIKAN: CEK DIVIDE BY ZERO
     private fun saveQuizResult() {
+        val userId = auth.currentUser?.uid ?: return
 
-        val userId =
-            auth.currentUser?.uid ?: return
+        // 🔥 CEK APAKAH QUESTIONS KOSONG
+        if (questions.isEmpty()) {
+            Toast.makeText(this, "Tidak ada soal untuk disimpan", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-        val database =
-            FirebaseDatabase.getInstance()
-                .getReference("QuizHistory")
-                .child(userId)
-
-        val quizId =
-            database.push().key ?: return
+        val database = FirebaseDatabase.getInstance().getReference("QuizHistory").child(userId)
+        val quizId = database.push().key ?: return
 
         val questionList = ArrayList<String>()
         val userAnswerList = ArrayList<String>()
         val correctAnswerList = ArrayList<String>()
 
         for (i in questions.indices) {
-
-            questionList.add(
-                questions[i].question
-            )
-
-            userAnswerList.add(
-                questions[i].options[userAnswers[i]]
-            )
-
-            correctAnswerList.add(
-                questions[i].options[
-                    questions[i].correctAnswer
-                ]
-            )
+            questionList.add(questions[i].question)
+            userAnswerList.add(questions[i].options[userAnswers.getOrElse(i) { 0 }])
+            correctAnswerList.add(questions[i].options[questions[i].correctAnswer])
         }
 
-        val finalScore =
-            (score * 100) / questions.size
+        // 🔥 PERBAIKAN: CEK PEMBAGIAN DENGAN NOL
+        val totalQuestions = questions.size
+        val finalScore = if (totalQuestions > 0) {
+            (score * 100) / totalQuestions
+        } else {
+            0
+        }
 
         val quizData = hashMapOf<String, Any>(
-
             "fileName" to (fileName ?: "Materi"),
-
             "score" to finalScore,
-
             "correctAnswer" to score,
-
-            "wrongAnswer" to (questions.size - score),
-
-            "totalQuestion" to questions.size,
-
+            "wrongAnswer" to (totalQuestions - score),
+            "totalQuestion" to totalQuestions,
             "questions" to questionList,
-
             "userAnswers" to userAnswerList,
-
             "correctAnswers" to correctAnswerList,
-
             "createdAt" to System.currentTimeMillis()
         )
 
-        database.child(quizId)
-            .setValue(quizData)
+        database.child(quizId).setValue(quizData)
     }
 
+    // 🔥 PERBAIKAN: CEK DIVIDE BY ZERO DI SHOW RESULT
     private fun showResult() {
+        val totalQuestions = questions.size
 
-        val correct = score
-        val wrong = questions.size - score
+        // 🔥 CEK APAKAH TOTAL QUESTIONS > 0
+        val finalScore = if (totalQuestions > 0) {
+            (score * 100) / totalQuestions
+        } else {
+            0
+        }
 
         val questionList = ArrayList<String>()
         val userAnswerList = ArrayList<String>()
         val correctAnswerList = ArrayList<String>()
 
         for (i in questions.indices) {
-
             questionList.add(questions[i].question)
-
-            userAnswerList.add(
-                questions[i].options[userAnswers[i]]
-            )
-
-            correctAnswerList.add(
-                questions[i].options[
-                    questions[i].correctAnswer
-                ]
-            )
+            userAnswerList.add(questions[i].options[userAnswers.getOrElse(i) { 0 }])
+            correctAnswerList.add(questions[i].options[questions[i].correctAnswer])
         }
 
         startActivity(
             Intent(this, HasilKuisActivity::class.java).apply {
-
                 putExtra("CORRECT", score)
-                putExtra("WRONG", questions.size - score)
-                putExtra("SCORE", (score * 100) / questions.size)
-
-                putExtra("TOTAL_QUESTIONS", questions.size)
-
+                putExtra("WRONG", totalQuestions - score)
+                putExtra("SCORE", finalScore)
+                putExtra("TOTAL_QUESTIONS", totalQuestions)
                 putExtra("FILE_NAME", fileName)
-
-                putStringArrayListExtra(
-                    "QUESTIONS",
-                    questionList
-                )
-
-                putStringArrayListExtra(
-                    "USER_ANSWERS",
-                    userAnswerList
-                )
-
-                putStringArrayListExtra(
-                    "CORRECT_ANSWERS",
-                    correctAnswerList
-                )
+                putStringArrayListExtra("QUESTIONS", questionList)
+                putStringArrayListExtra("USER_ANSWERS", userAnswerList)
+                putStringArrayListExtra("CORRECT_ANSWERS", correctAnswerList)
             }
         )
 
@@ -487,7 +312,6 @@ class QuizActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-
         if (isMusicOn) {
             mediaPlayer?.start()
         }
@@ -495,10 +319,8 @@ class QuizActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-
         mediaPlayer?.release()
         mediaPlayer = null
-
         clickSound?.release()
         clickSound = null
     }

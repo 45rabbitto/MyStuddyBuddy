@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/bg_gradient">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/kontainer"
+        android:padding="10dp"
+        android:layout_margin="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:src="@drawable/back"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Video Player"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/dark_text"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
+
+    <!-- 🔥 PERBESAR WEBVIEW -->
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="4dp"
+        android:background="#000000"/>
+
+    <TextView
+        android:id="@+id/tvVideoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Video Title"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/poppins"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"/>
+
+    <TextView
+        android:id="@+id/tvVideoChannel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Channel Name"
+        android:textSize="14sp"
+        android:textColor="@color/gray_text"
+        android:fontFamily="@font/poppins"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"/>
+
+</LinearLayout>

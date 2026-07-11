@@ -1,5 +1,6 @@
 package com.studdy.mystudybuddy.presentation.screens.ringkasan
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,6 +17,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.network.RetrofitClient
 import com.studdy.mystudybuddy.network.SummarizeRequest
+import com.studdy.mystudybuddy.presentation.screens.video.VideoRecommendationActivity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Date
@@ -28,6 +30,7 @@ class RingkasanActivity : AppCompatActivity() {
     private lateinit var tvRingkasan: TextView
     private lateinit var btnRingkasan: Button
     private lateinit var btnGenerateQuiz: Button
+    private lateinit var btnVideoRecommendation: Button
     private lateinit var btnFinishRingkasan: Button
     private lateinit var progressBar: android.widget.ProgressBar
 
@@ -75,15 +78,16 @@ class RingkasanActivity : AppCompatActivity() {
         tvRingkasan = findViewById(R.id.tvRingkasan)
         btnRingkasan = findViewById(R.id.btnRingkasan)
         btnGenerateQuiz = findViewById(R.id.btnGenerateQuiz)
+        btnVideoRecommendation = findViewById(R.id.btnVideoRecommendation)
         btnFinishRingkasan = findViewById(R.id.btnFinishRingkasan)
         progressBar = findViewById(R.id.progressBar)
 
         btnRingkasan.isEnabled = false
         btnGenerateQuiz.isEnabled = false
+        btnVideoRecommendation.visibility = View.GONE
     }
 
     private fun setupClickListeners() {
-
         btnBack.setOnClickListener { finish() }
 
         btnRingkasan.setOnClickListener {
@@ -104,6 +108,16 @@ class RingkasanActivity : AppCompatActivity() {
             }
 
             bottomSheet.show(supportFragmentManager, "bottom_generate_kuis")
+        }
+
+        btnVideoRecommendation.setOnClickListener {
+            if (currentOriginalText.isNotEmpty()) {
+                val intent = Intent(this, VideoRecommendationActivity::class.java)
+                intent.putExtra("TEXT", currentOriginalText)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Teks belum tersedia", Toast.LENGTH_SHORT).show()
+            }
         }
 
         btnFinishRingkasan.setOnClickListener {
@@ -147,6 +161,7 @@ class RingkasanActivity : AppCompatActivity() {
 
                 if (currentSummary.isNotEmpty()) {
                     tvRingkasan.text = buildSummaryUI(currentSummary)
+                    btnVideoRecommendation.visibility = View.VISIBLE  // 🔥 TAMPILKAN
                 }
 
                 btnRingkasan.isEnabled = true
@@ -184,6 +199,7 @@ class RingkasanActivity : AppCompatActivity() {
 
                 if (currentSummary.isNotEmpty()) {
                     tvRingkasan.text = buildSummaryUI(currentSummary)
+                    btnVideoRecommendation.visibility = View.VISIBLE  // 🔥 TAMPILKAN
                 }
 
                 btnRingkasan.isEnabled = true
@@ -225,6 +241,7 @@ class RingkasanActivity : AppCompatActivity() {
 
                     tvRingkasan.text = buildSummaryUI(summaryText)
                     btnGenerateQuiz.isEnabled = true
+                    btnVideoRecommendation.visibility = View.VISIBLE
                 }
 
             } catch (e: Exception) {
@@ -310,9 +327,7 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun showLoading(isLoading: Boolean) {
-        progressBar.visibility =
-            if (isLoading) View.VISIBLE else View.GONE
-
+        progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
         btnRingkasan.isEnabled = !isLoading
         btnGenerateQuiz.isEnabled = !isLoading && currentSummary.isNotEmpty()
     }
