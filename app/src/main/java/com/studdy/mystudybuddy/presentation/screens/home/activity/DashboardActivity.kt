@@ -6,7 +6,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.studdy.mystudybuddy.R
+import com.studdy.mystudybuddy.presentation.screens.auth.activity.LoginActivity
 import com.studdy.mystudybuddy.presentation.screens.history.activity.FileHistoryActivity
 import com.studdy.mystudybuddy.presentation.screens.profile.activity.ProfileActivity
 import com.studdy.mystudybuddy.presentation.screens.progress.activity.ProgresActivity
@@ -25,181 +27,109 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var profile: ImageView
     private lateinit var home: ImageView
 
-    // cek guest
+    private lateinit var auth: FirebaseAuth
     private var isGuest = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_dashboard)
 
-        setContentView(
-            R.layout.activity_dashboard
-        )
+        auth = FirebaseAuth.getInstance()
 
-        // Session guest
-        val session =
-            getSharedPreferences(
-                "user_session",
-                MODE_PRIVATE
-            )
+        //  CEK SESSION GUEST
+        val session = getSharedPreferences("user_session", MODE_PRIVATE)
+        isGuest = session.getBoolean("isGuest", false)
 
-        isGuest =
-            session.getBoolean(
-                "isGuest",
-                false
-            )
+        //  JIKA BUKAN GUEST DAN BELUM LOGIN → KEMBALI KE LOGIN
+        if (!isGuest && auth.currentUser == null) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+            return
+        }
 
-        // STREAK
-        tvStreak =
-            findViewById(R.id.tvStreak)
-
-        // MENU
-        history =
-            findViewById(R.id.history)
-
-        alur =
-            findViewById(R.id.alur)
-
-        progres =
-            findViewById(R.id.progres)
-
-        upload =
-            findViewById(R.id.upload)
-
-        profile =
-            findViewById(R.id.profile)
-
-        home =
-            findViewById(R.id.home)
-
+        initViews()
         setupStreak()
         setupMenu()
     }
 
+    private fun initViews() {
+        tvStreak = findViewById(R.id.tvStreak)
+
+        history = findViewById(R.id.history)
+        alur = findViewById(R.id.alur)
+        progres = findViewById(R.id.progres)
+        upload = findViewById(R.id.upload)
+        profile = findViewById(R.id.profile)
+        home = findViewById(R.id.home)
+    }
+
     private fun setupStreak() {
-
-        if (isGuest) {
-
+        //  GUEST ATAU BELUM LOGIN → STREAK 0
+        if (isGuest || auth.currentUser == null) {
             tvStreak.text = "0"
             return
         }
 
-        val streakManager =
-            StreakManager(this)
+        val streakManager = StreakManager(this)
+        val streak = streakManager.updateStreak()
+        tvStreak.text = streak.toString()
 
-        val streak =
-            streakManager.updateStreak()
-
-        tvStreak.text =
-            streak.toString()
-
-        Toast.makeText(
-            this,
-            "Streak kamu: $streak ",
-            Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(this, "Streak kamu: $streak", Toast.LENGTH_SHORT).show()
     }
 
     private fun setupMenu() {
-
         history.setOnClickListener {
-
-            if (isGuest) {
+            //  CEK LOGIN
+            if (!isUserLoggedIn()) {
                 showLoginMessage()
                 return@setOnClickListener
             }
-
-            startActivity(
-                Intent(
-                    this,
-                    FileHistoryActivity::class.java
-                )
-            )
+            startActivity(Intent(this, FileHistoryActivity::class.java))
         }
 
-        // ALUR
         alur.setOnClickListener {
-
-            if (isGuest) {
+            if (!isUserLoggedIn()) {
                 showLoginMessage()
                 return@setOnClickListener
             }
-
-            startActivity(
-                Intent(
-                    this,
-                    AlurActivity::class.java
-                )
-            )
+            startActivity(Intent(this, AlurActivity::class.java))
         }
 
         progres.setOnClickListener {
-
-            if (isGuest) {
+            if (!isUserLoggedIn()) {
                 showLoginMessage()
                 return@setOnClickListener
             }
-
-            startActivity(
-                Intent(
-                    this,
-                    ProgresActivity::class.java
-                )
-            )
+            startActivity(Intent(this, ProgresActivity::class.java))
         }
 
         upload.setOnClickListener {
-
-
-            startActivity(
-                Intent(
-                    this,
-                    UploadActivity::class.java
-                )
-            )
+            //  UPLOAD BOLEH UNTUK GUEST (DENGAN PERINGATAN)
+            if (isGuest) {
+                Toast.makeText(this, "Mode Guest: Data tidak akan tersimpan permanen", Toast.LENGTH_SHORT).show()
+            }
+            startActivity(Intent(this, UploadActivity::class.java))
         }
 
         profile.setOnClickListener {
-
-            if (isGuest) {
+            if (!isUserLoggedIn()) {
                 showLoginMessage()
                 return@setOnClickListener
             }
-
-            try {
-
-                startActivity(
-                    Intent(
-                        this,
-                        ProfileActivity::class.java
-                    )
-                )
-
-            } catch (e: Exception) {
-
-                Toast.makeText(
-                    this,
-                    "Profile belum tersedia",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            startActivity(Intent(this, ProfileActivity::class.java))
         }
 
         home.setOnClickListener {
-
-            Toast.makeText(
-                this,
-                "Kamu sudah di Home",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(this, "Kamu sudah di Home", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun showLoginMessage() {
+    //  CEK APAKAH USER LOGIN
+    private fun isUserLoggedIn(): Boolean {
+        return auth.currentUser != null && !isGuest
+    }
 
-        Toast.makeText(
-            this,
-            "Silakan login untuk menggunakan fitur ini",
-            Toast.LENGTH_SHORT
-        ).show()
+    private fun showLoginMessage() {
+        Toast.makeText(this, "Silakan login untuk menggunakan fitur ini", Toast.LENGTH_SHORT).show()
     }
 }

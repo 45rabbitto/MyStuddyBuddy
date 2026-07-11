@@ -9,6 +9,13 @@ class StreakManager(private val context: Context) {
     private val prefs = context.getSharedPreferences("streak_prefs", Context.MODE_PRIVATE)
 
     fun updateStreak(): Int {
+        // 🔥 JIKA GUEST, LANGSUNG RETURN 0
+        val session = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        val isGuest = session.getBoolean("isGuest", false)
+
+        if (isGuest) {
+            return 0
+        }
 
         val today = getToday()
         val lastDate = prefs.getString("last_date", null)
@@ -22,6 +29,7 @@ class StreakManager(private val context: Context) {
 
             when {
                 diff == 0 -> {
+                    // same day, no change
                 }
                 diff == 1 -> {
                     streak += 1
@@ -41,6 +49,14 @@ class StreakManager(private val context: Context) {
     }
 
     fun getStreak(): Int {
+        // 🔥 JIKA GUEST, LANGSUNG RETURN 0
+        val session = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
+        val isGuest = session.getBoolean("isGuest", false)
+
+        if (isGuest) {
+            return 0
+        }
+
         return prefs.getInt("streak_count", 0)
     }
 

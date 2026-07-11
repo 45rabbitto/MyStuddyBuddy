@@ -2,6 +2,8 @@ package com.studdy.mystudybuddy.presentation.screens.auth.activity
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -40,8 +42,7 @@ class LoginActivity : AppCompatActivity() {
 
         // AUTO LOGIN
         if (auth.currentUser != null) {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
+            navigateToDashboard()
             return
         }
 
@@ -59,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
         etEmail = findViewById(R.id.etEmail)
         etPassword = findViewById(R.id.etPassword)
         btnLogin = findViewById(R.id.btnLogin)
-        btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn)  // 🔥 LinearLayout
+        btnGoogleSignIn = findViewById(R.id.btnGoogleSignIn)
         tvRegister = findViewById(R.id.tvRegister)
     }
 
@@ -106,8 +107,7 @@ class LoginActivity : AppCompatActivity() {
 
                                     if (dbUsername == username) {
                                         Toast.makeText(this@LoginActivity, "Login berhasil", Toast.LENGTH_SHORT).show()
-                                        startActivity(Intent(this@LoginActivity, DashboardActivity::class.java))
-                                        finish()
+                                        navigateToDashboard()
                                     } else {
                                         Toast.makeText(this@LoginActivity, "Username salah", Toast.LENGTH_SHORT).show()
                                         auth.signOut()
@@ -124,7 +124,6 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        // 🔥 TOMBOL GOOGLE (LinearLayout) - KLIK DI SINI
         btnGoogleSignIn.setOnClickListener {
             signInWithGoogle()
         }
@@ -182,14 +181,15 @@ class LoginActivity : AppCompatActivity() {
                             database.child("Users").child(uid).setValue(userMap)
                                 .addOnSuccessListener {
                                     Toast.makeText(this@LoginActivity, "✅ Akun Google berhasil dibuat!", Toast.LENGTH_SHORT).show()
-                                    navigateToDashboard()
+                                    //  TAMBAHKAN DELAY AGAR DATA TERSIMPAN DULU
+                                    navigateToDashboardWithDelay()
                                 }
                                 .addOnFailureListener {
                                     Toast.makeText(this@LoginActivity, "Gagal menyimpan data: ${it.message}", Toast.LENGTH_SHORT).show()
                                 }
                         } else {
                             Toast.makeText(this@LoginActivity, "✅ Selamat datang kembali!", Toast.LENGTH_SHORT).show()
-                            navigateToDashboard()
+                            navigateToDashboardWithDelay()
                         }
                     }
 
@@ -203,8 +203,23 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
+    //  NAVIGASI DENGAN FLAG CLEAR TASK
     private fun navigateToDashboard() {
-        startActivity(Intent(this, DashboardActivity::class.java))
+        //  SET isGuest = false AGAR TIDAK DIANGGAP GUEST
+        val session = getSharedPreferences("user_session", MODE_PRIVATE)
+        session.edit().putBoolean("isGuest", false).apply()
+
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
+    }
+
+    //  NAVIGASI DENGAN DELAY (UNTUK GOOGLE LOGIN)
+    private fun navigateToDashboardWithDelay() {
+        // Tunggu 500ms agar Firebase Auth state benar-benar terupdate
+        Handler(Looper.getMainLooper()).postDelayed({
+            navigateToDashboard()
+        }, 500)
     }
 }
