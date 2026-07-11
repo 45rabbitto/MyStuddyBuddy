@@ -7,12 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.adapter.ChatAdapter
 import com.studdy.mystudybuddy.presentation.screens.chatbot.model.ChatMessage
 import com.studdy.mystudybuddy.utils.ChatbotApiService
+import com.studdy.mystudybuddy.utils.Constants
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -73,9 +73,9 @@ class ChatbotActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
+                // 🔥 PAKAI Constants.getUserId()
+                val userId = Constants.getUserId()
 
-                // 🔥 AMBIL DARI COLLECTION "documents" (BUKAN summaries)
                 val doc = FirebaseFirestore.getInstance()
                     .collection("PdfContents")
                     .document(userId)

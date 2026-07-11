@@ -16,6 +16,7 @@ import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActi
 import com.studdy.mystudybuddy.presentation.screens.quiz.activity.HasilKuisActivity
 import com.studdy.mystudybuddy.presentation.screens.quiz.bottomsheet.BottomGenerateKuis
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
+import com.studdy.mystudybuddy.utils.Constants
 
 class FileHistoryDetailActivity : AppCompatActivity() {
 
@@ -63,12 +64,10 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         tvFileName.text = fileName
 
         Log.d("HistoryDetail", "fileName=$fileName")
-        Log.d("HistoryDetail",  "Document ID = $savedDocumentId")
-
+        Log.d("HistoryDetail", "Document ID = $savedDocumentId")
     }
 
     private fun setupListeners() {
-
         btnBack.setOnClickListener { finish() }
 
         btnBukaRingkasan.setOnClickListener {
@@ -82,20 +81,18 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
 
         btnBukaQuiz.setOnClickListener {
-
-            val uid = auth.currentUser?.uid ?: return@setOnClickListener
+            // 🔥 PAKAI Constants.getUserId()
+            val userId = Constants.getUserId()
 
             database.child("QuizHistory")
-                .child(uid)
+                .child(userId)
                 .orderByChild("fileName")
                 .equalTo(fileName)
                 .addListenerForSingleValueEvent(object : ValueEventListener {
 
                     override fun onDataChange(snapshot: DataSnapshot) {
-
                         // Belum pernah mengerjakan kuis
                         if (!snapshot.exists()) {
-
                             if (savedDocumentId.isNullOrEmpty()) {
                                 Toast.makeText(
                                     this@FileHistoryDetailActivity,
@@ -106,12 +103,11 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                             }
 
                             firestore.collection("PdfContents")
-                                .document(uid)
+                                .document(userId)
                                 .collection("documents")
                                 .document(savedDocumentId!!)
                                 .get()
                                 .addOnSuccessListener { doc ->
-
                                     if (!doc.exists()) {
                                         Toast.makeText(
                                             this@FileHistoryDetailActivity,
@@ -121,33 +117,15 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                         return@addOnSuccessListener
                                     }
 
-                                    val summary =
-                                        doc.getString("summary") ?: ""
+                                    val summary = doc.getString("summary") ?: ""
+                                    val originalText = doc.getString("content") ?: ""
 
-                                    val originalText =
-                                        doc.getString("content") ?: ""
-
-                                    val bottomSheet =
-                                        BottomGenerateKuis()
-
-                                    bottomSheet.arguments =
-                                        Bundle().apply {
-
-                                            putString(
-                                                "FILE_NAME",
-                                                fileName
-                                            )
-
-                                            putString(
-                                                "RINGKASAN",
-                                                summary
-                                            )
-
-                                            putString(
-                                                "MATERI_ASLI",
-                                                originalText
-                                            )
-                                        }
+                                    val bottomSheet = BottomGenerateKuis()
+                                    bottomSheet.arguments = Bundle().apply {
+                                        putString("FILE_NAME", fileName)
+                                        putString("RINGKASAN", summary)
+                                        putString("MATERI_ASLI", originalText)
+                                    }
 
                                     bottomSheet.show(
                                         supportFragmentManager,
@@ -161,7 +139,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
-
                             return
                         }
 
@@ -176,39 +153,21 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                         val correctAnswers = arrayListOf<String>()
 
                         for (data in snapshot.children) {
-
-                            score =
-                                data.child("score")
-                                    .getValue(Int::class.java) ?: 0
-
-                            correct =
-                                data.child("correctAnswer")
-                                    .getValue(Int::class.java) ?: 0
-
-                            wrong =
-                                data.child("wrongAnswer")
-                                    .getValue(Int::class.java) ?: 0
-
-                            total =
-                                data.child("totalQuestion")
-                                    .getValue(Int::class.java) ?: 0
+                            score = data.child("score").getValue(Int::class.java) ?: 0
+                            correct = data.child("correctAnswer").getValue(Int::class.java) ?: 0
+                            wrong = data.child("wrongAnswer").getValue(Int::class.java) ?: 0
+                            total = data.child("totalQuestion").getValue(Int::class.java) ?: 0
 
                             data.child("questions").children.forEach {
-                                it.getValue(String::class.java)?.let { q ->
-                                    questions.add(q)
-                                }
+                                it.getValue(String::class.java)?.let { q -> questions.add(q) }
                             }
 
                             data.child("userAnswers").children.forEach {
-                                it.getValue(String::class.java)?.let { a ->
-                                    userAnswers.add(a)
-                                }
+                                it.getValue(String::class.java)?.let { a -> userAnswers.add(a) }
                             }
 
                             data.child("correctAnswers").children.forEach {
-                                it.getValue(String::class.java)?.let { a ->
-                                    correctAnswers.add(a)
-                                }
+                                it.getValue(String::class.java)?.let { a -> correctAnswers.add(a) }
                             }
                         }
 
@@ -217,33 +176,19 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                                 this@FileHistoryDetailActivity,
                                 HasilKuisActivity::class.java
                             ).apply {
-
                                 putExtra("SCORE", score)
                                 putExtra("CORRECT", correct)
                                 putExtra("WRONG", wrong)
                                 putExtra("TOTAL", total)
                                 putExtra("FILE_NAME", fileName)
-
-                                putStringArrayListExtra(
-                                    "QUESTIONS",
-                                    questions
-                                )
-
-                                putStringArrayListExtra(
-                                    "USER_ANSWERS",
-                                    userAnswers
-                                )
-
-                                putStringArrayListExtra(
-                                    "CORRECT_ANSWERS",
-                                    correctAnswers
-                                )
+                                putStringArrayListExtra("QUESTIONS", questions)
+                                putStringArrayListExtra("USER_ANSWERS", userAnswers)
+                                putStringArrayListExtra("CORRECT_ANSWERS", correctAnswers)
                             }
                         )
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-
                         Toast.makeText(
                             this@FileHistoryDetailActivity,
                             error.message,
@@ -254,7 +199,6 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
 
         btnChatbot.setOnClickListener {
-
             if (savedDocumentId.isNullOrEmpty()) {
                 Toast.makeText(this, "Document ID kosong", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -270,29 +214,27 @@ class FileHistoryDetailActivity : AppCompatActivity() {
         }
     }
 
+    // 🔥 PAKAI Constants.getUserId()
     private fun loadDetailHistory() {
+        val userId = Constants.getUserId()
 
-        val uid = auth.currentUser?.uid ?: return
+        Log.d("CHECK_HISTORY", "userId = $userId")
+        Log.d("CHECK_HISTORY", "documentId = $savedDocumentId")
 
-
-        android.util.Log.d("CHECK_HISTORY", "uid = $uid")
-        android.util.Log.d("CHECK_HISTORY", "documentId = $savedDocumentId")
-
+        // Ambil skor dari Realtime Database
         database.child("QuizHistory")
-            .child(uid)
+            .child(userId)
             .orderByChild("fileName")
             .equalTo(fileName)
             .addListenerForSingleValueEvent(object : ValueEventListener {
 
                 override fun onDataChange(snapshot: DataSnapshot) {
-
                     if (!snapshot.exists()) {
                         tvSkor.text = "Skor : 0"
                         return
                     }
 
                     var score = 0
-
                     snapshot.children.forEach { data ->
                         score = data.child("score").getValue(Int::class.java) ?: 0
                     }
@@ -305,26 +247,24 @@ class FileHistoryDetailActivity : AppCompatActivity() {
                 }
             })
 
+        // Ambil ringkasan dari Firestore
         if (savedDocumentId.isNullOrEmpty()) {
             tvRingkasan.text = "Ringkasan belum tersedia"
             return
         }
 
         firestore.collection("PdfContents")
-            .document(uid)
+            .document(userId)
             .collection("documents")
             .document(savedDocumentId!!)
             .get()
             .addOnSuccessListener { doc ->
-
                 Log.d("FIRESTORE_CHECK", "exists = ${doc.exists()}")
                 Log.d("FIRESTORE_CHECK", "data = ${doc.data}")
 
                 if (doc.exists()) {
                     val summary = doc.getString("summary")
-
                     Log.d("CHECK_HISTORY", "SUMMARY = $summary")
-
                     tvRingkasan.text = summary ?: "Ringkasan belum tersedia"
                 } else {
                     tvRingkasan.text = "Dokumen tidak ditemukan"

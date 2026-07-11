@@ -20,6 +20,7 @@ import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.presentation.screens.chatbot.activity.ChatbotActivity
 import com.studdy.mystudybuddy.presentation.screens.recommendation.activity.AlurActivity
 import com.studdy.mystudybuddy.presentation.screens.ringkasan.RingkasanActivity
+import com.studdy.mystudybuddy.utils.Constants
 import com.studdy.mystudybuddy.utils.LoggingHelper
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -174,12 +175,9 @@ class UploadActivity : AppCompatActivity() {
         }
     }
 
-    private fun savePdfTextToFirestore(
-        fileName: String,
-        content: String
-    ) {
-
-        val userId = auth.currentUser?.uid ?: "guest"
+    // 🔥 PAKAI Constants.getUserId()
+    private fun savePdfTextToFirestore(fileName: String, content: String) {
+        val userId = Constants.getUserId()  // 🔥 PAKAI CONSTANTS
 
         val data = hashMapOf(
             "fileName" to fileName,
@@ -194,21 +192,12 @@ class UploadActivity : AppCompatActivity() {
             .collection("documents")
             .add(data)
             .addOnSuccessListener { documentRef ->
-
                 savedDocumentId = documentRef.id
-
                 btnRingkasan.isEnabled = true
                 btnChatbot.isEnabled = true
 
-                Log.d(
-                    "FIRESTORE",
-                    "Document saved with ID: ${documentRef.id}"
-                )
-
-                Log.d(
-                    "FIRESTORE",
-                    "Content length: ${content.length}"
-                )
+                Log.d("FIRESTORE", "Document saved with ID: ${documentRef.id}")
+                Log.d("FIRESTORE", "Content length: ${content.length}")
 
                 LoggingHelper.logTextLength(
                     documentId = documentRef.id,
@@ -220,62 +209,32 @@ class UploadActivity : AppCompatActivity() {
                 )
 
                 if (isLoggedIn()) {
-
-                    saveUploadedMaterial(
-                        fileName,
-                        documentRef.id
-                    )
-
-                    saveToHistory(
-                        fileName,
-                        documentRef.id
-                    )
-
-                    updateProgress(
-                        fileName
-                    )
+                    saveUploadedMaterial(fileName, documentRef.id)
+                    saveToHistory(fileName, documentRef.id)
+                    updateProgress(fileName)
                 }
 
-                Toast.makeText(
-                    this,
-                    "PDF berhasil disimpan secara online!",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this, "PDF berhasil disimpan secara online!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-
-                Toast.makeText(
-                    this,
-                    "Gagal menyimpan: ${e.message}",
-                    Toast.LENGTH_LONG
-                ).show()
-
-                Log.e(
-                    "FIRESTORE",
-                    "Save failed",
-                    e
-                )
+                Toast.makeText(this, "Gagal menyimpan: ${e.message}", Toast.LENGTH_LONG).show()
+                Log.e("FIRESTORE", "Save failed", e)
             }
     }
 
     private fun saveToHistory(file: String, documentId: String) {
-
-        Log.d(
-            "SAVE_HISTORY",
-            "file=$file documentId=$documentId"
-        )
+        Log.d("SAVE_HISTORY", "file=$file documentId=$documentId")
 
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance().getReference("History").child(userId)
         val historyId = database.push().key ?: return
-        // Format tanggal dari File 1 (dengan waktu)
         val date = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault()).format(Date())
 
         val historyData = hashMapOf<String, Any>(
             "fileName" to file,
             "date" to date,
             "timestamp" to System.currentTimeMillis(),
-            "documentId" to documentId  // Dari File 1
+            "documentId" to documentId
         )
 
         database.child(historyId).setValue(historyData)
@@ -287,7 +246,7 @@ class UploadActivity : AppCompatActivity() {
             }
     }
 
-    private fun saveUploadedMaterial(materialName: String, documentId: String) {  // Dari File 1 dengan documentId
+    private fun saveUploadedMaterial(materialName: String, documentId: String) {
         val userId = auth.currentUser?.uid ?: return
         val database = FirebaseDatabase.getInstance()
             .getReference("UploadedMaterials").child(userId)
@@ -296,7 +255,7 @@ class UploadActivity : AppCompatActivity() {
             hashMapOf<String, Any>(
                 "fileName" to materialName,
                 "timestamp" to System.currentTimeMillis(),
-                "documentId" to documentId  // Dari File 1
+                "documentId" to documentId
             )
         )
     }

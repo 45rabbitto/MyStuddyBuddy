@@ -180,7 +180,7 @@ class LoginActivity : AppCompatActivity() {
 
                             database.child("Users").child(uid).setValue(userMap)
                                 .addOnSuccessListener {
-                                    Toast.makeText(this@LoginActivity, "✅ Akun Google berhasil dibuat!", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@LoginActivity, " Akun Google berhasil dibuat!", Toast.LENGTH_SHORT).show()
                                     //  TAMBAHKAN DELAY AGAR DATA TERSIMPAN DULU
                                     navigateToDashboardWithDelay()
                                 }
@@ -188,7 +188,7 @@ class LoginActivity : AppCompatActivity() {
                                     Toast.makeText(this@LoginActivity, "Gagal menyimpan data: ${it.message}", Toast.LENGTH_SHORT).show()
                                 }
                         } else {
-                            Toast.makeText(this@LoginActivity, "✅ Selamat datang kembali!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginActivity, "Selamat datang kembali!", Toast.LENGTH_SHORT).show()
                             navigateToDashboardWithDelay()
                         }
                     }

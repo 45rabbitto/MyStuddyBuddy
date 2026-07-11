@@ -18,6 +18,7 @@ import com.studdy.mystudybuddy.R
 import com.studdy.mystudybuddy.network.RetrofitClient
 import com.studdy.mystudybuddy.network.SummarizeRequest
 import com.studdy.mystudybuddy.presentation.screens.video.VideoRecommendationActivity
+import com.studdy.mystudybuddy.utils.Constants
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.Date
@@ -133,16 +134,17 @@ class RingkasanActivity : AppCompatActivity() {
         """.trimIndent()
     }
 
+    // 🔥 PAKAI Constants.getUserId()
     private fun loadOriginalText() {
         tvTeksAsli.text = "Memuat dokumen..."
         showLoading(true)
 
         lifecycleScope.launch {
             try {
-                val uid = auth.currentUser?.uid ?: return@launch
+                val userId = Constants.getUserId()  // 🔥 PAKAI CONSTANTS
 
                 val snapshot = firestore.collection("PdfContents")
-                    .document(uid)
+                    .document(userId)
                     .collection("documents")
                     .document(currentDocumentId)
                     .get()
@@ -161,7 +163,7 @@ class RingkasanActivity : AppCompatActivity() {
 
                 if (currentSummary.isNotEmpty()) {
                     tvRingkasan.text = buildSummaryUI(currentSummary)
-                    btnVideoRecommendation.visibility = View.VISIBLE  // 🔥 TAMPILKAN
+                    btnVideoRecommendation.visibility = View.VISIBLE
                 }
 
                 btnRingkasan.isEnabled = true
@@ -174,14 +176,15 @@ class RingkasanActivity : AppCompatActivity() {
         }
     }
 
+    // 🔥 PAKAI Constants.getUserId()
     private fun loadSavedSummary() {
-        val uid = auth.currentUser?.uid ?: return
+        val userId = Constants.getUserId()  // 🔥 PAKAI CONSTANTS
 
-        Log.d("SUMMARY_DEBUG", "uid = $uid")
+        Log.d("SUMMARY_DEBUG", "userId = $userId")
         Log.d("SUMMARY_DEBUG", "documentId = $currentDocumentId")
 
         firestore.collection("PdfContents")
-            .document(uid)
+            .document(userId)
             .collection("documents")
             .document(currentDocumentId)
             .get()
@@ -199,7 +202,7 @@ class RingkasanActivity : AppCompatActivity() {
 
                 if (currentSummary.isNotEmpty()) {
                     tvRingkasan.text = buildSummaryUI(currentSummary)
-                    btnVideoRecommendation.visibility = View.VISIBLE  // 🔥 TAMPILKAN
+                    btnVideoRecommendation.visibility = View.VISIBLE
                 }
 
                 btnRingkasan.isEnabled = true
@@ -216,7 +219,7 @@ class RingkasanActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val uid = auth.currentUser?.uid ?: return@launch
+                val userId = Constants.getUserId()  // 🔥 PAKAI CONSTANTS
 
                 val response = RetrofitClient.api.summarizeText(
                     SummarizeRequest(currentOriginalText)
@@ -228,7 +231,7 @@ class RingkasanActivity : AppCompatActivity() {
                     currentSummary = summaryText
 
                     firestore.collection("PdfContents")
-                        .document(uid)
+                        .document(userId)
                         .collection("documents")
                         .document(currentDocumentId)
                         .update(
@@ -295,7 +298,7 @@ class RingkasanActivity : AppCompatActivity() {
     }
 
     private fun saveFeedbackToFirestore(feedback: String) {
-        val uid = auth.currentUser?.uid ?: "guest"
+        val userId = Constants.getUserId()  // 🔥 PAKAI CONSTANTS
 
         val data = hashMapOf(
             "feedback" to feedback,
@@ -303,7 +306,7 @@ class RingkasanActivity : AppCompatActivity() {
             "fileName" to currentFileName,
             "summary" to currentSummary,
             "timestamp" to Date(),
-            "userId" to uid
+            "userId" to userId
         )
 
         firestore.collection("feedbacks").add(data)
