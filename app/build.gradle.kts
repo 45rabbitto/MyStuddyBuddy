@@ -35,7 +35,7 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file("D://mystudybuddy/keystoremystudybuddy.jks")
+            storeFile = file("D:\\mystudybuddy\\keystoremystudybuddy.jks")
             storePassword = "123456"
             keyAlias = "key0"
             keyPassword = "123456"

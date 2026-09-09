@@ -87,7 +87,7 @@ Buka https://railway.app/
 
 ### Langkah 7: Konfigurasi URL Backend di Android
 - pada file " network/RetrofitClient.kt" isi:
-> private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/" 
+> private const val BASE_URL = "https://mystudybuddy-backend-production-143e.up.railway.app" 
 - pada file "utils/ChatbotApiService.kt" isi:
 > private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 > private val MODEL_NAME = "openrouter/free"
