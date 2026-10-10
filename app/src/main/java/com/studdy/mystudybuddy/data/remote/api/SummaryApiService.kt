@@ -34,7 +34,7 @@ data class HealthResponse(
 )
 
 object RetrofitClient {
-    private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
+    private const val BASE_URL = "mystudybuddy-backend-production-1eaa.up.railway.app"
 
     val instance: SummaryApiService by lazy {
         val retrofit = Retrofit.Builder()
