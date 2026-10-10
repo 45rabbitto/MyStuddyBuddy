@@ -11,9 +11,13 @@ My Study Buddy adalah aplikasi pembelajaran berbasis AI yang dirancang untuk mem
 **Fitur Utama:**
 
 1. **Ringkasan Otomatis** - Upload dokumen (PDF) dan dapatkan ringkasan materi plus poin penting secara instan menggunakan AI
+
 2. **Kuis Interaktif** - Soal kuis dihasilkan otomatis dari materi dengan jumlah customizable oleh pengguna
+
 3. **AI Chatbot** - Tanya jawab tentang materi dengan chatbot yang memahami konteks dokumen yang sudah diupload
+
 4. **Monitoring Progres** - Lacak perkembangan belajar melalui grafik dan statistik performa
+
 5. **Rekomendasi Personal** - Dapatkan saran topik belajar selanjutnya berdasarkan riwayat belajar
 
 **Target Pengguna:** Pelajar, mahasiswa, dan siapa pun yang ingin belajar mandiri dengan bantuan AI.
@@ -27,11 +31,6 @@ My Study Buddy adalah aplikasi pembelajaran berbasis AI yang dirancang untuk mem
 - Minimum SDK: API 24 (Android 7.0)
 - Target SDK: API 34 (Android 14)
 
----
-## ⭐ Tautan download dan cara instalasi: 
-- download apk melalui https://drive.google.com/drive/folders/1eR9D7ea_NhQ0MDDiP1DAcRHCRRkdfi17?usp=sharing
-- install pada smartphone android
-- berikan akses aplikasi dan pastikan aplikasi tersambung pada internet
 ---
 
 ## 🛠️ Petunjuk Setup Environment
@@ -61,7 +60,7 @@ cd MyStudyBuddy-Backend
 
 ### Langkah 3: Download Model Ringkasan 
 - Buat folder models mkdir models
-- Download model git clone https://github.com/indhana11/MyStudyBuddy-Backend atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
+- Download model git clone https://github.com/45rabbitto/ai-MyStudyBuddy
 
 ### Langkah 4: OpenRouter API Key (Chatbot Gratis)
 - Dapatkan API Key:
@@ -87,7 +86,7 @@ Buka https://railway.app/
 
 ### Langkah 7: Konfigurasi URL Backend di Android
 - pada file " network/RetrofitClient.kt" isi:
-> private const val BASE_URL = "mystudybuddy-backend-production-1eaa.up.railway.app" 
+> private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/" 
 - pada file "utils/ChatbotApiService.kt" isi:
 > private val BASE_URL = "https://openrouter.ai/api/v1/chat/completions"
 > private val MODEL_NAME = "openrouter/free"
@@ -108,7 +107,7 @@ Menjalankan Aplikasi Android:
 ---
 
 ### TAUTAN MODEL:
-- Model AI Ringkasan: https://github.com/indhana11/MyStudyBuddy-Backend atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
+- Model AI Ringkasan: https://github.com/45rabbitto/ai-MyStudyBuddy
 - Chatbot	OpenRouter (DeepSeek/Llama/Phi)	https://openrouter.ai/models
 
 ---
@@ -129,21 +128,23 @@ Menjalankan Aplikasi Android:
 
 ## 👥 Tim Pengembang PJK-GM012
 
-- **Project Manager** - APC466D6X0165 - Desi Triana
+- **Project Manager & AI Engineer** - APC466D6X0165 - Desi Triana
 - **Android Developer 1** - APC466D6X0112 - Kharisma Nur Aulia
 - **Android Developer 1** - APC466D6X0174 - Khariska Melly Salsabila 
 - **Data Scientist** - APC349D6X0209 - Keysya Aulia
-- **AI Engineer** - APC466D6X0416 - Indhana Zulfa Mu'Azzizah
+- **AI Engineer**** - APC466D6X0416 - Indhana Zulfa Mu'Azzizah
 
 ---
 
-## Informasi Lebih Lanjut
+## 📞 Kontak & Informasi Lebih Lanjut
 
 - **Repository Android:** https://github.com/45rabbitto/MyStudyBuddy
 - **Repository Backend:** https://github.com/indhana11/MyStudyBuddy-Backend
-- **Repository Model:** https://github.com/45rabbitto/ai-MyStudyBuddy atau https://drive.google.com/drive/folders/1sMJnm3-lbVQpM9aZjp9DsQo5D5nHD1j5?usp=sharing
+- **Repository Model:** https://github.com/45rabbitto/ai-MyStudyBuddy
 - **OpenRouter (API Chatbot Gratis):** https://openrouter.ai/
 - **Railway (Hosting Backend):** https://railway.app/
 - **Firebase Console:** https://console.firebase.google.com/
-- **Download apk melalui** https://drive.google.com/drive/folders/1eR9D7ea_NhQ0MDDiP1DAcRHCRRkdfi17?usp=sharing
 
+---
+
+**⭐ Jika proyek ini bermanfaat, berikan star di GitHub!**
