@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
 
-    private const val BASE_URL = "https://mystudybuddy-backend-production.up.railway.app/"
+    private const val BASE_URL = "https://mystudybuddy-backend-production-1eaa.up.railway.app/"
     private val client = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
